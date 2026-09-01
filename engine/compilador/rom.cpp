@@ -1,8 +1,6 @@
 #include "ensamblador.h"
 #include "mapper.h"
 
-// El proyecto por defecto va a utilizar un mapper "LoROM"
-
 uint8_t DROM[TAMANO_ROM];
 
 uint32_t ConvertirAddrHwAPc(uint32_t addrHw) {

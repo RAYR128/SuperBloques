@@ -11,6 +11,9 @@ enum {
     BLOQUE_MAX
 };
 
+// Los bloques actuan como un arbol AST (Abstract Syntax Tree) que representa la logica de un objeto en la escena.
+// Cada bloque puede contener otros bloques como hijos, formando una estructura jerarquica que define el comportamiento del objeto.
+// Los bloques son compilados a scripts de behavior que son ejecutados por la CPU.
 class NodoBloque {
 public:
     virtual ~NodoBloque() {}
