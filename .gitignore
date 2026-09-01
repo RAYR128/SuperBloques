@@ -6,6 +6,7 @@ build-*/
 *.o
 *.sfc
 superbloques_cli.exe
+superbloques_cli
 
 # Debug
 rom-trace.log
