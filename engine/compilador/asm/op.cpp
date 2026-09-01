@@ -1,6 +1,8 @@
 #include "rom.h"
 #include "op.h"
 
+#define ErrorSB(msg) ;;
+
 // Generacion de codigo dinamico
 Emitidor65816 cc;
 
@@ -39,47 +41,21 @@ void Emitidor65816::EmitirDoblePalabra(uint32_t doblePalabra) {
 	DROM[PC++] = (doblePalabra >> 24) & 0xFF;
 }
 
-// Opcodes rapidos
-void Emitidor65816::LimpiarFlag(FlagOpcodes flg) {
-	switch (flg) {
-	case SFLG_CARRY:
-		EmitirByte(OP_CLC_IMP);
-		break;
-	case SFLG_DECIMAL:
-		EmitirByte(OP_CLD_IMP);
-		break;
-	case SFLG_INTERRUPT:
-		EmitirByte(OP_CLI_IMP);
-		break;
-	case SFLG_OVERFLOW:
-		EmitirByte(OP_CLV_IMP);
-		break;
-	}
-}
-
-void Emitidor65816::SetearFlag(FlagOpcodes flg) {
-	switch (flg) {
-	case SFLG_CARRY:
-		EmitirByte(OP_SEC_IMP);
-		break;
-	case SFLG_DECIMAL:
-		EmitirByte(OP_SED_IMP);
-		break;
-	case SFLG_INTERRUPT:
-		EmitirByte(OP_SEI_IMP);
-		break;
-	case SFLG_OVERFLOW:
-		// No hay opcode para setear el flag de overflow
-		break;
-	}
-}
-
-void Emitidor65816::ResetearFlags(uint8_t flags) {
+void Emitidor65816::LimpiarFlags(uint8_t flags) {
+	// versiones mas cortas de 1 byte
+	if(flags == FLAG_C) { EmitirByte(OP_CLC_IMP); return; }
+	if(flags == FLAG_D) { EmitirByte(OP_CLD_IMP); return; }
+	if(flags == FLAG_I) { EmitirByte(OP_CLI_IMP); return; }
+	if(flags == FLAG_V) { EmitirByte(OP_CLV_IMP); return; }
 	EmitirByte(OP_REP_IMM8);
 	EmitirByte(flags);
 }
 
 void Emitidor65816::SetearFlags(uint8_t flags) {
+	// versiones mas cortas de 1 byte
+	if(flags == FLAG_C) { EmitirByte(OP_SEC_IMP); return; }
+	if(flags == FLAG_D) { EmitirByte(OP_SED_IMP); return; }
+	if(flags == FLAG_I) { EmitirByte(OP_SEI_IMP); return; }
 	EmitirByte(OP_SEP_IMM8);
 	EmitirByte(flags);
 }
@@ -113,6 +89,7 @@ void Emitidor65816::CargarRegConst8(Registers reg, uint8_t valor) {
 		EmitirByte(valor);
 		break;
 	default:
+		ErrorSB("CargarRegConst8: Register invalido");
 		break;
 	}
 }
@@ -132,6 +109,7 @@ void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
 		EmitirPalabra(valor);
 		break;
 	default:
+		ErrorSB("CargarRegConst16: Register invalido");
 		break;
 	}
 }
@@ -151,6 +129,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
+		ErrorSB("AlmacenarRegEnMemoriaW: Register invalido");
 		break;
 	}
 }
@@ -162,6 +141,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
+		ErrorSB("AlmacenarRegEnMemoriaWX: Register invalido");
 		break;
 	}
 }
@@ -173,10 +153,25 @@ void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
+		ErrorSB("AlmacenarRegEnMemoriaWY: Register invalido");
 		break;
 	}
 }
 
 void Emitidor65816::PararCPU() {
 	EmitirByte(OP_STP_IMP);
+}
+
+void Emitidor65816::Transferir(Registers entrada, Registers destino) {
+	if(entrada == REG_A) {
+		switch(destino) {
+		case REG_STACK: EmitirByte(OP_TCS_IMP); break;
+		case REG_DP: EmitirByte(OP_TCD_IMP); break;
+		case REG_X: EmitirByte(OP_TAX_IMP); break;
+		case REG_Y: EmitirByte(OP_TAY_IMP); break;
+		default: ErrorSB("Transferir: A->Destino invalido"); break;
+		}
+		return;
+	}
+	ErrorSB("Transferir: Entrada invalida");
 }

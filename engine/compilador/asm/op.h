@@ -10,6 +10,7 @@ struct Label {
 	uint32_t direccion;
 };
 
+// LimpiarFlags / SetearFlags
 enum CpuFlags {
 	FLAG_N = 0x80, // Negativo
 	FLAG_V = 0x40, // Overflow
@@ -21,17 +22,12 @@ enum CpuFlags {
 	FLAG_C = 0x01  // Carry
 };
 
-enum FlagOpcodes {
-	SFLG_CARRY,
-	SFLG_DECIMAL,
-	SFLG_INTERRUPT,
-	SFLG_OVERFLOW
-};
-
 enum Registers {
 	REG_A,
 	REG_X,
-	REG_Y
+	REG_Y,
+	REG_STACK,
+	REG_DP
 };
 
 // Lista de opcodes de la CPU 65816
@@ -310,11 +306,7 @@ class Emitidor65816 {
 	void SetearPC(uint32_t direccion);
 	uint32_t ObtenerPC();
 
-	void LimpiarFlag(FlagOpcodes flg);
-	void SetearFlag(FlagOpcodes flg);
-
-	// CpuFlags
-	void ResetearFlags(uint8_t flags);
+	void LimpiarFlags(uint8_t flags);
 	void SetearFlags(uint8_t flags);
 
 	void IntercambiarCarryConEmulacion();
@@ -328,6 +320,8 @@ class Emitidor65816 {
 
 	void AlmacenarCeroEnMemoriaW(uint16_t addrHw);
 	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
+
+	void Transferir(Registers entrada, Registers destino);
 
 	void PararCPU();
 };
