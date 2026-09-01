@@ -1,4 +1,4 @@
-#include "ensamblador.h"
+#include "asm/ensamblador.h"
 #include "mapper.h"
 
 uint8_t DROM[TAMANO_ROM];
