@@ -1,5 +1,7 @@
 #include "asm/ensamblador.h"
-#include "mapper.h"
+#include "rom.h"
+#include <cstring>
+#include <cstdio>
 
 uint8_t DROM[TAMANO_ROM];
 
@@ -25,4 +27,8 @@ void GuardarROMArchivo(const char* nombreArchivo) {
 		fwrite(DROM, sizeof(uint8_t), TAMANO_ROM, archivo);
 		fclose(archivo);
 	}
+}
+
+void InicializarROM() {
+	memset(DROM, 0, TAMANO_ROM);
 }

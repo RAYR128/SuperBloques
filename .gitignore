@@ -1,0 +1,8 @@
+# CMake
+build/
+build-*/
+
+# Objetos
+*.o
+*.sfc
+superbloques_cli.exe
