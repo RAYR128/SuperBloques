@@ -23,11 +23,15 @@ enum CpuFlags {
 };
 
 enum Registers {
-	REG_A,
-	REG_X,
-	REG_Y,
-	REG_STACK,
-	REG_DP
+	REG_A, // Acumulador (A)
+	REG_X, // Indice (X)
+	REG_Y, // Indice (Y)
+	REG_BANK, // Banco (B)
+	REG_EXECBANK, // Banco de ejecucion (K)
+	REG_STACK, // Stack (S)
+	REG_FLAGS, // Flags (P)
+	REG_DP, // Pagina directa (D)
+	REG_EXECPC // Ejecucion (PC)
 };
 
 // Lista de opcodes de la CPU 65816
@@ -322,6 +326,9 @@ class Emitidor65816 {
 	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
 
 	void Transferir(Registers entrada, Registers destino);
+	
+	void Empujar(Registers reg);
+	void Sacar(Registers reg);
 
 	void PararCPU();
 };

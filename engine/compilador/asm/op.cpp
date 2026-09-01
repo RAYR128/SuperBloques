@@ -175,3 +175,29 @@ void Emitidor65816::Transferir(Registers entrada, Registers destino) {
 	}
 	ErrorSB("Transferir: Entrada invalida");
 }
+
+void Emitidor65816::Empujar(Registers reg) {
+	switch(reg) {
+		case REG_A: EmitirByte(OP_PHA_IMP); break;
+		case REG_X: EmitirByte(OP_PHX_IMP); break;
+		case REG_Y: EmitirByte(OP_PHY_IMP); break;
+		case REG_BANK: EmitirByte(OP_PHB_IMP); break;
+		case REG_EXECBANK: EmitirByte(OP_PHK_IMP); break;
+		case REG_FLAGS: EmitirByte(OP_PHP_IMP); break;
+		case REG_DP: EmitirByte(OP_PHD_IMP); break;
+		default: ErrorSB("Empujar: Register invalido"); break;
+	}
+}
+
+void Emitidor65816::Sacar(Registers reg) {
+	switch(reg) {
+		case REG_A: EmitirByte(OP_PLA_IMP); break;
+		case REG_X: EmitirByte(OP_PLX_IMP); break;
+		case REG_Y: EmitirByte(OP_PLY_IMP); break;
+		case REG_BANK: EmitirByte(OP_PLB_IMP); break;
+		// no existe REG_EXECBANK, en todo caso cuenta como program counter.
+		case REG_FLAGS: EmitirByte(OP_PLP_IMP); break;
+		case REG_DP: EmitirByte(OP_PLD_IMP); break;
+		default: ErrorSB("Empujar: Register invalido"); break;
+	}
+}
