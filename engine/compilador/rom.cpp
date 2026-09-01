@@ -21,8 +21,8 @@ uint32_t ConvertirAddrPcAHw(uint32_t addrPc) {
 	return INVALIDO;
 }
 
-void GuardarROMArchivo(const char* nombreArchivo) {
-	FILE* archivo = fopen(nombreArchivo, "wb");
+void GuardarROMArchivo(const char *nombreArchivo) {
+	FILE *archivo = fopen(nombreArchivo, "wb");
 	if(archivo) {
 		fwrite(DROM, sizeof(uint8_t), TAMANO_ROM, archivo);
 		fclose(archivo);

@@ -17,15 +17,22 @@ void EnsamblarROM() {
 	// $FFDC-$FFDF: Checksum + complement
 	// TO-DO: implementar calculo de checksum y complement, a la consola real le importa, pero a la mayoria de los emuladores no les importa
 	// asi que por ahora lo dejamos en 0xFFFF
-	DROM[0x7FDC] = 0xFF; DROM[0x7FDD] = 0xFF;
-	DROM[0x7FDE] = 0x00; DROM[0x7FDF] = 0x00;
+	DROM[0x7FDC] = 0xFF;
+	DROM[0x7FDD] = 0xFF;
+	DROM[0x7FDE] = 0x00;
+	DROM[0x7FDF] = 0x00;
 
 	// vectores de la CPU
-	DROM[0x7FEA] = 0x00; DROM[0x7FEB] = 0x80; // NMI -> $8000
-	DROM[0x7FEE] = 0x00; DROM[0x7FEF] = 0x80; // IRQ -> $8000
-	DROM[0x7FFA] = 0x00; DROM[0x7FFB] = 0x80; // NMI -> $8000
-	DROM[0x7FFC] = 0x00; DROM[0x7FFD] = 0x80; // RESET-> $8000
-	DROM[0x7FFE] = 0x00; DROM[0x7FFF] = 0x80; // IRQ/BRK -> $8000
+	DROM[0x7FEA] = 0x00;
+	DROM[0x7FEB] = 0x80; // NMI -> $8000
+	DROM[0x7FEE] = 0x00;
+	DROM[0x7FEF] = 0x80; // IRQ -> $8000
+	DROM[0x7FFA] = 0x00;
+	DROM[0x7FFB] = 0x80; // NMI -> $8000
+	DROM[0x7FFC] = 0x00;
+	DROM[0x7FFD] = 0x80; // RESET-> $8000
+	DROM[0x7FFE] = 0x00;
+	DROM[0x7FFF] = 0x80; // IRQ/BRK -> $8000
 
 	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
 	cc.SetearPC(0x000000);
