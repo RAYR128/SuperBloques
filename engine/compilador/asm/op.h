@@ -307,6 +307,9 @@ class Emitidor65816 {
   public:
 	Emitidor65816();
 
+	void SetearPC(uint32_t direccion);
+	uint32_t ObtenerPC();
+
 	void LimpiarFlag(FlagOpcodes flg);
 	void SetearFlag(FlagOpcodes flg);
 
@@ -325,6 +328,8 @@ class Emitidor65816 {
 
 	void AlmacenarCeroEnMemoriaW(uint16_t addrHw);
 	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
+
+	void PararCPU();
 };
 
 extern Emitidor65816 cc;

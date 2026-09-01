@@ -8,6 +8,14 @@ Emitidor65816::Emitidor65816() {
 	PC = 0;
 }
 
+void Emitidor65816::SetearPC(uint32_t direccion) {
+	PC = direccion;
+}
+
+uint32_t Emitidor65816::ObtenerPC() {
+	return PC;
+}
+
 // Escritura little endian
 void Emitidor65816::EmitirByte(uint8_t byte) {
 	DROM[PC++] = byte;
@@ -167,4 +175,8 @@ void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
 	default:
 		break;
 	}
+}
+
+void Emitidor65816::PararCPU() {
+	EmitirByte(OP_STP_IMP);
 }
