@@ -28,6 +28,12 @@ enum FlagOpcodes {
 	SFLG_OVERFLOW
 };
 
+enum Registers {
+	REG_A,
+	REG_X,
+	REG_Y
+};
+
 // Lista de opcodes de la CPU 65816
 enum CpuOpcodes {
 	OP_BRK_IMM8,
@@ -309,6 +315,16 @@ class Emitidor65816 {
 	void SetearFlags(uint8_t flags);
 
 	void IntercambiarCarryConEmulacion();
+
+	void CargarRegConst8(Registers reg, uint8_t valor);
+	void CargarRegConst16(Registers reg, uint16_t valor);
+
+	void AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw);
+	void AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
+	void AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw);
+
+	void AlmacenarCeroEnMemoriaW(uint16_t addrHw);
+	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
 };
 
 extern Emitidor65816 cc;

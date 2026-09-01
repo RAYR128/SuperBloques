@@ -21,9 +21,21 @@ void EnsamblarROM() {
 			LDA.W #$1FFF : TCS
 		SEP #$30
 	*/
-	cc.SetearFlag(SFLG_INTERRUPT);
 
-	// CLC : XCE
+	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
+	cc.SetearFlag(SFLG_INTERRUPT);
+	cc.AlmacenarCeroEnMemoriaW(HW_NMITIMEN);
+	cc.AlmacenarCeroEnMemoriaW(HW_HDMAEN);
+	cc.AlmacenarCeroEnMemoriaW(HW_APUIO0);
+	cc.AlmacenarCeroEnMemoriaW(HW_APUIO1);
+	cc.AlmacenarCeroEnMemoriaW(HW_APUIO2);
+	cc.AlmacenarCeroEnMemoriaW(HW_APUIO3);
+
+	// desactivar la pantalla y configurar el registro de control de video
+	cc.CargarRegConst8(REG_A, 0x8F);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
+
+	// CLC : XCE, desactivar emulacion de 6502 y activar modo nativo de 65816
 	cc.LimpiarFlag(SFLG_CARRY);
 	cc.IntercambiarCarryConEmulacion();
 

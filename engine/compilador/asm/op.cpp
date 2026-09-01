@@ -79,3 +79,92 @@ void Emitidor65816::SetearFlags(uint8_t flags) {
 void Emitidor65816::IntercambiarCarryConEmulacion() {
 	EmitirByte(OP_XCE_IMP);
 }
+
+void Emitidor65816::AlmacenarCeroEnMemoriaW(uint16_t addrHw) {
+	EmitirByte(OP_STZ_ABS);
+	EmitirPalabra(addrHw);
+}
+
+void Emitidor65816::AlmacenarCeroEnMemoriaWX(uint16_t addrHw) {
+	EmitirByte(OP_STZ_ABSX);
+	EmitirPalabra(addrHw);
+}
+
+void Emitidor65816::CargarRegConst8(Registers reg, uint8_t valor) {
+	switch (reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_IMMM);
+		EmitirByte(valor);
+		break;
+	case REG_X:
+		EmitirByte(OP_LDX_IMMX);
+		EmitirByte(valor);
+		break;
+	case REG_Y:
+		EmitirByte(OP_LDY_IMMX);
+		EmitirByte(valor);
+		break;
+	default:
+		break;
+	}
+}
+
+void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
+	switch (reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_IMMM);
+		EmitirPalabra(valor);
+		break;
+	case REG_X:
+		EmitirByte(OP_LDX_IMMX);
+		EmitirPalabra(valor);
+		break;
+	case REG_Y:
+		EmitirByte(OP_LDY_IMMX);
+		EmitirPalabra(valor);
+		break;
+	default:
+		break;
+	}
+}
+
+void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
+	switch (reg) {
+	case REG_A:
+		EmitirByte(OP_STA_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	case REG_X:
+		EmitirByte(OP_STX_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	case REG_Y:
+		EmitirByte(OP_STY_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		break;
+	}
+}
+
+void Emitidor65816::AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
+	switch (reg) {
+	case REG_A:
+		EmitirByte(OP_STA_ABSX);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		break;
+	}
+}
+
+void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
+	switch (reg) {
+	case REG_A:
+		EmitirByte(OP_STA_ABSY);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		break;
+	}
+}
