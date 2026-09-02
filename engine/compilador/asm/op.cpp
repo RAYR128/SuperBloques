@@ -96,6 +96,24 @@ void Emitidor65816::AlmacenarCeroEnMemoriaWX(uint16_t addrHw) {
 	EmitirPalabra(addrHw);
 }
 
+void Emitidor65816::ShiftALeft() {
+	EmitirByte(OP_ASL_ACC);
+}
+
+void Emitidor65816::ShiftARight() {
+	EmitirByte(OP_LSR_ACC);
+}
+
+void Emitidor65816::IncrementarMemoria(uint16_t addrHw) {
+	EmitirByte(OP_INC_ABS);
+	EmitirPalabra(addrHw);
+}
+
+void Emitidor65816::DecrementarMemoria(uint16_t addrHw) {
+	EmitirByte(OP_DEC_ABS);
+	EmitirPalabra(addrHw);
+}
+
 void Emitidor65816::CargarRegConst8(Registers reg, uint8_t valor) {
 	switch(reg) {
 	case REG_A:
@@ -132,6 +150,26 @@ void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
 		break;
 	default:
 		ErrorSB("CargarRegConst16: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::CargarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	case REG_X:
+		EmitirByte(OP_LDX_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	case REG_Y:
+		EmitirByte(OP_LDY_ABS);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		ErrorSB("CargarRegEnMemoriaW: Register invalido");
 		break;
 	}
 }
@@ -180,8 +218,24 @@ void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
 	}
 }
 
+void Emitidor65816::EsperarInterrupcion() {
+	EmitirByte(OP_WAI_IMP);
+}
+
 void Emitidor65816::PararCPU() {
 	EmitirByte(OP_STP_IMP);
+}
+
+void Emitidor65816::ReturnShort() {
+	EmitirByte(OP_RTS_IMP);
+}
+
+void Emitidor65816::ReturnLong() {
+	EmitirByte(OP_RTL_IMP);
+}
+
+void Emitidor65816::ReturnInterrupt() {
+	EmitirByte(OP_RTI_IMP);
 }
 
 void Emitidor65816::Transferir(Registers entrada, Registers destino) {
@@ -267,12 +321,54 @@ void Emitidor65816::Saltar(std::string label, TipoReferencia tipo) {
 	}
 }
 
+void Emitidor65816::Branch(std::string label, TipoBranch tipo) {
+	switch(tipo) {
+	case BRANCH_CARRY_SET:
+		EmitirByte(OP_BCS_REL);
+		break;
+	case BRANCH_CARRY_CLEAR:
+		EmitirByte(OP_BCC_REL);
+		break;
+	case BRANCH_ZERO_SET:
+		EmitirByte(OP_BEQ_REL);
+		break;
+	case BRANCH_ZERO_CLEAR:
+		EmitirByte(OP_BNE_REL);
+		break;
+	case BRANCH_NEGATIVE_CLEAR:
+		EmitirByte(OP_BPL_REL);
+		break;
+	case BRANCH_NEGATIVE_SET:
+		EmitirByte(OP_BMI_REL);
+		break;
+	case BRANCH_OVERFLOW_CLEAR:
+		EmitirByte(OP_BVC_REL);
+		break;
+	case BRANCH_OVERFLOW_SET:
+		EmitirByte(OP_BVS_REL);
+		break;
+	case BRANCH_ALWAYS:
+		EmitirByte(OP_BRA_REL);
+		break;
+	default:
+		ErrorSB("Branch: Tipo de branch invalido");
+		break;
+	}
+	ReferenciaCodigo ref;
+	ref.nombre = label;
+	ref.tipo = REF_BRANCH;
+	ref.direccion = PC;
+	referencias.push_back(ref);
+	EmitirByte(0x00); // placeholder para la direccion del label
+}
+
 void Emitidor65816::ResolverReferencias() {
 	for(ReferenciaCodigo ref : referencias) {
 		uint32_t direccion = INVALIDO;
 		for(EtiquetaCodigo l : etiquetas) {
 			if(l.nombre == ref.nombre) {
-				direccion = l.direccion;
+				// El label fue encontrado, convertir direccion de PC a direccion de hardware
+				direccion = ConvertirAddrPcAHw(l.direccion);
 				break;
 			}
 		}

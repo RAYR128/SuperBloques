@@ -36,6 +36,18 @@ enum CpuFlags {
 	FLAG_C = 0x01  // Carry
 };
 
+enum TipoBranch {
+	BRANCH_CARRY_SET, // BCS
+	BRANCH_CARRY_CLEAR, // BCC
+	BRANCH_ZERO_SET, // BEQ / EQUAL
+	BRANCH_ZERO_CLEAR, // BNE / NOT EQUAL
+	BRANCH_NEGATIVE_CLEAR, // BPL
+	BRANCH_NEGATIVE_SET, // BMI
+	BRANCH_OVERFLOW_CLEAR, // BVC
+	BRANCH_OVERFLOW_SET, // BVS
+	BRANCH_ALWAYS // BRA
+};
+
 enum Registers {
 	REG_A,		  // Acumulador (A)
 	REG_X,		  // Indice (X)
@@ -344,6 +356,8 @@ class Emitidor65816 {
 	void CargarRegConst8(Registers reg, uint8_t valor);
 	void CargarRegConst16(Registers reg, uint16_t valor);
 
+	void CargarRegEnMemoriaW(Registers reg, uint16_t addrHw);
+
 	void AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw);
 	void AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
 	void AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw);
@@ -351,13 +365,25 @@ class Emitidor65816 {
 	void AlmacenarCeroEnMemoriaW(uint16_t addrHw);
 	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
 
+	void IncrementarMemoria(uint16_t addrHw);
+	void DecrementarMemoria(uint16_t addrHw);
+
 	void Transferir(Registers entrada, Registers destino);
 
 	void Empujar(Registers reg);
 	void Sacar(Registers reg);
 
 	void Saltar(std::string label, TipoReferencia tipo);
+	void Branch(std::string label, TipoBranch tipo);
 
+	void ReturnShort();
+	void ReturnLong();
+	void ReturnInterrupt();
+
+	void ShiftALeft();
+	void ShiftARight();
+
+	void EsperarInterrupcion();
 	void PararCPU();
 };
 

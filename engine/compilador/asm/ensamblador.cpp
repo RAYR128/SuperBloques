@@ -37,9 +37,10 @@ void GenerarHeader() {
 	cc.CrearReferencia("I_IRQ", REF_ABSOLUTE);
 }
 
-void EnsamblarROM() {
+// La rutina de RESET se ejecuta cuando el hardware genera un reset, ya sea por presionar el boton de reset, encender la consola, o por un fallo de energia.
+// En este caso, el hardware genera un reset al encender la consola, lo que permite al programa inicializar la logica y la pantalla.
+void RutinaRESET() {
 	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
-	cc.SetearPC(0x000000);
 	cc.Etiqueta("I_RESET");
 	cc.SetearFlags(FLAG_I);
 	cc.AlmacenarCeroEnMemoriaW(HW_NMITIMEN);
@@ -67,9 +68,62 @@ void EnsamblarROM() {
 
 	// SEP #$30
 	cc.SetearFlags(FLAG_X | FLAG_M);
+	
+	// Loop de programa
+	cc.Etiqueta("PROGRAM_LOOP");
+	
+	// Chequear lectura de joypad
+	cc.CargarRegEnMemoriaW(REG_A, HW_HVBJOY);
+	cc.ShiftARight();
+	cc.Branch("PROGRAM_LOOP", BRANCH_CARRY_SET);
 
-	// TO-DO: Crear loop, añadir NMI
-	cc.PararCPU();
+	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
+	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
+	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
+	cc.CargarRegConst8(REG_A, 0x81); // Activar NMI + Auto joypad read
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+	cc.EsperarInterrupcion(); // Esperar una interrupcion
+
+	// Podemos ejecutar un nuevo cuadro?
+	cc.Etiqueta("ESPERAR_BLANK");
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_FLAG_EJECUCION);
+	cc.Branch("ESPERAR_BLANK", BRANCH_ZERO_CLEAR);
+
+	// Repetir
+	cc.Saltar("PROGRAM_LOOP", REF_ABSOLUTE);
+}
+
+// La rutina de NMI se ejecuta cuando el hardware genera una interrupcion no enmascarable (NMI).
+// En este caso, el hardware genera un NMI cada vez que se produce un cambio de fotograma (VBlank),
+// lo que permite al programa actualizar la pantalla y procesar la logica.
+// Usamos la logica de VBlank para mantener una tasa de refresco constante y sincronizada con la pantalla.
+void RutinaNMI() {
+	cc.Etiqueta("I_NMI");
+	cc.Empujar(REG_FLAGS);
+	cc.SetearFlags(FLAG_X | FLAG_M);
+	cc.Empujar(REG_BANK);
+	cc.Empujar(REG_A);
+	cc.Empujar(REG_X);
+	cc.Empujar(REG_Y);
+
+
+	// TO-DO: implementar rutina de NMI
+	cc.ReturnInterrupt();
+}
+
+
+// La rutina de IRQ se ejecuta cuando el hardware genera una interrupcion enmascarable (IRQ).
+// No es usada ahora mismo.
+void RutinaIRQ() {
+	cc.Etiqueta("I_IRQ");
+	cc.ReturnInterrupt();
+}
+
+void EnsamblarROM() {
+	cc.SetearPC(0x000000);
+	RutinaRESET();
+	RutinaNMI();
+	RutinaIRQ();
 
 	// Finalizar ROM
 	GenerarHeader();

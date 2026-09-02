@@ -3,6 +3,7 @@
 // Mapping de objetos en la memoria interna.
 // 0x100-0x1900
 #define WRAM_DIRECTPAGE 0x0000
+#define WRAM_FLAG_EJECUCION 0x00FF // sincronizacion
 #define WRAM_OBJETOS 0x0100
 
 #define CANTIDAD_DE_OBJETOS 64			   // 64 objetos en la pantalla maximo.
