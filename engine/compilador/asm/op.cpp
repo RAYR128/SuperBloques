@@ -2,7 +2,9 @@
 #include "op.h"
 #include <iostream>
 
-#define ErrorSB(msg) std::cout << "Error: " << msg << std::endl; exit(1);
+#define ErrorSB(msg)                            \
+	std::cout << "Error: " << msg << std::endl; \
+	exit(1);
 
 // Generacion de codigo dinamico
 Emitidor65816 cc;
@@ -294,11 +296,6 @@ void Emitidor65816::CrearReferencia(std::string label, TipoReferencia tipo) {
 }
 
 void Emitidor65816::Saltar(std::string label, TipoReferencia tipo) {
-	ReferenciaCodigo ref;
-	ref.nombre = label;
-	ref.tipo = tipo;
-	ref.direccion = PC;
-	referencias.push_back(ref);
 	switch(tipo) {
 	case REF_BRANCH:
 		EmitirByte(OP_BRA_REL);
@@ -362,6 +359,43 @@ void Emitidor65816::Branch(std::string label, TipoBranch tipo) {
 	EmitirByte(0x00); // placeholder para la direccion del label
 }
 
+// BranchLong es una version inversa de un branch que emite un JMP para hacer branches mas largos, ya que los branches normales solo permiten 1 byte.
+void Emitidor65816::BranchLong(std::string label, TipoBranch tipo) {
+	switch(tipo) {
+	case BRANCH_CARRY_SET:
+		EmitirByte(OP_BCC_REL);
+		break;
+	case BRANCH_CARRY_CLEAR:
+		EmitirByte(OP_BCS_REL);
+		break;
+	case BRANCH_ZERO_SET:
+		EmitirByte(OP_BNE_REL);
+		break;
+	case BRANCH_ZERO_CLEAR:
+		EmitirByte(OP_BEQ_REL);
+		break;
+	case BRANCH_NEGATIVE_CLEAR:
+		EmitirByte(OP_BMI_REL);
+		break;
+	case BRANCH_NEGATIVE_SET:
+		EmitirByte(OP_BPL_REL);
+		break;
+	case BRANCH_OVERFLOW_CLEAR:
+		EmitirByte(OP_BVS_REL);
+		break;
+	case BRANCH_OVERFLOW_SET:
+		EmitirByte(OP_BVC_REL);
+		break;
+	default:
+		ErrorSB("Branch: Tipo de branch invalido");
+		break;
+	}
+	EmitirByte(3);
+	EmitirByte(OP_JMP_ABSJ);
+	CrearReferencia(label, REF_ABSOLUTE);
+	EmitirPalabra(0x0000);
+}
+
 void Emitidor65816::ResolverReferencias() {
 	for(ReferenciaCodigo ref : referencias) {
 		uint32_t direccion = INVALIDO;
@@ -374,18 +408,25 @@ void Emitidor65816::ResolverReferencias() {
 		}
 		if(direccion != INVALIDO) {
 			switch(ref.tipo) {
-			case REF_BRANCH:
-				DROM[ref.direccion] = direccion & 0xFF;
+			case REF_BRANCH: {
+				int32_t offset = (int32_t)direccion - ((int32_t)ConvertirAddrPcAHw(ref.direccion) + 1);
+				if(offset < -128 || offset > 127) {
+					ErrorSB("ResolverReferencias: branch fuera de rango para " + ref.nombre);
+				}
+				DROM[ref.direccion] = (uint8_t)offset;
 				break;
-			case REF_ABSOLUTE:
+			}
+			case REF_ABSOLUTE: {
 				DROM[ref.direccion] = direccion & 0xFF;
 				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
 				break;
-			case REF_LONG:
+			}
+			case REF_LONG: {
 				DROM[ref.direccion] = direccion & 0xFF;
 				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
 				DROM[ref.direccion + 2] = (direccion >> 16) & 0xFF;
 				break;
+			}
 			}
 		} else {
 			ErrorSB("ResolverReferencias: No se encontro la etiqueta " + ref.nombre);

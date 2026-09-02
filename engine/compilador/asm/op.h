@@ -13,9 +13,9 @@ struct EtiquetaCodigo {
 // Referencia a un label, direccion o valor literal. Se usa para instrucciones que requieren un argumento de 8, 16 o 24 bits.
 // Es compilada en dos pasos: primero se crea la referencia, y luego se resuelve cuando se conoce la direccion del label o el valor literal.
 enum TipoReferencia {
-	REF_BRANCH,	// Referencia a un label para un salto relativo (8 o 16 bits)
+	REF_BRANCH,	  // Referencia a un label para un salto relativo (8 o 16 bits)
 	REF_ABSOLUTE, // Referencia a un label para una direccion absoluta (16 bits)
-	REF_LONG // Referencia a un label para una direccion larga (24 bits)
+	REF_LONG	  // Referencia a un label para una direccion larga (24 bits)
 };
 
 struct ReferenciaCodigo {
@@ -37,15 +37,15 @@ enum CpuFlags {
 };
 
 enum TipoBranch {
-	BRANCH_CARRY_SET, // BCS
-	BRANCH_CARRY_CLEAR, // BCC
-	BRANCH_ZERO_SET, // BEQ / EQUAL
-	BRANCH_ZERO_CLEAR, // BNE / NOT EQUAL
+	BRANCH_CARRY_SET,	   // BCS
+	BRANCH_CARRY_CLEAR,	   // BCC
+	BRANCH_ZERO_SET,	   // BEQ / EQUAL
+	BRANCH_ZERO_CLEAR,	   // BNE / NOT EQUAL
 	BRANCH_NEGATIVE_CLEAR, // BPL
-	BRANCH_NEGATIVE_SET, // BMI
+	BRANCH_NEGATIVE_SET,   // BMI
 	BRANCH_OVERFLOW_CLEAR, // BVC
-	BRANCH_OVERFLOW_SET, // BVS
-	BRANCH_ALWAYS // BRA
+	BRANCH_OVERFLOW_SET,   // BVS
+	BRANCH_ALWAYS		   // BRA
 };
 
 enum Registers {
@@ -329,7 +329,7 @@ class Emitidor65816 {
 	void EmitirPalabra(uint16_t palabra);
 	void Emitir24Bit(uint32_t doblePalabra);
 	void EmitirDoblePalabra(uint32_t doblePalabra);
-	
+
 	std::vector<EtiquetaCodigo> etiquetas;
 	std::vector<ReferenciaCodigo> referencias;
 
@@ -375,6 +375,7 @@ class Emitidor65816 {
 
 	void Saltar(std::string label, TipoReferencia tipo);
 	void Branch(std::string label, TipoBranch tipo);
+	void BranchLong(std::string label, TipoBranch tipo);
 
 	void ReturnShort();
 	void ReturnLong();

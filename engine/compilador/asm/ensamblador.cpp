@@ -68,10 +68,10 @@ void RutinaRESET() {
 
 	// SEP #$30
 	cc.SetearFlags(FLAG_X | FLAG_M);
-	
+
 	// Loop de programa
 	cc.Etiqueta("PROGRAM_LOOP");
-	
+
 	// Chequear lectura de joypad
 	cc.CargarRegEnMemoriaW(REG_A, HW_HVBJOY);
 	cc.ShiftARight();
@@ -80,7 +80,7 @@ void RutinaRESET() {
 	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
 	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
-	cc.CargarRegConst8(REG_A, 0x81); // Activar NMI + Auto joypad read
+	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
 	cc.EsperarInterrupcion(); // Esperar una interrupcion
 
@@ -99,18 +99,31 @@ void RutinaRESET() {
 // Usamos la logica de VBlank para mantener una tasa de refresco constante y sincronizada con la pantalla.
 void RutinaNMI() {
 	cc.Etiqueta("I_NMI");
+
+	// preservar estado de CPU durante interrupcion
 	cc.Empujar(REG_FLAGS);
-	cc.SetearFlags(FLAG_X | FLAG_M);
+	cc.LimpiarFlags(FLAG_X | FLAG_M | FLAG_D);
 	cc.Empujar(REG_BANK);
 	cc.Empujar(REG_A);
 	cc.Empujar(REG_X);
 	cc.Empujar(REG_Y);
+	cc.SetearFlags(FLAG_X | FLAG_M);
 
+	// podemos ejecutar NMI?
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_FLAG_EJECUCION);
+	cc.BranchLong("FINALIZAR_NMI", BRANCH_ZERO_SET);
+	cc.AlmacenarCeroEnMemoriaW(WRAM_FLAG_EJECUCION);
 
-	// TO-DO: implementar rutina de NMI
+	// rescatar estado de CPU, volver a ejecucion normal
+	cc.Etiqueta("FINALIZAR_NMI");
+	cc.LimpiarFlags(FLAG_X | FLAG_M);
+	cc.Sacar(REG_Y);
+	cc.Sacar(REG_X);
+	cc.Sacar(REG_A);
+	cc.Sacar(REG_BANK);
+	cc.Sacar(REG_FLAGS);
 	cc.ReturnInterrupt();
 }
-
 
 // La rutina de IRQ se ejecuta cuando el hardware genera una interrupcion enmascarable (IRQ).
 // No es usada ahora mismo.
