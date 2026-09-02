@@ -1,6 +1,6 @@
 #include <iostream>
 #include "rom.h"
-#include "asm/ensamblador.h"
+#include "ensamblador.h"
 
 int main() {
 	// prueba CLI simple por ahora

@@ -15,7 +15,7 @@ void GenerarChecksum() {
 void GenerarHeader() {
 	// crear un header basico para el ROM
 	memset(&DROM[0x7FC0], ' ', 21);
-	memcpy(&DROM[0x7FC0], "SuperBloques ROM", 12);
+	memcpy(&DROM[0x7FC0], "SuperBloques", 12);
 	DROM[0x7FD5] = 0x20; // $FFD5: Modo de mapa (LoROM, Sin fastROM)
 	DROM[0x7FD6] = 0x00; // $FFD6: Tipo de cartucho (ROM solamente)
 	DROM[0x7FD7] = 0x0B; // $FFD7: Tamaño de ROM (2MB = 2^11 KB -> N=11)

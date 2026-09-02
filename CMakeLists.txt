@@ -18,10 +18,10 @@ endfunction()
 add_executable(superbloques_cli
 	engine/compilador/main.cpp
 	engine/compilador/rom.cpp
+	engine/compilador/ensamblador.cpp
 	engine/compilador/instancia.cpp
 	engine/compilador/bloques.cpp
 	engine/compilador/asm/op.cpp
-	engine/compilador/asm/ensamblador.cpp
 	engine/compilador/codegen/bloques_motion.cpp
 )
 target_include_directories(superbloques_cli PRIVATE
