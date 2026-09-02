@@ -109,13 +109,27 @@ void RutinaNMI() {
 	cc.Empujar(REG_Y);
 	cc.SetearFlags(FLAG_X | FLAG_M);
 
+	// desactivar el interrupt de vblank, dejar solo auto joypad read activado.
+	// esto es para prevenir un bug en el cual si el NMI tarda demasiado en ejecutarse, otro vblank puede causar que se vuelva a ejecutar,
+	// generando un bucle infinito y corrupcion de stack.
+	cc.CargarRegConst8(REG_A, 0x1);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+
 	// podemos ejecutar NMI?
 	cc.CargarRegEnMemoriaW(REG_A, WRAM_FLAG_EJECUCION);
 	cc.BranchLong("FINALIZAR_NMI", BRANCH_ZERO_SET);
 	cc.AlmacenarCeroEnMemoriaW(WRAM_FLAG_EJECUCION);
+	cc.Etiqueta("NMI_EJECUCION");
+
+	// TO-DO: codigo de NMI (configuracion de video)
 
 	// rescatar estado de CPU, volver a ejecucion normal
 	cc.Etiqueta("FINALIZAR_NMI");
+
+	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
+	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+
 	cc.LimpiarFlags(FLAG_X | FLAG_M);
 	cc.Sacar(REG_Y);
 	cc.Sacar(REG_X);
