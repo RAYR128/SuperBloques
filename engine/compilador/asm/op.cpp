@@ -1,9 +1,8 @@
 #include "rom.h"
 #include "op.h"
+#include <iostream>
 
-#define ErrorSB(msg) \
-	;                \
-	;
+#define ErrorSB(msg) std::cout << "Error: " << msg << std::endl; exit(1);
 
 // Generacion de codigo dinamico
 Emitidor65816 cc;
@@ -222,5 +221,78 @@ void Emitidor65816::Sacar(Registers reg) {
 	case REG_FLAGS: EmitirByte(OP_PLP_IMP); break;
 	case REG_DP: EmitirByte(OP_PLD_IMP); break;
 	default: ErrorSB("Empujar: Register invalido"); break;
+	}
+}
+
+void Emitidor65816::Etiqueta(std::string nombre) {
+	EtiquetaCodigo l;
+	l.nombre = nombre;
+	l.direccion = PC;
+	etiquetas.push_back(l);
+}
+
+void Emitidor65816::CrearReferencia(std::string label, TipoReferencia tipo) {
+	ReferenciaCodigo ref;
+	ref.nombre = label;
+	ref.tipo = tipo;
+	ref.direccion = PC;
+	referencias.push_back(ref);
+}
+
+void Emitidor65816::Saltar(std::string label, TipoReferencia tipo) {
+	ReferenciaCodigo ref;
+	ref.nombre = label;
+	ref.tipo = tipo;
+	ref.direccion = PC;
+	referencias.push_back(ref);
+	switch(tipo) {
+	case REF_BRANCH:
+		EmitirByte(OP_BRA_REL);
+		CrearReferencia(label, REF_BRANCH);
+		EmitirByte(0x00);
+		break;
+	case REF_ABSOLUTE:
+		EmitirByte(OP_JMP_ABSJ);
+		CrearReferencia(label, REF_ABSOLUTE);
+		EmitirPalabra(0x0000);
+		break;
+	case REF_LONG:
+		EmitirByte(OP_JML_LONGJ);
+		CrearReferencia(label, REF_LONG);
+		Emitir24Bit(0x000000);
+		break;
+	default:
+		ErrorSB("Saltar: Tipo de referencia invalido");
+		break;
+	}
+}
+
+void Emitidor65816::ResolverReferencias() {
+	for(ReferenciaCodigo ref : referencias) {
+		uint32_t direccion = INVALIDO;
+		for(EtiquetaCodigo l : etiquetas) {
+			if(l.nombre == ref.nombre) {
+				direccion = l.direccion;
+				break;
+			}
+		}
+		if(direccion != INVALIDO) {
+			switch(ref.tipo) {
+			case REF_BRANCH:
+				DROM[ref.direccion] = direccion & 0xFF;
+				break;
+			case REF_ABSOLUTE:
+				DROM[ref.direccion] = direccion & 0xFF;
+				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
+				break;
+			case REF_LONG:
+				DROM[ref.direccion] = direccion & 0xFF;
+				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
+				DROM[ref.direccion + 2] = (direccion >> 16) & 0xFF;
+				break;
+			}
+		} else {
+			ErrorSB("ResolverReferencias: No se encontro la etiqueta " + ref.nombre);
+		}
 	}
 }

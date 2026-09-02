@@ -2,7 +2,17 @@
 #include "ensamblador.h"
 #include <cstring>
 
-void EnsamblarROM() {
+// $FFDC-$FFDF: Checksum + complement
+// TO-DO: implementar calculo de checksum y complement, a la consola real le importa, pero a la mayoria de los emuladores no les importa
+// asi que por ahora lo dejamos en 0xFFFF
+void GenerarChecksum() {
+	DROM[0x7FDC] = 0xFF;
+	DROM[0x7FDD] = 0xFF;
+	DROM[0x7FDE] = 0x00;
+	DROM[0x7FDF] = 0x00;
+}
+
+void GenerarHeader() {
 	// crear un header basico para el ROM
 	memset(&DROM[0x7FC0], ' ', 21);
 	memcpy(&DROM[0x7FC0], "SuperBloques ROM", 12);
@@ -14,28 +24,23 @@ void EnsamblarROM() {
 	DROM[0x7FDA] = 0x33; // $FFDA: Version de ROM
 	DROM[0x7FDB] = 0x00; // $FFDB: Version de ROM
 
-	// $FFDC-$FFDF: Checksum + complement
-	// TO-DO: implementar calculo de checksum y complement, a la consola real le importa, pero a la mayoria de los emuladores no les importa
-	// asi que por ahora lo dejamos en 0xFFFF
-	DROM[0x7FDC] = 0xFF;
-	DROM[0x7FDD] = 0xFF;
-	DROM[0x7FDE] = 0x00;
-	DROM[0x7FDF] = 0x00;
-
 	// vectores de la CPU
-	DROM[0x7FEA] = 0x00;
-	DROM[0x7FEB] = 0x80; // NMI -> $8000
-	DROM[0x7FEE] = 0x00;
-	DROM[0x7FEF] = 0x80; // IRQ -> $8000
-	DROM[0x7FFA] = 0x00;
-	DROM[0x7FFB] = 0x80; // NMI -> $8000
-	DROM[0x7FFC] = 0x00;
-	DROM[0x7FFD] = 0x80; // RESET-> $8000
-	DROM[0x7FFE] = 0x00;
-	DROM[0x7FFF] = 0x80; // IRQ/BRK -> $8000
+	cc.SetearPC(0x7FEA);
+	cc.CrearReferencia("I_NMI", REF_ABSOLUTE);
+	cc.SetearPC(0x7FEE);
+	cc.CrearReferencia("I_IRQ", REF_ABSOLUTE);
+	cc.SetearPC(0x7FFA);
+	cc.CrearReferencia("I_NMI", REF_ABSOLUTE);
+	cc.SetearPC(0x7FFC);
+	cc.CrearReferencia("I_RESET", REF_ABSOLUTE);
+	cc.SetearPC(0x7FFE);
+	cc.CrearReferencia("I_IRQ", REF_ABSOLUTE);
+}
 
+void EnsamblarROM() {
 	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
 	cc.SetearPC(0x000000);
+	cc.Etiqueta("I_RESET");
 	cc.SetearFlags(FLAG_I);
 	cc.AlmacenarCeroEnMemoriaW(HW_NMITIMEN);
 	cc.AlmacenarCeroEnMemoriaW(HW_HDMAEN);
@@ -65,4 +70,9 @@ void EnsamblarROM() {
 
 	// TO-DO: Crear loop, añadir NMI
 	cc.PararCPU();
+
+	// Finalizar ROM
+	GenerarHeader();
+	cc.ResolverReferencias();
+	GenerarChecksum();
 }

@@ -5,9 +5,23 @@
 #include <vector>
 #include "memmap.h"
 
-struct Label {
+struct EtiquetaCodigo {
 	std::string nombre;
 	uint32_t direccion;
+};
+
+// Referencia a un label, direccion o valor literal. Se usa para instrucciones que requieren un argumento de 8, 16 o 24 bits.
+// Es compilada en dos pasos: primero se crea la referencia, y luego se resuelve cuando se conoce la direccion del label o el valor literal.
+enum TipoReferencia {
+	REF_BRANCH,	// Referencia a un label para un salto relativo (8 o 16 bits)
+	REF_ABSOLUTE, // Referencia a un label para una direccion absoluta (16 bits)
+	REF_LONG // Referencia a un label para una direccion larga (24 bits)
+};
+
+struct ReferenciaCodigo {
+	std::string nombre;
+	uint32_t direccion;
+	TipoReferencia tipo;
 };
 
 // LimpiarFlags / SetearFlags
@@ -303,13 +317,25 @@ class Emitidor65816 {
 	void EmitirPalabra(uint16_t palabra);
 	void Emitir24Bit(uint32_t doblePalabra);
 	void EmitirDoblePalabra(uint32_t doblePalabra);
+	
+	std::vector<EtiquetaCodigo> etiquetas;
+	std::vector<ReferenciaCodigo> referencias;
 
   public:
 	Emitidor65816();
 
+	// Resolver referencias a labels, direcciones o valores literales. Se debe llamar al final de la compilacion, cuando se conocen todas las etiquetas y referencias.
+	void ResolverReferencias();
+
+	// Crear etiquetas y referencias a labels, direcciones o valores literales. Se debe llamar antes de emitir la instruccion que requiere la referencia.
+	void Etiqueta(std::string nombre);
+	void CrearReferencia(std::string label, TipoReferencia tipo);
+
+	// Setear y obtener el contador de programa (PC)
 	void SetearPC(uint32_t direccion);
 	uint32_t ObtenerPC();
 
+	// Emitir instrucciones de la CPU 65816
 	void LimpiarFlags(uint8_t flags);
 	void SetearFlags(uint8_t flags);
 
@@ -329,6 +355,8 @@ class Emitidor65816 {
 
 	void Empujar(Registers reg);
 	void Sacar(Registers reg);
+
+	void Saltar(std::string label, TipoReferencia tipo);
 
 	void PararCPU();
 };
