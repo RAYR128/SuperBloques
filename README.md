@@ -32,7 +32,7 @@ Trabajo en progreso.
 Trabajo en progreso.
 
 # Estado actual
-Compilador: El compilador produce una ROM la cual es ejecutable en emuladores, pero ya que no hay configuracion de video, la pantalla siempre es negra. Emuladores de depuracion de codigo como BSNES muestran que la CPU si esta corriendo y falta la configuracion de video. El siguiente paso es inicializar la VRAM de la consola y los registers de video para mostrar una pantalla valida. Despues de eso, seria la implementacion de todos los bloques programables, visualizacion de objetos, modificacion de tilemaps y el codigo para generar estos.
+Compilador: El compilador produce una ROM la cual es ejecutable en emuladores, pero ya que no hay configuracion de video, el color de la pantalla es asignado a un timer estatico. Emuladores de depuracion de codigo como BSNES muestran que la CPU si esta corriendo, pero falta la configuracion de video. El siguiente paso es inicializar la VRAM de la consola y los registers de video para mostrar una pantalla valida. Despues de eso, seria la implementacion de todos los bloques programables, visualizacion de objetos, modificacion de tilemaps y el codigo para generar estos.
 
 Backend: Trabajo a empezar, el plan es hacer una plataforma de distribucion y almacenacion de proyectos JSON y un sistema de cuentas.
 

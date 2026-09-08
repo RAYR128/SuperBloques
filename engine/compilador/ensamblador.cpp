@@ -77,6 +77,11 @@ void RutinaRESET() {
 	cc.ShiftARight();
 	cc.Branch("PROGRAM_LOOP", BRANCH_CARRY_SET);
 
+	// Loop principal
+	cc.LimpiarFlags(FLAG_X | FLAG_M);
+	cc.IncrementarMemoria(WRAM_TIMER);
+	cc.SetearFlags(FLAG_X | FLAG_M);
+
 	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
 	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
@@ -122,6 +127,22 @@ void RutinaNMI() {
 	cc.Etiqueta("NMI_EJECUCION");
 
 	// TO-DO: codigo de NMI (configuracion de video)
+	cc.CargarRegConst8(REG_A, 0x8F);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
+
+	// Pantalla: Blanca
+	cc.CargarRegConst8(REG_A, 0x00);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGADD);
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER+1);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
+	cc.CargarRegConst8(REG_A, 0xFF);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_COLDATA);
+
+	// Brillo: 100%
+	cc.CargarRegConst8(REG_A, 0x0F);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
 
 	// rescatar estado de CPU, volver a ejecucion normal
 	cc.Etiqueta("FINALIZAR_NMI");
