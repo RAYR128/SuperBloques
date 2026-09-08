@@ -10,6 +10,7 @@ class Escena {
   public:
 	std::string Nombre;
 	std::vector<NodoBloque> Bloques;
+	std::vector<std::string> Variables;
 	uint8_t GraficosPrincipales[0x400 * TILE_SIZE_4BPP];
 	uint8_t GraficosHud[0x100 * TILE_SIZE_2BPP];
 	uint8_t Tilemap1[64 * 64 * 2];
@@ -24,6 +25,7 @@ class ObjetoEscena {
   public:
 	std::string Nombre;
 	std::vector<NodoBloque> Bloques;
+	std::vector<std::string> Variables;
 };
 
 extern std::vector<Escena> EscenasProyecto;

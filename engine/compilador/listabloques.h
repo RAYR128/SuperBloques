@@ -28,10 +28,15 @@ xx(CONTROL, "control")
 xx(EVENTO, "event")
 
 // Control y asignacion de variables
+// VARIABLE usa ParametroEspecial como un offset hacia "Variables" en ObjetoEscena/Escena
 xx(VARIABLE, "variable")
+xx(VARIABLE_STORE, "variable_store")
 
 // Operaciones matematicas y logicas
 xx(OPERACION, "operation")
-xx(OPERACION_SUMA, "operation_add")
+xx(OPERACION_SUMA, "operation_add") // (Bloques[0] + Bloques[1])
+xx(OPERACION_RESTA, "operation_sub") // (Bloques[0] - Bloques[1])
+xx(OPERACION_MULTIPLICACION, "operation_mul") // (Bloques[0] * Bloques[1])
+xx(OPERACION_DIVISION, "operation_div") // (Bloques[0] / Bloques[1])
 
 #undef xx
