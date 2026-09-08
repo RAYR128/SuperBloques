@@ -22,10 +22,13 @@ add_executable(superbloques_cli
 	engine/compilador/instancia.cpp
 	engine/compilador/bloques.cpp
 	engine/compilador/asm/op.cpp
+	engine/compilador/serializer/cargar.cpp
+	engine/compilador/serializer/guardar.cpp
 	engine/compilador/codegen/bloques_motion.cpp
 )
 target_include_directories(superbloques_cli PRIVATE
 	${CMAKE_SOURCE_DIR}/engine/compilador
+	${CMAKE_SOURCE_DIR}/engine/lib
 )
 
 set_output_dirs(superbloques_cli "..")

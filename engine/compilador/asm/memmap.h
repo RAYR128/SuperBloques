@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vrammap.h"
+
 // Mapping de objetos en la memoria interna.
 // 0x100-0x1900
 #define WRAM_DIRECTPAGE 0x0000
