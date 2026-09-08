@@ -440,7 +440,7 @@ void Emitidor65816::EscribirEtiqueta(std::string label, bool grande) {
 	}
 }
 
-void Emitidor65816::DecrementarReg(Registers reg) {
+void Emitidor65816::IncrementarReg(Registers reg) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_INC_ACC);
@@ -457,7 +457,7 @@ void Emitidor65816::DecrementarReg(Registers reg) {
 	}
 }
 
-void Emitidor65816::IncrementarReg(Registers reg) {
+void Emitidor65816::DecrementarReg(Registers reg) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_DEC_ACC);
@@ -469,7 +469,7 @@ void Emitidor65816::IncrementarReg(Registers reg) {
 		EmitirByte(OP_DEY_IMP);
 		break;
 	default:
-		throw std::runtime_error("IncrementarReg: Register invalido");
+		throw std::runtime_error("DecrementarReg: Register invalido");
 		break;
 	}
 }
