@@ -8,6 +8,7 @@
 // Una escena es un estado de control del programa.
 class Escena {
   public:
+	void Compilar();
 	std::string Nombre;
 	std::vector<NodoBloque> Bloques;
 	std::vector<std::string> Variables;
@@ -23,6 +24,7 @@ class Escena {
 // se comporta el objeto en la escena. Un objeto puede ser un enemigo, un item, un bloque, etc. La programacion es libre para el usuario.
 class ObjetoEscena {
   public:
+	void Compilar();
 	std::string Nombre;
 	std::vector<NodoBloque> Bloques;
 	std::vector<std::string> Variables;

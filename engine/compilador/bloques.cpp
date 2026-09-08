@@ -27,3 +27,7 @@ std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada) {
 	}
 	return "";
 }
+
+void NodoBloque::Compilar() {
+	
+}

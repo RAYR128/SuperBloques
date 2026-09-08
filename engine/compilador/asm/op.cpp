@@ -430,6 +430,16 @@ void Emitidor65816::ResolverReferencias() {
 	}
 }
 
+void Emitidor65816::EscribirEtiqueta(std::string label, bool grande) {
+	if(grande) {
+		CrearReferencia(label, REF_LONG);
+		Emitir24Bit(0x000000);
+	} else {
+		CrearReferencia(label, REF_ABSOLUTE);
+		EmitirPalabra(0x0000);
+	}
+}
+
 void Emitidor65816::DecrementarReg(Registers reg) {
 	switch(reg) {
 	case REG_A:

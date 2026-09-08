@@ -376,6 +376,7 @@ class Emitidor65816 {
 	void Empujar(Registers reg);
 	void Sacar(Registers reg);
 
+	void EscribirEtiqueta(std::string label, bool grande);
 	void Saltar(std::string label, TipoReferencia tipo);
 	void Branch(std::string label, TipoBranch tipo);
 	void BranchLong(std::string label, TipoBranch tipo);

@@ -1,5 +1,6 @@
 #include "asm/op.h"
 #include "ensamblador.h"
+#include "instancia.h"
 #include <cstring>
 
 // $FFDC-$FFDF: Checksum + complement
@@ -180,6 +181,20 @@ void EnsamblarROM() {
 	RutinaRESET();
 	RutinaNMI();
 	RutinaIRQ();
+
+	// Tabla de salto de escena
+	cc.Etiqueta("TABLA_SALTO_ESCENA");
+	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
+		cc.EscribirEtiqueta("OBJETO_ENTRY_" + EscenasProyecto[i].Nombre, true);
+	}
+
+	// Generar codigo de objetos
+	for(size_t i = 0; i < ObjetosProyecto.size(); i++) {
+		ObjetosProyecto[i].Compilar();
+	}
+	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
+		EscenasProyecto[i].Compilar();
+	}
 
 	// Finalizar ROM
 	GenerarHeader();
