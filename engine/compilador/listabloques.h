@@ -29,7 +29,7 @@ xx(CONTROL, "control")
 xx(EVENTO, "event")
 
 // Control y asignacion de variables
-// VARIABLE usa ParametroEspecial como un offset hacia "Variables" en ObjetoEscena/Escena
+// VARIABLE es similar a NUMERO, y usa ParametroEspecial como un offset hacia "Variables" en ObjetoEscena/Escena
 xx(VARIABLE, "variable")
 xx(VARIABLE_STORE, "variable_store")
 
