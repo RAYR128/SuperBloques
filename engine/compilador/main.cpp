@@ -7,5 +7,5 @@ int main() {
 	InicializarROM();
 	EnsamblarROM();
 	GuardarROMArchivo("salida.sfc");
-	return 1;
+	return 0;
 }

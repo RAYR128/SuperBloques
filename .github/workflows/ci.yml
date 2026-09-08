@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compilador:
+    name: Compilar y generar ROM
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Configurar CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compilar el compilador
+        run: cmake --build build --config Release -j"$(nproc)"
+
+      - name: Generar ROM
+        run: ./superbloques_cli
+
+      - name: Verificar ROM
+        run: |
+          set -euo pipefail
+          if [ ! -f salida.sfc ]; then
+            echo "No se genero salida.sfc"
+            exit 1
+          fi
+          actual="$(stat -c%s salida.sfc)"
+          expected=2097152
+          if [ "$actual" -ne "$expected" ]; then
+            echo "Tamaño inesperado de salida.sfc: ${actual} bytes (se esperaban ${expected})"
+            exit 1
+          fi
+          echo "ROM generado: salida.sfc (${actual} bytes)"
