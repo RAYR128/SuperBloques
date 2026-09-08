@@ -1,3 +1,4 @@
+// clang-format off
 // Generacion utilizando macros para bloques.
 #ifndef xx
 #define xx(n,s)
@@ -40,3 +41,4 @@ xx(OPERACION_MULTIPLICACION, "operation_mul") // (Bloques[0] * Bloques[1])
 xx(OPERACION_DIVISION, "operation_div") // (Bloques[0] / Bloques[1])
 
 #undef xx
+// clang-format on
