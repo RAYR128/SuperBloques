@@ -10,3 +10,4 @@ superbloques_cli
 
 # Debug
 rom-trace.log
+*.sym
