@@ -49,8 +49,8 @@ std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada);
 // Los bloques son compilados a scripts de behavior que son ejecutados por la CPU.
 class NodoBloque {
   public:
-	virtual ~NodoBloque() {}
-	virtual void Compilar() = 0;
+	~NodoBloque() {}
+	void Compilar();
 
 	TipoBloque TipoDeBloque;
 
