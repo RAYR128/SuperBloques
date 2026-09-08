@@ -2,10 +2,6 @@
 #include "op.h"
 #include <iostream>
 
-#define ErrorSB(msg)                            \
-	std::cout << "Error: " << msg << std::endl; \
-	exit(1);
-
 // Generacion de codigo dinamico
 Emitidor65816 cc;
 
@@ -131,7 +127,7 @@ void Emitidor65816::CargarRegConst8(Registers reg, uint8_t valor) {
 		EmitirByte(valor);
 		break;
 	default:
-		ErrorSB("CargarRegConst8: Register invalido");
+		throw std::runtime_error("CargarRegConst8: Register invalido");
 		break;
 	}
 }
@@ -151,7 +147,7 @@ void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
 		EmitirPalabra(valor);
 		break;
 	default:
-		ErrorSB("CargarRegConst16: Register invalido");
+		throw std::runtime_error("CargarRegConst16: Register invalido");
 		break;
 	}
 }
@@ -171,7 +167,7 @@ void Emitidor65816::CargarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
-		ErrorSB("CargarRegEnMemoriaW: Register invalido");
+		throw std::runtime_error("CargarRegEnMemoriaW: Register invalido");
 		break;
 	}
 }
@@ -191,7 +187,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
-		ErrorSB("AlmacenarRegEnMemoriaW: Register invalido");
+		throw std::runtime_error("AlmacenarRegEnMemoriaW: Register invalido");
 		break;
 	}
 }
@@ -203,7 +199,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
-		ErrorSB("AlmacenarRegEnMemoriaWX: Register invalido");
+		throw std::runtime_error("AlmacenarRegEnMemoriaWX: Register invalido");
 		break;
 	}
 }
@@ -215,7 +211,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
 		EmitirPalabra(addrHw);
 		break;
 	default:
-		ErrorSB("AlmacenarRegEnMemoriaWY: Register invalido");
+		throw std::runtime_error("AlmacenarRegEnMemoriaWY: Register invalido");
 		break;
 	}
 }
@@ -247,11 +243,11 @@ void Emitidor65816::Transferir(Registers entrada, Registers destino) {
 		case REG_DP: EmitirByte(OP_TCD_IMP); break;
 		case REG_X: EmitirByte(OP_TAX_IMP); break;
 		case REG_Y: EmitirByte(OP_TAY_IMP); break;
-		default: ErrorSB("Transferir: A->Destino invalido"); break;
+		default: throw std::runtime_error("Transferir: A->Destino invalido"); break;
 		}
 		return;
 	}
-	ErrorSB("Transferir: Entrada invalida");
+	throw std::runtime_error("Transferir: Entrada invalida");
 }
 
 void Emitidor65816::Empujar(Registers reg) {
@@ -263,7 +259,7 @@ void Emitidor65816::Empujar(Registers reg) {
 	case REG_EXECBANK: EmitirByte(OP_PHK_IMP); break;
 	case REG_FLAGS: EmitirByte(OP_PHP_IMP); break;
 	case REG_DP: EmitirByte(OP_PHD_IMP); break;
-	default: ErrorSB("Empujar: Register invalido"); break;
+	default: throw std::runtime_error("Empujar: Register invalido"); break;
 	}
 }
 
@@ -276,7 +272,7 @@ void Emitidor65816::Sacar(Registers reg) {
 	// no existe REG_EXECBANK, en todo caso cuenta como program counter.
 	case REG_FLAGS: EmitirByte(OP_PLP_IMP); break;
 	case REG_DP: EmitirByte(OP_PLD_IMP); break;
-	default: ErrorSB("Empujar: Register invalido"); break;
+	default: throw std::runtime_error("Empujar: Register invalido"); break;
 	}
 }
 
@@ -313,7 +309,7 @@ void Emitidor65816::Saltar(std::string label, TipoReferencia tipo) {
 		Emitir24Bit(0x000000);
 		break;
 	default:
-		ErrorSB("Saltar: Tipo de referencia invalido");
+		throw std::runtime_error("Saltar: Tipo de referencia invalido");
 		break;
 	}
 }
@@ -348,7 +344,7 @@ void Emitidor65816::Branch(std::string label, TipoBranch tipo) {
 		EmitirByte(OP_BRA_REL);
 		break;
 	default:
-		ErrorSB("Branch: Tipo de branch invalido");
+		throw std::runtime_error("Branch: Tipo de branch invalido");
 		break;
 	}
 	ReferenciaCodigo ref;
@@ -387,7 +383,7 @@ void Emitidor65816::BranchLong(std::string label, TipoBranch tipo) {
 		EmitirByte(OP_BVC_REL);
 		break;
 	default:
-		ErrorSB("Branch: Tipo de branch invalido");
+		throw std::runtime_error("Branch: Tipo de branch invalido");
 		break;
 	}
 	EmitirByte(3);
@@ -411,7 +407,7 @@ void Emitidor65816::ResolverReferencias() {
 			case REF_BRANCH: {
 				int32_t offset = (int32_t)direccion - ((int32_t)ConvertirAddrPcAHw(ref.direccion) + 1);
 				if(offset < -128 || offset > 127) {
-					ErrorSB("ResolverReferencias: branch fuera de rango para " + ref.nombre);
+					throw std::runtime_error("ResolverReferencias: branch fuera de rango para " + ref.nombre);
 				}
 				DROM[ref.direccion] = (uint8_t)offset;
 				break;
@@ -429,7 +425,7 @@ void Emitidor65816::ResolverReferencias() {
 			}
 			}
 		} else {
-			ErrorSB("ResolverReferencias: No se encontro la etiqueta " + ref.nombre);
+			throw std::runtime_error("ResolverReferencias: No se encontro la etiqueta " + ref.nombre);
 		}
 	}
 }
@@ -446,7 +442,7 @@ void Emitidor65816::DecrementarReg(Registers reg) {
 		EmitirByte(OP_INY_IMP);
 		break;
 	default:
-		ErrorSB("IncrementarReg: Register invalido");
+		throw std::runtime_error("IncrementarReg: Register invalido");
 		break;
 	}
 }
@@ -463,7 +459,7 @@ void Emitidor65816::IncrementarReg(Registers reg) {
 		EmitirByte(OP_DEY_IMP);
 		break;
 	default:
-		ErrorSB("IncrementarReg: Register invalido");
+		throw std::runtime_error("IncrementarReg: Register invalido");
 		break;
 	}
 }

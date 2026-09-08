@@ -5,38 +5,8 @@
 
 // Tipos de bloques que pueden existir en un objeto de la escena. Cada bloque tiene un comportamiento distinto y puede contener distintos datos.
 enum TipoBloque {
-	// Tipo basico: Numero (ParametroEspecial)
-	BLOQUE_NUMERO,
-
-	// Movimiento del objeto, administracion de posicion
-	BLOQUE_MOTION,
-	BLOQUE_MOTION_GET_POSICION_X,
-	BLOQUE_MOTION_GET_POSICION_Y,
-	BLOQUE_MOTION_SET_POSICION_X,
-	BLOQUE_MOTION_SET_POSICION_Y,
-	BLOQUE_MOTION_ADD_POSICION_X,
-	BLOQUE_MOTION_ADD_POSICION_Y,
-
-	// Reproduccion de animaciones, control de frames y sprites
-	BLOQUE_ANIMACION,
-
-	// Reproduccion de sonidos y musica
-	BLOQUE_SONIDO,
-
-	// Condicionales y bucles
-	BLOQUE_CONTROL,
-
-	// Inicio, labels
-	BLOQUE_EVENTO,
-
-	// Control y asignacion de variables
-	BLOQUE_VARIABLE,
-
-	// Operaciones matematicas y logicas
-	BLOQUE_OPERACION,
-	BLOQUE_OPERACION_SUMA,
-
-	// Final
+	#define xx(n,s) BLOQUE_##n,
+	#include "listabloques.h"
 	BLOQUE_MAX
 };
 
@@ -49,6 +19,9 @@ std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada);
 // Los bloques son compilados a scripts de behavior que son ejecutados por la CPU.
 class NodoBloque {
   public:
+	NodoBloque()
+		: TipoDeBloque(BLOQUE_NUMERO), ParametroEspecial(0), PosicionVisualX(0), PosicionVisualY(0), Siguiente(nullptr),
+		  Previo(nullptr) {}
 	~NodoBloque() {}
 	void Compilar();
 

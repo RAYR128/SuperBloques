@@ -24,6 +24,7 @@ add_executable(superbloques_cli
 	engine/compilador/asm/op.cpp
 	engine/compilador/serializer/cargar.cpp
 	engine/compilador/serializer/guardar.cpp
+	engine/compilador/serializer/base64.cpp
 	engine/compilador/codegen/bloques_motion.cpp
 )
 target_include_directories(superbloques_cli PRIVATE
