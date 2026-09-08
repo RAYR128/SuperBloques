@@ -368,6 +368,9 @@ class Emitidor65816 {
 	void IncrementarMemoria(uint16_t addrHw);
 	void DecrementarMemoria(uint16_t addrHw);
 
+	void IncrementarReg(Registers reg);
+	void DecrementarReg(Registers reg);
+
 	void Transferir(Registers entrada, Registers destino);
 
 	void Empujar(Registers reg);

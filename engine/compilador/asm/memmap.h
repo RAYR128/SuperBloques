@@ -17,6 +17,7 @@
 #define PARAMETRO_OBJ_VARIABLES 10		   // 86 bytes para variables del objeto (43 variables 16-bit), dando un total de 96 bytes por objeto.
 
 #define WRAM_STACK 0x1FFF // Pila de la CPU
+#define WRAM_SIZE 0x2000
 
 // Registros de hardware (Memoria especial).
 // La consola siempre mapea estos en los bancos $00-$3F, en $2000-$4FFF.

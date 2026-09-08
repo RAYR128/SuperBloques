@@ -66,6 +66,14 @@ void RutinaRESET() {
 	cc.CargarRegConst16(REG_A, WRAM_STACK);
 	cc.Transferir(REG_A, REG_STACK);
 
+	// Limpiar toda la memoria
+	cc.CargarRegConst16(REG_X, WRAM_SIZE - 2);
+	cc.Etiqueta("LIMPIAR_MEMORIA");
+	cc.AlmacenarCeroEnMemoriaWX(0x0000);
+	cc.DecrementarReg(REG_X);
+	cc.DecrementarReg(REG_X);
+	cc.Branch("LIMPIAR_MEMORIA", BRANCH_NEGATIVE_CLEAR);
+
 	// SEP #$30
 	cc.SetearFlags(FLAG_X | FLAG_M);
 

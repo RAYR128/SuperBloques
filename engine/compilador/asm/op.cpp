@@ -433,3 +433,37 @@ void Emitidor65816::ResolverReferencias() {
 		}
 	}
 }
+
+void Emitidor65816::DecrementarReg(Registers reg) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_INC_ACC);
+		break;
+	case REG_X:
+		EmitirByte(OP_INX_IMP);
+		break;
+	case REG_Y:
+		EmitirByte(OP_INY_IMP);
+		break;
+	default:
+		ErrorSB("IncrementarReg: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::IncrementarReg(Registers reg) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_DEC_ACC);
+		break;
+	case REG_X:
+		EmitirByte(OP_DEX_IMP);
+		break;
+	case REG_Y:
+		EmitirByte(OP_DEY_IMP);
+		break;
+	default:
+		ErrorSB("IncrementarReg: Register invalido");
+		break;
+	}
+}
