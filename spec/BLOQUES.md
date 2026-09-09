@@ -15,6 +15,8 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 			"Tilemap1": "<base64>",
 			"Tilemap2": "<base64>",
 			"Tilemap3": "<base64>",
+			"Paleta": "<base64>",
+			"Variables": ["Variable 1"],
 			"Bloques": {
 				"bloque_id_001": {
 					"PosicionVisual": [1, 1],
@@ -35,14 +37,23 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 					"Operacion": "motion_set_posicion_x",
 					"ParametroEspecial": 0,
 					"Entradas": [],
-					"Siguiente": null,
+					"Siguiente": "bloque_id_003",
 					"Previo": "bloque_id_001"
+				},
+				"bloque_id_003": {
+					"PosicionVisual": [1, 3],
+					"Operacion": "variable",
+					"ParametroEspecial": "Variable 1",
+					"Entradas": [],
+					"Siguiente": null,
+					"Previo": "bloque_id_002"
 				}
 			}
 		}
 	},
 	"Objetos": {
 		"NuevoObjeto": {
+			"Variables": ["Variable 1"],
 			"Bloques": {
 				"bloque_id_001": {
 					"PosicionVisual": [0, 0],
@@ -58,15 +69,19 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 }
 ```
 
-`Escenas` y `Objetos` pueden omitirse (se tratan como `{}`). Un blob omitido se carga como ceros. Un JSON malformado no modifica el proyecto en memoria, un error de contenido despues del parse (Operacion desconocida, base64 de tamaño incorrecto, id colgante) tampoco, porque se construye un proyecto temporal y solo se publica al terminar.
+`Escenas` y `Objetos` pueden omitirse (se tratan como `{}`). Un blob omitido se carga como ceros. Un JSON malformado no modifica el proyecto en memoria, un error de contenido despues del parse (Operacion desconocida, base64 de tamaño incorrecto, id colgante, variable inexistente o duplicada, demasiadas variables) tampoco, porque se construye un proyecto temporal y solo se publica al terminar.
 
 ### Operacion
 
 String que identifica `TipoBloque`.
 
+### Variables
+
+Array de nombres unicos en la escena u objeto. El indice en este array es el offset que usa un bloque `variable` / `variable_store`. Si se omite, se trata como `[]`. Nombres vacios o duplicados se rechazan.
+
 ### ParametroEspecial
 
-Entero auxiliar del bloque (por ejemplo el literal de `numero`). Si se omite, vale `0`.
+Entero auxiliar del bloque (por ejemplo el literal de `numero`), o un string con el nombre de una variable del mismo objeto/escena. Un string se resuelve al offset (indice) de ese nombre en `Variables`; si no existe, es un error de contenido. Un entero se usa tal cual (para `variable` / `variable_store` es el offset). Si se omite, vale `0`. Al exportar, `variable` y `variable_store` escriben el nombre si el offset apunta a una entrada de `Variables`.
 
 ### PosicionVisual
 
@@ -93,3 +108,4 @@ Los buffers de cada escena se almacenan como blobs base64 de tamaño fijo. Un de
 | `Tilemap1` | `64 * 64 * 2` = 8192 |
 | `Tilemap2` | `32 * 32 * 2` = 2048 |
 | `Tilemap3` | `32 * 32 * 2` = 2048 |
+| `Paleta` | `256 * 2` = 512 |

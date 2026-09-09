@@ -17,6 +17,7 @@ class Escena {
 	uint8_t Tilemap1[64 * 64 * 2];
 	uint8_t Tilemap2[32 * 32 * 2];
 	uint8_t Tilemap3[32 * 32 * 2];
+	uint8_t Paleta[256 * 2];
 };
 
 // Un objeto es una declaracion de un objeto el cual puede ser creado en una escena.
