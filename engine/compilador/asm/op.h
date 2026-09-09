@@ -350,43 +350,59 @@ class Emitidor65816 {
 	void SetearPC(uint32_t direccion);
 	uint32_t ObtenerPC();
 
-	// Emitir instrucciones de la CPU 65816
+	// Control de flags de CPU
 	void LimpiarFlags(uint8_t flags);
 	void SetearFlags(uint8_t flags);
 
+	// XCE, operacion especial.
 	void IntercambiarCarryConEmulacion();
 
+	// Cargar valor directo/constante a un register
 	void CargarRegConst8(Registers reg, uint8_t valor);
 	void CargarRegConst16(Registers reg, uint16_t valor);
 
+	// Sumar a acumulador (REG_A)
 	void SumaAcumuladorConst8(uint8_t valor);
 	void SumaAcumuladorConst16(uint16_t valor);
 
+	// Comparar register con un valor constante
 	void CompararRegConst8(Registers reg, uint8_t valor);
 	void CompararRegConst16(Registers reg, uint16_t valor);
 
-	void CargarRegEnMemoriaW(Registers reg, uint16_t addrHw);
-	void CargarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
-	void CargarRegEnMemoriaWY(Registers reg, uint16_t addrHw);
+	// Cargar datos en memoria a un reg
+	void CargarRegEnMemoria(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw);
 
-	void AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw);
-	void AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
-	void AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw);
+	// Almacenar datos en memoria a un reg
+	void AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw);
+	void AlmacenarRegEnMemoria_IndX(Registers reg, uint16_t addrHw);
+	void AlmacenarRegEnMemoria_IndY(Registers reg, uint16_t addrHw);
 
-	void AlmacenarCeroEnMemoriaW(uint16_t addrHw);
-	void AlmacenarCeroEnMemoriaWX(uint16_t addrHw);
+	// Almacenar cero a memoria
+	void AlmacenarCeroEnMemoria(uint16_t addrHw);
+	void AlmacenarCeroEnMemoria_IndX(uint16_t addrHw);
 
+	// Incrementar/Decrementar datos en memoria
 	void IncrementarMemoria(uint16_t addrHw);
 	void DecrementarMemoria(uint16_t addrHw);
 
+	// Incrementar/Decrementar reg
 	void IncrementarReg(Registers reg);
 	void DecrementarReg(Registers reg);
 
+	// Operaciones con bits
+	void ShiftALeft();
+	void ShiftARight();
+
+	// Transferir
 	void Transferir(Registers entrada, Registers destino);
 
+	// Pila de CPU
 	void Empujar(Registers reg);
 	void Sacar(Registers reg);
 
+	// Etiquetas/Control
 	void EscribirEtiqueta(std::string label, bool grande);
 	void Saltar(std::string label, TipoReferencia tipo);
 	void SaltarLongIndirecto(uint16_t addrHw);
@@ -394,14 +410,9 @@ class Emitidor65816 {
 	void LlamadaLong(std::string label);
 	void Branch(std::string label, TipoBranch tipo);
 	void BranchLong(std::string label, TipoBranch tipo);
-
 	void ReturnShort();
 	void ReturnLong();
 	void ReturnInterrupt();
-
-	void ShiftALeft();
-	void ShiftARight();
-
 	void EsperarInterrupcion();
 	void PararCPU();
 };

@@ -85,12 +85,12 @@ void Emitidor65816::IntercambiarCarryConEmulacion() {
 	EmitirByte(OP_XCE_IMP);
 }
 
-void Emitidor65816::AlmacenarCeroEnMemoriaW(uint16_t addrHw) {
+void Emitidor65816::AlmacenarCeroEnMemoria(uint16_t addrHw) {
 	EmitirByte(OP_STZ_ABS);
 	EmitirPalabra(addrHw);
 }
 
-void Emitidor65816::AlmacenarCeroEnMemoriaWX(uint16_t addrHw) {
+void Emitidor65816::AlmacenarCeroEnMemoria_IndX(uint16_t addrHw) {
 	EmitirByte(OP_STZ_ABSX);
 	EmitirPalabra(addrHw);
 }
@@ -203,7 +203,7 @@ void Emitidor65816::CompararRegConst16(Registers reg, uint16_t valor) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_LDA_ABS);
@@ -223,7 +223,7 @@ void Emitidor65816::CargarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_LDA_ABSX);
@@ -235,7 +235,7 @@ void Emitidor65816::CargarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_LDA_ABSY);
@@ -252,7 +252,7 @@ void Emitidor65816::SaltarLongIndirecto(uint16_t addrHw) {
 	EmitirPalabra(addrHw);
 }
 
-void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_STA_ABS);
@@ -272,7 +272,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_STA_ABSX);
@@ -284,7 +284,7 @@ void Emitidor65816::AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::AlmacenarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria_IndY(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
 		EmitirByte(OP_STA_ABSY);

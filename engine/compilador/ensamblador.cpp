@@ -16,17 +16,17 @@ void RutinaLoopPrincipal() {
 	// Codigo para cada objeto
 	// Primero chequeamos si existe
 	cc.SetearFlags(FLAG_M_8BIT);
-	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_STATUS);
+	cc.CargarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_STATUS);
 	cc.LimpiarFlags(FLAG_M_8BIT);
 
 	// No existe? Saltar este codigo.
 	cc.Branch("LOOP_CONTROL_OBJETO_NO_EXISTE", BRANCH_ZERO_SET);
 
 	// Tenemos que almacenar un puntero de 24-bit.
-	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER);
-	cc.AlmacenarRegEnMemoriaW(REG_A, WRAM_POSICION_SALTO);
-	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER + 1);
-	cc.AlmacenarRegEnMemoriaW(REG_A, WRAM_POSICION_SALTO + 1);
+	cc.CargarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER);
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO);
+	cc.CargarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER + 1);
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO + 1);
 
 	// Llamamos al objeto ahora.
 	cc.LlamadaLong("OBJC_LLAMAR");
@@ -48,20 +48,27 @@ void RutinaLoopPrincipal() {
 }
 
 void RutinaControlObjetos() {
+	// Rutina de control: Llamar a codigo de objeto
 	cc.Etiqueta("OBJC_LLAMAR");
 	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
+	
+	// Rutina de control: Crear objeto
+	// TO-DO: definir como se implementaria esto. Tiene que existir algun parametro (probablemente el script bhv del objeto en WRAM_POSICION_SALTO)
+	// para la inicializacion de este, y el estado a activar (PARAMETRO_OBJ_BHV_SCRIPT_STATUS), normalmente Estado 1
+	cc.Etiqueta("OBJC_CREAR");
+	cc.ReturnLong();
 }
 
 void RutinaConfiguracionVideo() {
 	// Pantalla: Utilizar WRAM_TIMER (temporal)
 	cc.CargarRegConst8(REG_A, 0x00);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGADD);
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER+1);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_CGADD);
+	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
+	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER+1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
 	cc.CargarRegConst8(REG_A, 0xFF);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_COLDATA);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_COLDATA);
 }
 
 // $FFDC-$FFDF (LoROM $7FDC-$7FDF): complemento + checksum de 16 bits.
@@ -120,16 +127,16 @@ void RutinaRESET() {
 	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
 	cc.Etiqueta("I_RESET");
 	cc.SetearFlags(FLAG_INTERR);
-	cc.AlmacenarCeroEnMemoriaW(HW_NMITIMEN);
-	cc.AlmacenarCeroEnMemoriaW(HW_HDMAEN);
-	cc.AlmacenarCeroEnMemoriaW(HW_APUIO0);
-	cc.AlmacenarCeroEnMemoriaW(HW_APUIO1);
-	cc.AlmacenarCeroEnMemoriaW(HW_APUIO2);
-	cc.AlmacenarCeroEnMemoriaW(HW_APUIO3);
+	cc.AlmacenarCeroEnMemoria(HW_NMITIMEN);
+	cc.AlmacenarCeroEnMemoria(HW_HDMAEN);
+	cc.AlmacenarCeroEnMemoria(HW_APUIO0);
+	cc.AlmacenarCeroEnMemoria(HW_APUIO1);
+	cc.AlmacenarCeroEnMemoria(HW_APUIO2);
+	cc.AlmacenarCeroEnMemoria(HW_APUIO3);
 
 	// desactivar la pantalla y configurar el registro de control de video
 	cc.CargarRegConst8(REG_A, 0x8F);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 
 	// CLC : XCE, desactivar emulacion de 6502 y activar modo nativo de 65816
 	cc.LimpiarFlags(FLAG_CARRYF);
@@ -146,7 +153,7 @@ void RutinaRESET() {
 	// Limpiar toda la memoria
 	cc.CargarRegConst16(REG_X, WRAM_SIZE - 2);
 	cc.Etiqueta("LIMPIAR_MEMORIA");
-	cc.AlmacenarCeroEnMemoriaWX(0x0000);
+	cc.AlmacenarCeroEnMemoria_IndX(0x0000);
 	cc.DecrementarReg(REG_X);
 	cc.DecrementarReg(REG_X);
 	cc.Branch("LIMPIAR_MEMORIA", BRANCH_NEGATIVE_CLEAR);
@@ -158,7 +165,7 @@ void RutinaRESET() {
 	cc.Etiqueta("PROGRAM_LOOP");
 
 	// Chequear lectura de joypad
-	cc.CargarRegEnMemoriaW(REG_A, HW_HVBJOY);
+	cc.CargarRegEnMemoria(REG_A, HW_HVBJOY);
 	cc.ShiftARight();
 	cc.Branch("PROGRAM_LOOP", BRANCH_CARRY_SET);
 
@@ -167,14 +174,14 @@ void RutinaRESET() {
 
 	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
-	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
+	cc.CargarRegEnMemoria(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
 	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_NMITIMEN);
 	cc.EsperarInterrupcion(); // Esperar una interrupcion
 
 	// Podemos ejecutar un nuevo cuadro?
 	cc.Etiqueta("ESPERAR_BLANK");
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_FLAG_EJECUCION);
+	cc.CargarRegEnMemoria(REG_A, WRAM_FLAG_EJECUCION);
 	cc.Branch("ESPERAR_BLANK", BRANCH_ZERO_CLEAR);
 
 	// Repetir
@@ -201,27 +208,27 @@ void RutinaNMI() {
 	// esto es para prevenir un bug en el cual si el NMI tarda demasiado en ejecutarse, otro vblank puede causar que se vuelva a ejecutar,
 	// generando un bucle infinito y corrupcion de stack.
 	cc.CargarRegConst8(REG_A, 0x1);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_NMITIMEN);
 
 	// podemos ejecutar NMI?
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_FLAG_EJECUCION);
+	cc.CargarRegEnMemoria(REG_A, WRAM_FLAG_EJECUCION);
 	cc.BranchLong("FINALIZAR_NMI", BRANCH_ZERO_SET);
-	cc.AlmacenarCeroEnMemoriaW(WRAM_FLAG_EJECUCION);
+	cc.AlmacenarCeroEnMemoria(WRAM_FLAG_EJECUCION);
 	cc.Etiqueta("NMI_EJECUCION");
 
 	// Ejecucion de codigo de NMI, configuracion de video
 	cc.CargarRegConst8(REG_A, 0x8F);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 	RutinaConfiguracionVideo();
 	cc.CargarRegConst8(REG_A, 0x0F);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 
 	// rescatar estado de CPU, volver a ejecucion normal
 	cc.Etiqueta("FINALIZAR_NMI");
 
-	cc.CargarRegEnMemoriaW(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
+	cc.CargarRegEnMemoria(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
 	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_NMITIMEN);
 
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 	cc.Sacar(REG_Y);
