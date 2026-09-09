@@ -71,10 +71,6 @@ void RutinaLoopPrincipal() {
 }
 
 void RutinaControlObjetos() {
-	// Rutina de control: Llamar a codigo de objeto
-	cc.Etiqueta("CALL_DYNAMIC_POSITION");
-	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
-	
 	// Rutina de control: Crear objeto
 	// TO-DO: definir como se implementaria esto. Tiene que existir algun parametro (probablemente el script bhv del objeto en WRAM_POSICION_SALTO)
 	// para la inicializacion de este, y el estado a activar (PARAMETRO_OBJ_BHV_SCRIPT_STATUS), normalmente Estado 1
@@ -243,6 +239,10 @@ void RutinaRESET() {
 
 	// Repetir
 	cc.Saltar("PROGRAM_LOOP", REF_ABSOLUTE);
+	
+	// Rutina de control: Llamar a codigo en WRAM_POSICION_SALTO
+	cc.Etiqueta("CALL_DYNAMIC_POSITION");
+	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
 }
 
 // La rutina de NMI se ejecuta cuando el hardware genera una interrupcion no enmascarable (NMI).
