@@ -3,11 +3,34 @@
 #include "instancia.h"
 #include <cstring>
 
+// Compartido
+void ConRegALlamarJumpTable(std::string tabla) {
+	// X = A * 3;
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SCRATCH);
+	cc.ShiftALeft();
+	cc.SumaAcumuladorMemoria(WRAM_SCRATCH);
+	cc.Transferir(REG_A, REG_X);
+	
+	// Tenemos ahora el puntero a la tabla, usamos esto para conseguir el PC a ejecutar.
+	// WRAM_POSICION_SALTO = tabla[X];
+	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO);
+	cc.IncrementarReg(REG_X);
+	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO + 1);
+	
+	// Llamamos a la rutina dinamica.
+	cc.LlamadaLong("CALL_DYNAMIC_POSITION");
+}
+
 // Rutinas
 void RutinaLoopPrincipal() {
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 	
+	// Correr codigo main de escena
+	cc.LlamadaLong("LLAMAR_ESCENA_ID");
+
 	// Iterar por toda la memoria dedicada a objetos
 	// Los objetos van a utilizar REG_Y de forma compartida!!
 	cc.CargarRegConst16(REG_Y, 0);
@@ -29,7 +52,7 @@ void RutinaLoopPrincipal() {
 	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO + 1);
 
 	// Llamamos al objeto ahora.
-	cc.LlamadaLong("OBJC_LLAMAR");
+	cc.LlamadaLong("CALL_DYNAMIC_POSITION");
 	cc.Etiqueta("LOOP_CONTROL_OBJETO_NO_EXISTE");
 
 	// Iteramos hacia el siguiente objeto
@@ -49,13 +72,43 @@ void RutinaLoopPrincipal() {
 
 void RutinaControlObjetos() {
 	// Rutina de control: Llamar a codigo de objeto
-	cc.Etiqueta("OBJC_LLAMAR");
+	cc.Etiqueta("CALL_DYNAMIC_POSITION");
 	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
 	
 	// Rutina de control: Crear objeto
 	// TO-DO: definir como se implementaria esto. Tiene que existir algun parametro (probablemente el script bhv del objeto en WRAM_POSICION_SALTO)
 	// para la inicializacion de este, y el estado a activar (PARAMETRO_OBJ_BHV_SCRIPT_STATUS), normalmente Estado 1
 	cc.Etiqueta("OBJC_CREAR");
+	cc.ReturnLong();
+}
+
+void RutinaControlEscena() {
+	// Rutina de control: Inicializar escena
+	cc.Etiqueta("INICIALIZAR_ESCENA_ID");
+	
+	// Desactivar modo 16-bit
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+
+	// Desactivar pantalla
+	cc.CargarRegConst8(REG_A, 0x8F);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
+	
+	// Activar modo 16-bit
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+
+	// TO-DO: Aqui tenemos que implementar el DMA a la VRAM para los recursos utilizados.
+
+	// Ahora llamamos a la rutina de init de la escena actual.
+	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
+	cc.ANDAcumuladorConst16(0x00FF);
+	ConRegALlamarJumpTable("TABLA_SALTO_ESCENA_INIT");
+	cc.ReturnLong();
+
+	// Rutina de control: Llamar a escena
+	cc.Etiqueta("LLAMAR_ESCENA_ID");
+	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
+	cc.ANDAcumuladorConst16(0x00FF);
+	ConRegALlamarJumpTable("TABLA_SALTO_ESCENA_MAIN");
 	cc.ReturnLong();
 }
 
@@ -158,6 +211,9 @@ void RutinaRESET() {
 	cc.DecrementarReg(REG_X);
 	cc.Branch("LIMPIAR_MEMORIA", BRANCH_NEGATIVE_CLEAR);
 
+	// Inicializar escena
+	cc.LlamadaLong("INICIALIZAR_ESCENA_ID");
+
 	// SEP #$30
 	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
@@ -251,13 +307,18 @@ void EnsamblarROM() {
 	cc.SetearPC(0x000000);
 	RutinaRESET();
 	RutinaControlObjetos();
+	RutinaControlEscena();
 	RutinaNMI();
 	RutinaIRQ();
 
 	// Tabla de salto de escena
-	cc.Etiqueta("TABLA_SALTO_ESCENA");
+	cc.Etiqueta("TABLA_SALTO_ESCENA_INIT");
 	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
-		cc.EscribirEtiqueta("OBJETO_ENTRY_" + EscenasProyecto[i].Nombre, true);
+		cc.EscribirEtiqueta("ESCENA_INIT" + EscenasProyecto[i].Nombre, true);
+	}
+	cc.Etiqueta("TABLA_SALTO_ESCENA_MAIN");
+	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
+		cc.EscribirEtiqueta("ESCENA_MAIN" + EscenasProyecto[i].Nombre, true);
 	}
 
 	// Generar codigo de objetos
@@ -273,4 +334,5 @@ void EnsamblarROM() {
 	cc.ResolverReferencias();
 	GenerarChecksum();
 	cc.GuardarSimbolosArchivo("salida.sym");
+	cc.GuardarSimbolosArchivo("salida.cpu.sym");
 }

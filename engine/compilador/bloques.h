@@ -27,10 +27,6 @@ class NodoBloque {
 	// Compilar un bloque y todos sus sub-bloques.
 	void Compilar();
 
-	// Alguien puede poner bloques en el editor los cuales estan desconectados de un evento. Estos compilarian como bloques normales, hay que evitar esto
-	// y solo empezar a compilar desde un bloque de evento real.
-	bool EsInicioEvento();
-
 	// Tipo de bloque
 	TipoBloque TipoDeBloque;
 

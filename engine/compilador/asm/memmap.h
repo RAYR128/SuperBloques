@@ -1,26 +1,47 @@
 #pragma once
 
+// TO-DO: Utilizar un macro para asignar esto? Generar simbolos tambien seria util en el futuro.
 #include "vrammap.h"
 
 // Objetos
 #define CANTIDAD_DE_OBJETOS 64 // 64 objetos en la pantalla maximo.
 #define TAMANO_OBJETO 96	   // Cada objeto ocupa 96 bytes en la memoria interna
+#define TAMANO_ESCENA 256      // La escena actual tiene 256 bytes (128 variables) disponibles para trabajar en la memoria interna
+
 enum {
-    PARAMETRO_OBJ_BHV_SCRIPT_STATUS = 0, // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
-    PARAMETRO_OBJ_BHV_SCRIPT_POINTER = 1, // 3 bytes para una ubicacion en PC
-    PARAMETRO_OBJ_POSICION_X = 4, // 2 bytes para la posicion X del objeto
-    PARAMETRO_OBJ_POSICION_Y = 6, // 2 bytes para la posicion Y del objeto
-    PARAMETRO_OBJ_SPRITE = 8, // 2 bytes para la frame del objeto
-    PARAMETRO_OBJ_VARIABLES = 10 // 86 bytes para variables del objeto (43 variables 16-bit), dando un total de 96 bytes por objeto.
+	PARAMETRO_OBJ_BHV_SCRIPT_STATUS = 0, // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
+	PARAMETRO_OBJ_BHV_SCRIPT_POINTER = 1, // 3 bytes para una ubicacion en PC
+	PARAMETRO_OBJ_POSICION_X = 4, // 2 bytes para la posicion X del objeto
+	PARAMETRO_OBJ_POSICION_Y = 6, // 2 bytes para la posicion Y del objeto
+	PARAMETRO_OBJ_SPRITE = 8, // 2 bytes para la frame del objeto
+	PARAMETRO_OBJ_VARIABLES = 10 // 86 bytes para variables del objeto (43 variables 16-bit), dando un total de 96 bytes por objeto.
 };
 
-// Mapping de objetos en la memoria interna.
-// 0x100-0x1900
-#define WRAM_DIRECTPAGE 0x0000
+#define WRAM_DIRECTPAGE 0x0000 // DP, acceso rapido
+
+#define WRAM_SCRATCH 0x0000 // Variables temporales
+
+#define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F0 // Datos de control 1 en bits
+#define WRAM_CONTROL1_BYETUDLR_PRESIONADO 0x00F1 // Datos de control 1 en bits, solo para el cuadro actual
+#define WRAM_CONTROL1_AXLR_MANTENIDO 0x00F2 // Datos de control 1 en bits
+#define WRAM_CONTROL1_AXLR_PRESIONADO 0x00F3 // Datos de control 1 en bits, solo para el cuadro actual
+#define WRAM_CONTROL2_BYETUDLR_MANTENIDO 0x00F4 // Datos de control 2 en bits
+#define WRAM_CONTROL2_BYETUDLR_PRESIONADO 0x00F5 // Datos de control 2 en bits, solo para el cuadro actual
+#define WRAM_CONTROL2_AXLR_MANTENIDO 0x00F6 // Datos de control 2 en bits
+#define WRAM_CONTROL2_AXLR_PRESIONADO 0x00F7 // Datos de control 2 en bits, solo para el cuadro actual
+#define WRAM_ESCENA_ACTUAL 0x00F8 // Escena actual (1 byte)
+#define WRAM_ESCENA_STATUS 0x00F9 // Status de escena
 #define WRAM_POSICION_SALTO 0x00FA // Posicion salto objeto
 #define WRAM_TIMER 0x00FD // Timer global
 #define WRAM_FLAG_EJECUCION 0x00FF // Sincronizacion con PPU
+
+// Mapping de objetos en la memoria interna.
+// 0x0100-0x18FF
 #define WRAM_OBJETOS 0x0100
+
+// Mapping de escenas en la memoria interna.
+// 0x1900-0x19FF
+#define WRAM_ESCENA 0x1900
 
 #define WRAM_STACK 0x1FFF // Pila de la CPU
 #define WRAM_SIZE 0x2000 // Tamaño de WRAM total

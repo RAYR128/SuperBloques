@@ -163,6 +163,21 @@ void Emitidor65816::SumaAcumuladorConst16(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
+void Emitidor65816::SumaAcumuladorMemoria(uint16_t valor) {
+	EmitirByte(OP_ADC_ABS);
+	EmitirPalabra(valor);
+}
+
+void Emitidor65816::ANDAcumuladorConst8(uint8_t valor) {
+	EmitirByte(OP_AND_IMMM);
+	EmitirByte(valor);
+}
+
+void Emitidor65816::ANDAcumuladorConst16(uint16_t valor) {
+	EmitirByte(OP_AND_IMMM);
+	EmitirPalabra(valor);
+}
+
 void Emitidor65816::CompararRegConst8(Registers reg, uint8_t valor) {
 	switch(reg) {
 	case REG_A:
@@ -243,6 +258,19 @@ void Emitidor65816::CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw) {
 		break;
 	default:
 		throw std::runtime_error("CargarRegEnMemoriaWY: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::CargarRegEnMemoria_SymLX(Registers reg, std::string label) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_LONGX);
+		CrearReferencia(label, REF_LONG);
+		Emitir24Bit(0x000000);
+		break;
+	default:
+		throw std::runtime_error("CargarRegEnMemoria_SymLX: Register invalido");
 		break;
 	}
 }

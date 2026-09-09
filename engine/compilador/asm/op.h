@@ -365,6 +365,10 @@ class Emitidor65816 {
 	void SumaAcumuladorConst8(uint8_t valor);
 	void SumaAcumuladorConst16(uint16_t valor);
 
+	// AND acumulador (REG_A)
+	void ANDAcumuladorConst8(uint8_t valor);
+	void ANDAcumuladorConst16(uint16_t valor);
+
 	// Comparar register con un valor constante
 	void CompararRegConst8(Registers reg, uint8_t valor);
 	void CompararRegConst16(Registers reg, uint16_t valor);
@@ -373,6 +377,7 @@ class Emitidor65816 {
 	void CargarRegEnMemoria(Registers reg, uint16_t addrHw);
 	void CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw);
 	void CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoria_SymLX(Registers reg, std::string label);
 
 	// Almacenar datos en memoria a un reg
 	void AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw);
@@ -382,6 +387,9 @@ class Emitidor65816 {
 	// Almacenar cero a memoria
 	void AlmacenarCeroEnMemoria(uint16_t addrHw);
 	void AlmacenarCeroEnMemoria_IndX(uint16_t addrHw);
+
+	// Sumar a acumulador (REG_A)
+	void SumaAcumuladorMemoria(uint16_t addrHw);
 
 	// Incrementar/Decrementar datos en memoria
 	void IncrementarMemoria(uint16_t addrHw);
