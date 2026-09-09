@@ -31,3 +31,7 @@ std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada) {
 void NodoBloque::Compilar() {
 	
 }
+
+bool NodoBloque::EsInicioEvento() {
+	return TipoDeBloque == BLOQUE_EVENTO_FRAME || TipoDeBloque == BLOQUE_EVENTO_INIT;
+}

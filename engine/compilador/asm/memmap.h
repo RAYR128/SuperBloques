@@ -2,25 +2,28 @@
 
 #include "vrammap.h"
 
+// Objetos
+#define CANTIDAD_DE_OBJETOS 64 // 64 objetos en la pantalla maximo.
+#define TAMANO_OBJETO 96	   // Cada objeto ocupa 96 bytes en la memoria interna
+enum {
+    PARAMETRO_OBJ_BHV_SCRIPT_STATUS = 0, // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
+    PARAMETRO_OBJ_BHV_SCRIPT_POINTER = 1, // 3 bytes para una ubicacion en PC
+    PARAMETRO_OBJ_POSICION_X = 4, // 2 bytes para la posicion X del objeto
+    PARAMETRO_OBJ_POSICION_Y = 6, // 2 bytes para la posicion Y del objeto
+    PARAMETRO_OBJ_SPRITE = 8, // 2 bytes para la frame del objeto
+    PARAMETRO_OBJ_VARIABLES = 10 // 86 bytes para variables del objeto (43 variables 16-bit), dando un total de 96 bytes por objeto.
+};
+
 // Mapping de objetos en la memoria interna.
 // 0x100-0x1900
 #define WRAM_DIRECTPAGE 0x0000
 #define WRAM_POSICION_SALTO 0x00FA // Posicion salto objeto
 #define WRAM_TIMER 0x00FD // Timer global
-#define WRAM_FLAG_EJECUCION 0x00FF // sincronizacion
+#define WRAM_FLAG_EJECUCION 0x00FF // Sincronizacion con PPU
 #define WRAM_OBJETOS 0x0100
 
-#define CANTIDAD_DE_OBJETOS 64			   // 64 objetos en la pantalla maximo.
-#define TAMANO_OBJETO 96				   // Cada objeto ocupa 96 bytes en la memoria interna
-#define PARAMETRO_OBJ_BHV_SCRIPT_STATUS 0  // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
-#define PARAMETRO_OBJ_BHV_SCRIPT_POINTER 1 // 3 bytes para una ubicacion en PC
-#define PARAMETRO_OBJ_POSICION_X 4		   // 2 bytes para la posicion X del objeto
-#define PARAMETRO_OBJ_POSICION_Y 6		   // 2 bytes para la posicion Y del objeto
-#define PARAMETRO_OBJ_SPRITE 8			   // 2 bytes para la frame del objeto
-#define PARAMETRO_OBJ_VARIABLES 10		   // 86 bytes para variables del objeto (43 variables 16-bit), dando un total de 96 bytes por objeto.
-
 #define WRAM_STACK 0x1FFF // Pila de la CPU
-#define WRAM_SIZE 0x2000
+#define WRAM_SIZE 0x2000 // Tamaño de WRAM total
 
 // Registros de hardware (Memoria especial).
 // La consola siempre mapea estos en los bancos $00-$3F, en $2000-$4FFF.

@@ -7,7 +7,9 @@ std::vector<ObjetoEscena> ObjetosProyecto;
 void Escena::Compilar() {
     cc.Etiqueta("ESCENA_ENTRY_" + Nombre);
     for(NodoBloque bloque : Bloques) {
-        bloque.Compilar();
+        if(bloque.EsInicioEvento()) {
+            bloque.Compilar();
+        }
     }
     cc.ReturnLong();
 }
@@ -15,7 +17,9 @@ void Escena::Compilar() {
 void ObjetoEscena::Compilar() {
     cc.Etiqueta("OBJETO_ENTRY_" + Nombre);
     for(NodoBloque bloque : Bloques) {
-        bloque.Compilar();
+        if(bloque.EsInicioEvento()) {
+            bloque.Compilar();
+        }
     }
     cc.ReturnLong();
 }
