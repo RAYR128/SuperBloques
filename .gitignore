@@ -2,12 +2,10 @@
 build/
 build-*/
 
-# Objetos
+# Objetos y logs
 *.o
 *.sfc
-superbloques_cli.exe
-superbloques_cli
-
-# Debug
-rom-trace.log
+*.exe
 *.sym
+*.log
+superbloques_cli
