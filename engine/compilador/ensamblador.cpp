@@ -9,10 +9,28 @@ void RutinaLoopPrincipal() {
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 	
 	// Iterar por toda la memoria dedicada a objetos
-	cc.CargarRegConst16(REG_X, 0);
+	// Los objetos van a utilizar REG_Y de forma compartida!!
+	cc.CargarRegConst16(REG_Y, 0);
 	cc.Etiqueta("LOOP_CONTROL_OBJETOS");
 
-	// TO-DO: Aqui es donde llamamos el codigo de cada objeto..
+	// Codigo para cada objeto
+	// Primero chequeamos si existe
+	cc.SetearFlags(FLAG_M_8BIT);
+	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_STATUS);
+	cc.LimpiarFlags(FLAG_M_8BIT);
+
+	// No existe? Saltar este codigo.
+	cc.Branch("LOOP_CONTROL_OBJETO_NO_EXISTE", BRANCH_ZERO_SET);
+
+	// Tenemos que almacenar un puntero de 24-bit.
+	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER);
+	cc.AlmacenarRegEnMemoriaW(REG_A, WRAM_POSICION_SALTO);
+	cc.CargarRegEnMemoriaWY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_POINTER + 1);
+	cc.AlmacenarRegEnMemoriaW(REG_A, WRAM_POSICION_SALTO + 1);
+
+	// Llamamos al objeto ahora.
+	cc.LlamadaLong("OBJC_LLAMAR");
+	cc.Etiqueta("LOOP_CONTROL_OBJETO_NO_EXISTE");
 
 	// Iteramos hacia el siguiente objeto
 	cc.Transferir(REG_Y, REG_A);
@@ -27,6 +45,11 @@ void RutinaLoopPrincipal() {
 
 	// Desactivar modo 16-bit
 	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+}
+
+void RutinaControlObjetos() {
+	cc.Etiqueta("OBJC_LLAMAR");
+	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
 }
 
 void RutinaConfiguracionVideo() {
@@ -219,6 +242,7 @@ void RutinaIRQ() {
 void EnsamblarROM() {
 	cc.SetearPC(0x000000);
 	RutinaRESET();
+	RutinaControlObjetos();
 	RutinaNMI();
 	RutinaIRQ();
 

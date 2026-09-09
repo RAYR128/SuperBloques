@@ -366,6 +366,8 @@ class Emitidor65816 {
 	void CompararRegConst16(Registers reg, uint16_t valor);
 
 	void CargarRegEnMemoriaW(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoriaWY(Registers reg, uint16_t addrHw);
 
 	void AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw);
 	void AlmacenarRegEnMemoriaWX(Registers reg, uint16_t addrHw);
@@ -387,6 +389,9 @@ class Emitidor65816 {
 
 	void EscribirEtiqueta(std::string label, bool grande);
 	void Saltar(std::string label, TipoReferencia tipo);
+	void SaltarLongIndirecto(uint16_t addrHw);
+	void Llamada(std::string label);
+	void LlamadaLong(std::string label);
 	void Branch(std::string label, TipoBranch tipo);
 	void BranchLong(std::string label, TipoBranch tipo);
 

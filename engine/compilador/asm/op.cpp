@@ -223,6 +223,35 @@ void Emitidor65816::CargarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 	}
 }
 
+void Emitidor65816::CargarRegEnMemoriaWX(Registers reg, uint16_t addrHw) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_ABSX);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		throw std::runtime_error("CargarRegEnMemoriaWX: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::CargarRegEnMemoriaWY(Registers reg, uint16_t addrHw) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_ABSY);
+		EmitirPalabra(addrHw);
+		break;
+	default:
+		throw std::runtime_error("CargarRegEnMemoriaWY: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::SaltarLongIndirecto(uint16_t addrHw) {
+	EmitirByte(OP_JML_INDL);
+	EmitirPalabra(addrHw);
+}
+
 void Emitidor65816::AlmacenarRegEnMemoriaW(Registers reg, uint16_t addrHw) {
 	switch(reg) {
 	case REG_A:
@@ -379,6 +408,18 @@ void Emitidor65816::Saltar(std::string label, TipoReferencia tipo) {
 		throw std::runtime_error("Saltar: Tipo de referencia invalido");
 		break;
 	}
+}
+
+void Emitidor65816::Llamada(std::string label) {
+	EmitirByte(OP_JSR_ABSJ);
+	CrearReferencia(label, REF_ABSOLUTE);
+	EmitirPalabra(0x0000);
+}
+
+void Emitidor65816::LlamadaLong(std::string label) {
+	EmitirByte(OP_JSL_LONGJ);
+	CrearReferencia(label, REF_LONG);
+	Emitir24Bit(0x000000);
 }
 
 void Emitidor65816::Branch(std::string label, TipoBranch tipo) {

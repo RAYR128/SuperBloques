@@ -5,6 +5,7 @@
 // Mapping de objetos en la memoria interna.
 // 0x100-0x1900
 #define WRAM_DIRECTPAGE 0x0000
+#define WRAM_POSICION_SALTO 0x00FA // Posicion salto objeto
 #define WRAM_TIMER 0x00FD // Timer global
 #define WRAM_FLAG_EJECUCION 0x00FF // sincronizacion
 #define WRAM_OBJETOS 0x0100
