@@ -8,6 +8,9 @@
 #define TAMANO_OBJETO 96	   // Cada objeto ocupa 96 bytes en la memoria interna
 #define TAMANO_ESCENA 256      // La escena actual tiene 256 bytes (128 variables) disponibles para trabajar en la memoria interna
 
+#define OBJETO_VARIABLES_MAX 43
+#define ESCENA_VARIABLES_MAX 128
+
 enum {
 	PARAMETRO_OBJ_BHV_SCRIPT_STATUS = 0, // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
 	PARAMETRO_OBJ_BHV_SCRIPT_POINTER = 1, // 3 bytes para una ubicacion en PC
