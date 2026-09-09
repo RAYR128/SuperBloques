@@ -41,14 +41,29 @@ void RutinaConfiguracionVideo() {
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_COLDATA);
 }
 
-// $FFDC-$FFDF: Checksum + complement
-// TO-DO: implementar calculo de checksum y complement, a la consola real le importa, pero a la mayoria de los emuladores no les importa
-// asi que por ahora lo dejamos en 0xFFFF
+// $FFDC-$FFDF (LoROM $7FDC-$7FDF): complemento + checksum de 16 bits.
+// el checksum es la suma de todos los bytes de la ROM (se descarta overflow).
+// Cualquier par checksum/complemento valido suma 0x1FE en esos 4 bytes, asi que
+// se inicializan a $FFFF/$0000 antes de sumar para que el valor escrito coincida
+// con la ROM final.
 void GenerarChecksum() {
 	DROM[0x7FDC] = 0xFF;
 	DROM[0x7FDD] = 0xFF;
 	DROM[0x7FDE] = 0x00;
 	DROM[0x7FDF] = 0x00;
+
+	uint32_t suma = 0;
+	for(uint32_t i = 0; i < TAMANO_ROM; i++) {
+		suma += DROM[i];
+	}
+
+	uint16_t checksum = (uint16_t)(suma & 0xFFFF);
+	uint16_t complemento = checksum ^ 0xFFFF;
+
+	DROM[0x7FDC] = (uint8_t)(complemento & 0xFF);
+	DROM[0x7FDD] = (uint8_t)((complemento >> 8) & 0xFF);
+	DROM[0x7FDE] = (uint8_t)(checksum & 0xFF);
+	DROM[0x7FDF] = (uint8_t)((checksum >> 8) & 0xFF);
 }
 
 void GenerarHeader() {

@@ -31,3 +31,27 @@ void GuardarROMArchivo(const char *nombreArchivo) {
 void InicializarROM() {
 	memset(DROM, 0, TAMANO_ROM);
 }
+
+// CRC32 IEEE 802.3 (polinomio 0xEDB88320), igual que WLA-DX / zlib.
+// Los emuladores lo usan en [rom checksum] del .sym para verificar que el archivo
+// de simbolos corresponde a esta ROM.
+uint32_t CalcularCRC32ROM() {
+	static uint32_t tabla[256];
+	static bool inicializada = false;
+	if(!inicializada) {
+		for(uint32_t i = 0; i < 256; i++) {
+			uint32_t c = i;
+			for(int b = 0; b < 8; b++) {
+				c = (c >> 1) ^ (0xEDB88320u & (uint32_t)-(int32_t)(c & 1));
+			}
+			tabla[i] = c;
+		}
+		inicializada = true;
+	}
+
+	uint32_t crc = 0xFFFFFFFFu;
+	for(uint32_t i = 0; i < TAMANO_ROM; i++) {
+		crc = tabla[(crc ^ DROM[i]) & 0xFF] ^ (crc >> 8);
+	}
+	return ~crc;
+}

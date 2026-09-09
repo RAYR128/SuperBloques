@@ -473,7 +473,7 @@ void Emitidor65816::GuardarSimbolosArchivo(const char *nombreArchivo) {
 			fprintf(archivo, "%02X:%04X %s\n", (direccion >> 16) & 0xFF, direccion & 0xFFFF, l.nombre.c_str());
 		}
 		fprintf(archivo, "\n[source files]\n");
-		fprintf(archivo, "\n[rom checksum]\n");
+		fprintf(archivo, "\n[rom checksum]\n%08x\n", CalcularCRC32ROM());
 		fprintf(archivo, "\n[addr-to-line mapping]");
 		fclose(archivo);
 	}

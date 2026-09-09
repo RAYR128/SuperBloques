@@ -10,3 +10,4 @@ extern uint32_t ConvertirAddrHwAPc(uint32_t addrHw);
 extern uint32_t ConvertirAddrPcAHw(uint32_t addrPc);
 extern void InicializarROM();
 extern void GuardarROMArchivo(const char *nombreArchivo);
+extern uint32_t CalcularCRC32ROM();
