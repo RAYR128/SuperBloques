@@ -15,16 +15,16 @@ void RutinaLoopPrincipal() {
 	// TO-DO: Aqui es donde llamamos el codigo de cada objeto..
 
 	// Iteramos hacia el siguiente objeto
-	cc.Transferir(REG_X, REG_A);
+	cc.Transferir(REG_Y, REG_A);
 	cc.LimpiarFlags(FLAG_CARRYF);
 	cc.SumaAcumuladorConst16(TAMANO_OBJETO);
-	cc.Transferir(REG_A, REG_X);
-	cc.CompararRegConst16(REG_X, CANTIDAD_DE_OBJETOS * TAMANO_OBJETO);
+	cc.Transferir(REG_A, REG_Y);
+	cc.CompararRegConst16(REG_Y, CANTIDAD_DE_OBJETOS * TAMANO_OBJETO);
 	cc.Branch("LOOP_CONTROL_OBJETOS", BRANCH_CARRY_CLEAR);
 
 	// Incrementar WRAM_TIMER
 	cc.IncrementarMemoria(WRAM_TIMER);
-	
+
 	// Desactivar modo 16-bit
 	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 }
@@ -225,4 +225,5 @@ void EnsamblarROM() {
 	GenerarHeader();
 	cc.ResolverReferencias();
 	GenerarChecksum();
+	cc.GuardarSimbolosArchivo("salida.sym");
 }
