@@ -42,19 +42,19 @@ void Emitidor65816::EmitirDoblePalabra(uint32_t doblePalabra) {
 
 void Emitidor65816::LimpiarFlags(uint8_t flags) {
 	// versiones mas cortas de 1 byte
-	if(flags == FLAG_C) {
+	if(flags == FLAG_CARRYF) {
 		EmitirByte(OP_CLC_IMP);
 		return;
 	}
-	if(flags == FLAG_D) {
+	if(flags == FLAG_DECIML) {
 		EmitirByte(OP_CLD_IMP);
 		return;
 	}
-	if(flags == FLAG_I) {
+	if(flags == FLAG_INTERR) {
 		EmitirByte(OP_CLI_IMP);
 		return;
 	}
-	if(flags == FLAG_V) {
+	if(flags == FLAG_OVERFL) {
 		EmitirByte(OP_CLV_IMP);
 		return;
 	}
@@ -64,15 +64,15 @@ void Emitidor65816::LimpiarFlags(uint8_t flags) {
 
 void Emitidor65816::SetearFlags(uint8_t flags) {
 	// versiones mas cortas de 1 byte
-	if(flags == FLAG_C) {
+	if(flags == FLAG_CARRYF) {
 		EmitirByte(OP_SEC_IMP);
 		return;
 	}
-	if(flags == FLAG_D) {
+	if(flags == FLAG_DECIML) {
 		EmitirByte(OP_SED_IMP);
 		return;
 	}
-	if(flags == FLAG_I) {
+	if(flags == FLAG_INTERR) {
 		EmitirByte(OP_SEI_IMP);
 		return;
 	}
@@ -144,6 +144,56 @@ void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
 		break;
 	case REG_Y:
 		EmitirByte(OP_LDY_IMMX);
+		EmitirPalabra(valor);
+		break;
+	default:
+		throw std::runtime_error("CargarRegConst16: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::SumaAcumuladorConst8(uint8_t valor) {
+	EmitirByte(OP_ADC_IMMM);
+	EmitirByte(valor);
+}
+
+void Emitidor65816::SumaAcumuladorConst16(uint16_t valor) {
+	EmitirByte(OP_ADC_IMMM);
+	EmitirPalabra(valor);
+}
+
+void Emitidor65816::CompararRegConst8(Registers reg, uint8_t valor) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_CMP_IMMM);
+		EmitirByte(valor);
+		break;
+	case REG_X:
+		EmitirByte(OP_CPX_IMMX);
+		EmitirByte(valor);
+		break;
+	case REG_Y:
+		EmitirByte(OP_CPY_IMMX);
+		EmitirByte(valor);
+		break;
+	default:
+		throw std::runtime_error("CargarRegConst16: Register invalido");
+		break;
+	}
+}
+
+void Emitidor65816::CompararRegConst16(Registers reg, uint16_t valor) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_CMP_IMMM);
+		EmitirPalabra(valor);
+		break;
+	case REG_X:
+		EmitirByte(OP_CPX_IMMX);
+		EmitirPalabra(valor);
+		break;
+	case REG_Y:
+		EmitirByte(OP_CPY_IMMX);
 		EmitirPalabra(valor);
 		break;
 	default:

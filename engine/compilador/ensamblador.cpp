@@ -3,6 +3,44 @@
 #include "instancia.h"
 #include <cstring>
 
+// Rutinas
+void RutinaLoopPrincipal() {
+	// Activar modo 16-bit
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+	
+	// Iterar por toda la memoria dedicada a objetos
+	cc.CargarRegConst16(REG_X, 0);
+	cc.Etiqueta("LOOP_CONTROL_OBJETOS");
+
+	// TO-DO: Aqui es donde llamamos el codigo de cada objeto..
+
+	// Iteramos hacia el siguiente objeto
+	cc.Transferir(REG_X, REG_A);
+	cc.LimpiarFlags(FLAG_CARRYF);
+	cc.SumaAcumuladorConst16(TAMANO_OBJETO);
+	cc.Transferir(REG_A, REG_X);
+	cc.CompararRegConst16(REG_X, CANTIDAD_DE_OBJETOS * TAMANO_OBJETO);
+	cc.Branch("LOOP_CONTROL_OBJETOS", BRANCH_CARRY_CLEAR);
+
+	// Incrementar WRAM_TIMER
+	cc.IncrementarMemoria(WRAM_TIMER);
+	
+	// Desactivar modo 16-bit
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+}
+
+void RutinaConfiguracionVideo() {
+	// Pantalla: Utilizar WRAM_TIMER (temporal)
+	cc.CargarRegConst8(REG_A, 0x00);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGADD);
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
+	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER+1);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
+	cc.CargarRegConst8(REG_A, 0xFF);
+	cc.AlmacenarRegEnMemoriaW(REG_A, HW_COLDATA);
+}
+
 // $FFDC-$FFDF: Checksum + complement
 // TO-DO: implementar calculo de checksum y complement, a la consola real le importa, pero a la mayoria de los emuladores no les importa
 // asi que por ahora lo dejamos en 0xFFFF
@@ -43,7 +81,7 @@ void GenerarHeader() {
 void RutinaRESET() {
 	// limpiar registros de control de interrupciones, dma de hardware, y puertos de audio
 	cc.Etiqueta("I_RESET");
-	cc.SetearFlags(FLAG_I);
+	cc.SetearFlags(FLAG_INTERR);
 	cc.AlmacenarCeroEnMemoriaW(HW_NMITIMEN);
 	cc.AlmacenarCeroEnMemoriaW(HW_HDMAEN);
 	cc.AlmacenarCeroEnMemoriaW(HW_APUIO0);
@@ -56,11 +94,11 @@ void RutinaRESET() {
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
 
 	// CLC : XCE, desactivar emulacion de 6502 y activar modo nativo de 65816
-	cc.LimpiarFlags(FLAG_C);
+	cc.LimpiarFlags(FLAG_CARRYF);
 	cc.IntercambiarCarryConEmulacion();
 
 	// REP #$38
-	cc.LimpiarFlags(FLAG_X | FLAG_M | FLAG_D);
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT | FLAG_DECIML);
 
 	cc.CargarRegConst16(REG_A, WRAM_DIRECTPAGE);
 	cc.Transferir(REG_A, REG_DP);
@@ -76,7 +114,7 @@ void RutinaRESET() {
 	cc.Branch("LIMPIAR_MEMORIA", BRANCH_NEGATIVE_CLEAR);
 
 	// SEP #$30
-	cc.SetearFlags(FLAG_X | FLAG_M);
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
 	// Loop de programa
 	cc.Etiqueta("PROGRAM_LOOP");
@@ -87,9 +125,7 @@ void RutinaRESET() {
 	cc.Branch("PROGRAM_LOOP", BRANCH_CARRY_SET);
 
 	// Loop principal
-	cc.LimpiarFlags(FLAG_X | FLAG_M);
-	cc.IncrementarMemoria(WRAM_TIMER);
-	cc.SetearFlags(FLAG_X | FLAG_M);
+	RutinaLoopPrincipal();
 
 	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
@@ -116,12 +152,12 @@ void RutinaNMI() {
 
 	// preservar estado de CPU durante interrupcion
 	cc.Empujar(REG_FLAGS);
-	cc.LimpiarFlags(FLAG_X | FLAG_M | FLAG_D);
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT | FLAG_DECIML);
 	cc.Empujar(REG_BANK);
 	cc.Empujar(REG_A);
 	cc.Empujar(REG_X);
 	cc.Empujar(REG_Y);
-	cc.SetearFlags(FLAG_X | FLAG_M);
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
 	// desactivar el interrupt de vblank, dejar solo auto joypad read activado.
 	// esto es para prevenir un bug en el cual si el NMI tarda demasiado en ejecutarse, otro vblank puede causar que se vuelva a ejecutar,
@@ -135,21 +171,10 @@ void RutinaNMI() {
 	cc.AlmacenarCeroEnMemoriaW(WRAM_FLAG_EJECUCION);
 	cc.Etiqueta("NMI_EJECUCION");
 
-	// TO-DO: codigo de NMI (configuracion de video)
+	// Ejecucion de codigo de NMI, configuracion de video
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
-
-	// Pantalla: Blanca
-	cc.CargarRegConst8(REG_A, 0x00);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGADD);
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
-	cc.CargarRegEnMemoriaW(REG_A, WRAM_TIMER+1);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_CGDATA);
-	cc.CargarRegConst8(REG_A, 0xFF);
-	cc.AlmacenarRegEnMemoriaW(REG_A, HW_COLDATA);
-
-	// Brillo: 100%
+	RutinaConfiguracionVideo();
 	cc.CargarRegConst8(REG_A, 0x0F);
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_INIDISP);
 
@@ -160,7 +185,7 @@ void RutinaNMI() {
 	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
 	cc.AlmacenarRegEnMemoriaW(REG_A, HW_NMITIMEN);
 
-	cc.LimpiarFlags(FLAG_X | FLAG_M);
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 	cc.Sacar(REG_Y);
 	cc.Sacar(REG_X);
 	cc.Sacar(REG_A);

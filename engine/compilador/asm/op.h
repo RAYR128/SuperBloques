@@ -26,14 +26,14 @@ struct ReferenciaCodigo {
 
 // LimpiarFlags / SetearFlags
 enum CpuFlags {
-	FLAG_N = 0x80, // Negativo
-	FLAG_V = 0x40, // Overflow
-	FLAG_M = 0x20, // Modo de acumulador (8/16 bits)
-	FLAG_X = 0x10, // Modo de indice (8/16 bits)
-	FLAG_D = 0x08, // Decimal
-	FLAG_I = 0x04, // Interrupcion
-	FLAG_Z = 0x02, // Cero
-	FLAG_C = 0x01  // Carry
+	FLAG_NEGATV = 0x80, // Negativo
+	FLAG_OVERFL = 0x40, // Overflow
+	FLAG_M_8BIT = 0x20, // Modo de acumulador (8/16 bits)
+	FLAG_X_8BIT = 0x10, // Modo de indice (8/16 bits)
+	FLAG_DECIML = 0x08, // Decimal
+	FLAG_INTERR = 0x04, // Interrupcion
+	FLAG_ZEROEQ = 0x02, // Cero
+	FLAG_CARRYF = 0x01  // Carry
 };
 
 enum TipoBranch {
@@ -355,6 +355,12 @@ class Emitidor65816 {
 
 	void CargarRegConst8(Registers reg, uint8_t valor);
 	void CargarRegConst16(Registers reg, uint16_t valor);
+
+	void SumaAcumuladorConst8(uint8_t valor);
+	void SumaAcumuladorConst16(uint16_t valor);
+
+	void CompararRegConst8(Registers reg, uint8_t valor);
+	void CompararRegConst16(Registers reg, uint16_t valor);
 
 	void CargarRegEnMemoriaW(Registers reg, uint16_t addrHw);
 
