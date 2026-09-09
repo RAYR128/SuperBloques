@@ -173,6 +173,7 @@ void RutinaRESET() {
 	RutinaLoopPrincipal();
 
 	// Esperar a que el hardware genere un VBlank, para sincronizar la logica con la pantalla
+	cc.Etiqueta("PROGRAM_FINALIZAR_FRAME");
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
 	cc.CargarRegEnMemoria(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
 	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
