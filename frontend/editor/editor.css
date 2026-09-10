@@ -16,6 +16,7 @@
 	--cat-evento: #ffbf00;
 	--cat-variable: #ff8c1a;
 	--cat-operacion: #59c059;
+	--cat-sensor: #5cb1d6;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -171,6 +172,7 @@ header .sub {
 .cat.evento { background: var(--cat-evento); }
 .cat.variable { background: var(--cat-variable); }
 .cat.operacion { background: var(--cat-operacion); }
+.cat.sensor { background: var(--cat-sensor); }
 
 .blocks-viewer {
 	flex: 1;

@@ -95,12 +95,16 @@ void Emitidor65816::AlmacenarCeroEnMemoria_IndX(uint16_t addrHw) {
 	EmitirPalabra(addrHw);
 }
 
-void Emitidor65816::ShiftALeft() {
-	EmitirByte(OP_ASL_ACC);
+void Emitidor65816::ShiftALeft(int veces) {
+	for(int i = 0; i < veces; i++) {
+		EmitirByte(OP_ASL_ACC);
+	}
 }
 
-void Emitidor65816::ShiftARight() {
-	EmitirByte(OP_LSR_ACC);
+void Emitidor65816::ShiftARight(int veces) {
+	for(int i = 0; i < veces; i++) {
+		EmitirByte(OP_LSR_ACC);
+	}
 }
 
 void Emitidor65816::IncrementarMemoria(uint16_t addrHw) {

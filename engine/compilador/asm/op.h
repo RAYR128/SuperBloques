@@ -404,8 +404,8 @@ class Emitidor65816 {
 	void DecrementarReg(Registers reg);
 
 	// Operaciones con bits
-	void ShiftALeft();
-	void ShiftARight();
+	void ShiftALeft(int veces = 1);
+	void ShiftARight(int veces = 1);
 
 	// Transferir
 	void Transferir(Registers entrada, Registers destino);

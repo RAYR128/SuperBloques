@@ -28,14 +28,42 @@ enum {
 #define WRAM_SCRATCH 0x0000 // Variables temporales
 #define WRAM_SCRATCH_SIZE 0x0040 // Tamaño de scratch (0x00-0x3F), utiliza 16-bit (index * 2)
 
-#define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F0 // Datos de control 1 en bits
-#define WRAM_CONTROL1_BYETUDLR_PRESIONADO 0x00F1 // Datos de control 1 en bits, solo para el cuadro actual
-#define WRAM_CONTROL1_AXLR_MANTENIDO 0x00F2 // Datos de control 1 en bits
-#define WRAM_CONTROL1_AXLR_PRESIONADO 0x00F3 // Datos de control 1 en bits, solo para el cuadro actual
-#define WRAM_CONTROL2_BYETUDLR_MANTENIDO 0x00F4 // Datos de control 2 en bits
-#define WRAM_CONTROL2_BYETUDLR_PRESIONADO 0x00F5 // Datos de control 2 en bits, solo para el cuadro actual
-#define WRAM_CONTROL2_AXLR_MANTENIDO 0x00F6 // Datos de control 2 en bits
-#define WRAM_CONTROL2_AXLR_PRESIONADO 0x00F7 // Datos de control 2 en bits, solo para el cuadro actual
+// La consola nativamente almacena los controladores como variables de 16-bit en HW_CNTRL
+// Esto tiene byetudlraxLRxxxx (bit 15..0). Los bits 0-3 son firma del control (no son botones).
+#define WRAM_CONTROL1 0x00F0
+#define WRAM_CONTROL1_AXLR_MANTENIDO 0x00F0 // Datos de control 1 en bits
+#define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F1 // Datos de control 1 en bits
+#define WRAM_CONTROL1_PRESIONADO 0x00F0
+#define WRAM_CONTROL1_AXLR_PRESIONADO 0x00F2 // Datos de control 1 en bits, solo para el cuadro actual
+#define WRAM_CONTROL1_BYETUDLR_PRESIONADO 0x00F3 // Datos de control 1 en bits, solo para el cuadro actual
+
+#define WRAM_CONTROL2 0x00F4
+#define WRAM_CONTROL2_AXLR_MANTENIDO 0x00F4 // Datos de control 2 en bits
+#define WRAM_CONTROL2_BYETUDLR_MANTENIDO 0x00F5 // Datos de control 2 en bits
+#define WRAM_CONTROL2_PRESIONADO 0x00F4
+#define WRAM_CONTROL2_AXLR_PRESIONADO 0x00F6 // Datos de control 2 en bits, solo para el cuadro actual
+#define WRAM_CONTROL2_BYETUDLR_PRESIONADO 0x00F7 // Datos de control 2 en bits, solo para el cuadro actual
+
+// ParametroEspecial de SENSOR_BOTON_CONTROL_1/2. Los primeros bits de firma (BOTON_FIRMA_0..3) no corresponden a un boton, pero igual deben compilar.
+enum BotonControl {
+	BOTON_FIRMA_0 = 0,
+	BOTON_FIRMA_1 = 1,
+	BOTON_FIRMA_2 = 2,
+	BOTON_FIRMA_3 = 3,
+	BOTON_R = 4,
+	BOTON_L = 5,
+	BOTON_X = 6,
+	BOTON_A = 7,
+	BOTON_DERECHA = 8,
+	BOTON_IZQUIERDA = 9,
+	BOTON_ABAJO = 10,
+	BOTON_ARRIBA = 11,
+	BOTON_START = 12,
+	BOTON_SELECT = 13,
+	BOTON_Y = 14,
+	BOTON_B = 15
+};
+
 #define WRAM_ESCENA_ACTUAL 0x00F8 // Escena actual (1 byte)
 #define WRAM_ESCENA_STATUS 0x00F9 // Status de escena
 #define WRAM_POSICION_SALTO 0x00FA // Posicion salto objeto
