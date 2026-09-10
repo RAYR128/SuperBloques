@@ -50,6 +50,8 @@ xx(SENSOR, "sensor", BLOQUE_CLASE_CATEGORIA)
 xx(SENSOR_TIEMPO, "sensor_tiempo", BLOQUE_CLASE_VALOR) // Devuelve WRAM_TIMER
 xx(SENSOR_BOTON_CONTROL_1, "sensor_boton_control_1", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL1)
 xx(SENSOR_BOTON_CONTROL_2, "sensor_boton_control_2", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL2)
+xx(SENSOR_BOTON_CONTROL_1_PRESIONADO, "sensor_boton_control_1_presionado", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL1_PRESIONADO)
+xx(SENSOR_BOTON_CONTROL_2_PRESIONADO, "sensor_boton_control_2_presionado", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL2_PRESIONADO)
 
 #undef xx
 // clang-format on

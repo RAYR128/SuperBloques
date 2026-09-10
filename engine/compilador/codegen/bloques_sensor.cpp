@@ -33,3 +33,11 @@ void Emit_SENSOR_BOTON_CONTROL_1(NodoBloque *blk) {
 void Emit_SENSOR_BOTON_CONTROL_2(NodoBloque *blk) {
 	EmitirBotonControl(blk, WRAM_CONTROL2, "SENSOR_BOTON_CONTROL_2");
 }
+
+void Emit_SENSOR_BOTON_CONTROL_1_PRESIONADO(NodoBloque *blk) {
+	EmitirBotonControl(blk, WRAM_CONTROL1_PRESIONADO, "SENSOR_BOTON_CONTROL_1");
+}
+
+void Emit_SENSOR_BOTON_CONTROL_2_PRESIONADO(NodoBloque *blk) {
+	EmitirBotonControl(blk, WRAM_CONTROL2_PRESIONADO, "SENSOR_BOTON_CONTROL_2");
+}
