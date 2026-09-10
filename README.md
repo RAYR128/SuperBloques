@@ -70,7 +70,7 @@ Trabajo en progreso.
 
 # Estado actual
 ## Compilador
-El compilador es compilable localmente, no existe target a WASM aun, pero produce una ROM la cual ya es ejecutable en emuladores, pero ya que no hay configuracion de video, el color de la pantalla es asignado a un timer estatico. Emuladores de depuracion de codigo como BSNES muestran que la CPU si esta corriendo. El siguiente paso es inicializar la VRAM de la consola y los registers de video para mostrar una pantalla valida. Despues de eso, seria la implementacion de todos los bloques programables, visualizacion de objetos, serializacion y carga de JSON para proyectos, modificacion de tilemaps y el codigo para generar estos.
+El compilador es compilable localmente, no existe target a WASM aun, pero produce una ROM la cual ya es ejecutable en emuladores. Los objetos no tienen sistema de renderizacion aun.
 
 ## Backend
 Trabajo a empezar, el plan es hacer una plataforma de distribucion y almacenacion de proyectos JSON y un sistema de cuentas.
