@@ -1,5 +1,6 @@
 import {initMenu} from "./menu.js";
 import {initTree} from "./tree.js";
+import {initSplitters} from "./splitters.js";
 import {initWorkspace} from "./blocks/workspace.js";
 
 function info(html) {
@@ -14,6 +15,7 @@ window.addEventListener("error", (e) => {
 });
 
 try {
+	initSplitters();
 	initWorkspace();
 	initTree();
 	initMenu();

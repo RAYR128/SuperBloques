@@ -17,6 +17,9 @@
 	--cat-variable: #ff8c1a;
 	--cat-operacion: #59c059;
 	--cat-sensor: #5cb1d6;
+	--objects-width: 190px;
+	--right-width: 548px;
+	--flyout-width: 280px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,13 +129,52 @@ header .sub {
 
 .panel {
 	background: var(--panel);
-	border-right: 1px solid var(--border);
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
 }
 
-.panel:last-child { border-right: none; }
+.splitter {
+	width: 4px;
+	flex-shrink: 0;
+	background: var(--border);
+	cursor: col-resize;
+	position: relative;
+	z-index: 8;
+	touch-action: none;
+}
+
+.splitter::after {
+	content: "";
+	position: absolute;
+	inset: 0 -3px;
+}
+
+.splitter:hover,
+.splitter.dragging {
+	background: var(--accent);
+}
+
+.flyout-splitter {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: var(--flyout-width);
+	width: 4px;
+	margin-left: -2px;
+	z-index: 40;
+}
+
+body.col-resizing {
+	cursor: col-resize;
+	user-select: none;
+}
+
+body.col-resizing iframe,
+body.col-resizing canvas,
+body.col-resizing .injectionDiv {
+	pointer-events: none;
+}
 
 .panel-title {
 	height: 28px;
@@ -149,7 +191,10 @@ header .sub {
 }
 
 /* izquierda: escena / objetos */
-.objects-panel { width: 190px; }
+.objects-panel {
+	width: var(--objects-width);
+	flex-shrink: 0;
+}
 
 .tree {
 	padding: 8px 6px;
@@ -253,12 +298,16 @@ header .sub {
 .dot.scene { background: #59c059; }
 
 /* categorias; el flyout de Blockly vive en el workspace */
-.blocks-panel { width: 108px; flex-direction: row; }
+.blocks-panel {
+	width: 108px;
+	flex-direction: row;
+	flex-shrink: 0;
+	border-right: 1px solid var(--border);
+}
 
 .categories {
 	width: 100%;
 	background: var(--panel-2);
-	border-right: 1px solid var(--border);
 	padding: 8px 8px;
 	display: flex;
 	flex-direction: column;
@@ -309,6 +358,12 @@ header .sub {
 	background: var(--panel);
 	position: relative;
 	min-height: 0;
+	min-width: 0;
+}
+
+#blocklyDiv {
+	width: 100%;
+	height: 100%;
 }
 
 .workspace-body .blocklySvg {
@@ -317,6 +372,10 @@ header .sub {
 
 .blocklyMainBackground {
 	stroke: none !important;
+}
+
+.blocklyFlyout {
+	overflow: hidden !important;
 }
 
 .blocklyFlyoutBackground {
@@ -348,8 +407,10 @@ header .sub {
 
 /* derecha */
 .right-panel {
-	width: 548px;
+	width: var(--right-width);
+	flex-shrink: 0;
 	background: #10141c;
+	overflow: auto;
 }
 
 .stage-wrap {

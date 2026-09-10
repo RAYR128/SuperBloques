@@ -17,6 +17,7 @@ import {
 	theme,
 } from "./catalog.js";
 import {loadBloquesIntoWorkspace, workspaceToBloques} from "./serializer.js";
+import {getFlyoutWidth, onLayoutChange} from "../splitters.js";
 
 Blockly.setLocale(Es);
 
@@ -205,8 +206,40 @@ export function initWorkspace() {
 	const ro = new ResizeObserver(() => Blockly.svgResize(workspace));
 	ro.observe(host);
 	window.addEventListener("resize", () => Blockly.svgResize(workspace));
+	lockFlyoutWidth(workspace);
+	onLayoutChange(() => {
+		applyFlyoutWidth(workspace.getFlyout());
+		Blockly.svgResize(workspace);
+	});
 
 	subscribe(loadEntityIntoWorkspace);
 	lastSelKey = null;
 	loadEntityIntoWorkspace();
+}
+
+function applyFlyoutWidth(flyout) {
+	if (!flyout) {
+		return;
+	}
+	flyout.width_ = getFlyoutWidth();
+	flyout.position();
+	const target = flyout.targetWorkspace;
+	target?.resizeContents();
+	target?.recordDragTargets();
+}
+
+function lockFlyoutWidth(ws) {
+	const flyout = ws.getFlyout();
+	if (!flyout || flyout.__sbWidthLocked) {
+		return;
+	}
+	flyout.__sbWidthLocked = true;
+	if (typeof flyout.reflowInternal_ === "function") {
+		const orig = flyout.reflowInternal_.bind(flyout);
+		flyout.reflowInternal_ = () => {
+			orig();
+			applyFlyoutWidth(flyout);
+		};
+	}
+	applyFlyoutWidth(flyout);
 }
