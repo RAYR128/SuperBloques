@@ -18,6 +18,7 @@ endfunction()
 add_executable(superbloques_cli
 	engine/compilador/main.cpp
 	engine/compilador/rom.cpp
+	engine/compilador/datos.cpp
 	engine/compilador/ensamblador.cpp
 	engine/compilador/instancia.cpp
 	engine/compilador/bloques.cpp

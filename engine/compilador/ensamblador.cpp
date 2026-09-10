@@ -1,7 +1,9 @@
 #include "asm/op.h"
+#include "datos.h"
 #include "ensamblador.h"
 #include "instancia.h"
 #include <cstring>
+#include <stdexcept>
 
 // Compartido
 void ConRegALlamarJumpTable(std::string tabla) {
@@ -337,6 +339,13 @@ void RutinaIRQ() {
 	cc.ReturnInterrupt();
 }
 
+void EmitirTablaEscena(string tabla, string nombre) {
+	cc.Etiqueta(tabla);
+	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
+		cc.EscribirEtiqueta(nombre + EscenasProyecto[i].Nombre, true);
+	}
+}
+
 void EnsamblarROM() {
 	cc.SetearPC(0x000000);
 	RutinaRESET();
@@ -346,14 +355,14 @@ void EnsamblarROM() {
 	RutinaIRQ();
 
 	// Tabla de salto de escena
-	cc.Etiqueta("TABLA_SALTO_ESCENA_INIT");
-	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
-		cc.EscribirEtiqueta("ESCENA_INIT" + EscenasProyecto[i].Nombre, true);
-	}
-	cc.Etiqueta("TABLA_SALTO_ESCENA_MAIN");
-	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
-		cc.EscribirEtiqueta("ESCENA_MAIN" + EscenasProyecto[i].Nombre, true);
-	}
+	EmitirTablaEscena("TABLA_SALTO_ESCENA_INIT", "ESCENA_INIT");
+	EmitirTablaEscena("TABLA_SALTO_ESCENA_MAIN", "ESCENA_MAIN");
+	EmitirTablaEscena("TABLA_DATOS_GraficosPrincipales", "ESCENA_DATO_GraficosPrincipales");
+	EmitirTablaEscena("TABLA_DATOS_GraficosHud", "ESCENA_DATO_GraficosHud");
+	EmitirTablaEscena("TABLA_DATOS_Paleta", "ESCENA_DATO_Paleta");
+	EmitirTablaEscena("TABLA_DATOS_Tilemap1", "ESCENA_DATO_Tilemap1");
+	EmitirTablaEscena("TABLA_DATOS_Tilemap2", "ESCENA_DATO_Tilemap2");
+	EmitirTablaEscena("TABLA_DATOS_Tilemap3", "ESCENA_DATO_Tilemap3");
 
 	// Generar codigo de objetos
 	for(size_t i = 0; i < ObjetosProyecto.size(); i++) {
@@ -362,6 +371,22 @@ void EnsamblarROM() {
 	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
 		EscenasProyecto[i].Compilar();
 	}
+
+	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
+		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");
+	}
+
+	std::vector<BloqueDato> datos;
+	datos.reserve(EscenasProyecto.size() * 6);
+	for(const auto &escena : EscenasProyecto) {
+		datos.push_back({"ESCENA_DATO_GraficosPrincipales" + escena.Nombre, escena.GraficosPrincipales, (uint32_t)sizeof(escena.GraficosPrincipales)});
+		datos.push_back({"ESCENA_DATO_GraficosHud" + escena.Nombre, escena.GraficosHud, (uint32_t)sizeof(escena.GraficosHud)});
+		datos.push_back({"ESCENA_DATO_Paleta" + escena.Nombre, escena.Paleta, (uint32_t)sizeof(escena.Paleta)});
+		datos.push_back({"ESCENA_DATO_Tilemap1" + escena.Nombre, escena.Tilemap1, (uint32_t)sizeof(escena.Tilemap1)});
+		datos.push_back({"ESCENA_DATO_Tilemap2" + escena.Nombre, escena.Tilemap2, (uint32_t)sizeof(escena.Tilemap2)});
+		datos.push_back({"ESCENA_DATO_Tilemap3" + escena.Nombre, escena.Tilemap3, (uint32_t)sizeof(escena.Tilemap3)});
+	}
+	EmpaquetarDatosROM(std::move(datos));
 
 	// Finalizar ROM
 	GenerarHeader();

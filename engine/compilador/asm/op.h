@@ -354,6 +354,9 @@ class Emitidor65816 {
 	void SetearPC(uint32_t direccion);
 	uint32_t ObtenerPC();
 
+	// Escribir un blob crudo en la posicion actual de PC (datos de ROM, no opcodes).
+	void EscribirBytes(const uint8_t *datos, uint32_t tamano);
+
 	// Control de flags de CPU
 	void LimpiarFlags(uint8_t flags);
 	void SetearFlags(uint8_t flags);

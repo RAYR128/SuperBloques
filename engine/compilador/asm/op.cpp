@@ -1,7 +1,9 @@
 #include "rom.h"
 #include "op.h"
 #include <cstdio>
+#include <cstring>
 #include <iostream>
+#include <stdexcept>
 
 // Generacion de codigo dinamico
 Emitidor65816 cc;
@@ -16,6 +18,20 @@ void Emitidor65816::SetearPC(uint32_t direccion) {
 
 uint32_t Emitidor65816::ObtenerPC() {
 	return PC;
+}
+
+void Emitidor65816::EscribirBytes(const uint8_t *datos, uint32_t tamano) {
+	if(tamano == 0) {
+		return;
+	}
+	if(datos == nullptr) {
+		throw std::runtime_error("EscribirBytes: datos nulos");
+	}
+	if(PC >= TAMANO_ROM || tamano > TAMANO_ROM - PC) {
+		throw std::runtime_error("EscribirBytes: fuera de la ROM");
+	}
+	memcpy(&DROM[PC], datos, tamano);
+	PC += tamano;
 }
 
 // Escritura little endian
