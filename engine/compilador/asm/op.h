@@ -395,6 +395,10 @@ class Emitidor65816 {
 	void SumaAcumuladorMemoria(uint16_t addrHw);
 	void RestaAcumuladorMemoria(uint16_t addrHw);
 
+	// AND acumulador (REG_A)
+	void ANDAcumuladorMemoria(uint16_t addrHw);
+	void EORAcumuladorMemoria(uint16_t addrHw);
+
 	// Incrementar/Decrementar datos en memoria
 	void IncrementarMemoria(uint16_t addrHw);
 	void DecrementarMemoria(uint16_t addrHw);

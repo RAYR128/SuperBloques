@@ -30,6 +30,8 @@ enum {
 
 // La consola nativamente almacena los controladores como variables de 16-bit en HW_CNTRL
 // Esto tiene byetudlraxLRxxxx (bit 15..0). Los bits 0-3 son firma del control (no son botones).
+#define WRAM_CONTROL1_MASK 0x00EC
+#define WRAM_CONTROL2_MASK 0x00EE
 #define WRAM_CONTROL1 0x00F0
 #define WRAM_CONTROL1_AXLR_MANTENIDO 0x00F0 // Datos de control 1 en bits
 #define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F1 // Datos de control 1 en bits

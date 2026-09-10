@@ -27,6 +27,20 @@ void ConRegALlamarJumpTable(std::string tabla) {
 void RutinaLoopPrincipal() {
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+
+	// TO-DO: Añadir latch (WRAM_CONTROL1_PRESIONADO)
+	for(int i = 0; i < 2; i++) {
+		int hwCntrl = HW_CNTRL1 + i * 2;
+		int cntMask = WRAM_CONTROL1_MASK + i * 2;
+		int cntIndex = WRAM_CONTROL1 + i * 4;
+		cc.CargarRegEnMemoria(REG_A, hwCntrl);
+		cc.AlmacenarRegEnMemoria(REG_A, cntIndex);
+		cc.Transferir(REG_A, REG_Y);
+		cc.EORAcumuladorMemoria(cntMask);
+		cc.ANDAcumuladorMemoria(cntIndex);
+		cc.AlmacenarRegEnMemoria(REG_A, cntIndex + 2);
+		cc.AlmacenarRegEnMemoria(REG_Y, cntMask);
+	}
 	
 	// Correr codigo main de escena
 	cc.LlamadaLong("LLAMAR_ESCENA_ID");
