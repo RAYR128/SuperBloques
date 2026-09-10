@@ -163,7 +163,7 @@ const JSON_BLOCKS = [
 	},
 	{
 		type: "control_if",
-		message0: "si %1 entonces",
+		message0: "si %1 no es 0 entonces",
 		args0: [{type: "input_value", name: "COND", check: "Number"}],
 		message1: "%1",
 		args1: [{type: "input_statement", name: "CUERPO"}],
@@ -173,7 +173,7 @@ const JSON_BLOCKS = [
 	},
 	{
 		type: "control_while",
-		message0: "mientras %1",
+		message0: "mientras que %1 no es 0",
 		args0: [{type: "input_value", name: "COND", check: "Number"}],
 		message1: "%1",
 		args1: [{type: "input_statement", name: "CUERPO"}],
@@ -183,7 +183,7 @@ const JSON_BLOCKS = [
 	},
 	{
 		type: "control_ifelse",
-		message0: "si %1 entonces",
+		message0: "si %1 no es 0 entonces",
 		args0: [{type: "input_value", name: "COND", check: "Number"}],
 		message1: "%1",
 		args1: [{type: "input_statement", name: "CUERPO"}],

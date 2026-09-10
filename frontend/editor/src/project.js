@@ -12,9 +12,13 @@ export const OBJETO_VARIABLES_MAX = 43;
 
 const listeners = new Set();
 
+export const NOMBRE_ARCHIVO_DEFECTO = "Nuevo Proyecto.json";
+
 export const state = {
 	proyecto: proyectoPorDefecto(),
 	seleccion: {tipo: "escena", nombre: "Escena1"},
+	nombreArchivo: NOMBRE_ARCHIVO_DEFECTO,
+	generation: 0,
 };
 
 export function subscribe(fn) {
@@ -224,4 +228,37 @@ export function guardarBloquesActuales(bloques) {
 		return;
 	}
 	entidad.Bloques = bloques;
+}
+
+function primeraSeleccion(proyecto) {
+	const escenas = Object.keys(proyecto.Escenas);
+	if (escenas.length) {
+		return {tipo: "escena", nombre: escenas[0]};
+	}
+	const objetos = Object.keys(proyecto.Objetos);
+	if (objetos.length) {
+		return {tipo: "objeto", nombre: objetos[0]};
+	}
+	return null;
+}
+
+function tituloDeArchivo(nombreArchivo) {
+	const nombre = (nombreArchivo || NOMBRE_ARCHIVO_DEFECTO).replace(/\.json$/i, "").trim();
+	return nombre || "Nuevo Proyecto";
+}
+
+function actualizarTitulo() {
+	const el = document.querySelector("header .sub");
+	if (el) {
+		el.textContent = tituloDeArchivo(state.nombreArchivo);
+	}
+}
+
+export function cargarProyecto(proyecto, nombreArchivo) {
+	state.proyecto = proyecto;
+	state.nombreArchivo = nombreArchivo || NOMBRE_ARCHIVO_DEFECTO;
+	state.generation += 1;
+	state.seleccion = primeraSeleccion(proyecto);
+	actualizarTitulo();
+	notify();
 }

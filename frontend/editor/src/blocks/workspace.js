@@ -69,7 +69,8 @@ function refreshFlyout() {
 
 function selKey() {
 	const sel = state.seleccion;
-	return sel ? `${sel.tipo}:${sel.nombre}` : "";
+	const gen = state.generation ?? 0;
+	return sel ? `${gen}:${sel.tipo}:${sel.nombre}` : `${gen}:`;
 }
 
 function refreshVariableFields() {
@@ -98,6 +99,7 @@ function loadEntityIntoWorkspace() {
 	if (!workspace) {
 		return;
 	}
+	clearTimeout(flushTimer);
 	const key = selKey();
 	if (key === lastSelKey) {
 		refreshFlyout();

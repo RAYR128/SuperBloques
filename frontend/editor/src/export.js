@@ -1,6 +1,4 @@
-import {state} from "./project.js";
-
-const NOMBRE_ARCHIVO = "Nuevo Proyecto.json";
+import {NOMBRE_ARCHIVO_DEFECTO, state} from "./project.js";
 
 export function exportarProyecto() {
 	const json = JSON.stringify(state.proyecto, null, "\t");
@@ -8,7 +6,7 @@ export function exportarProyecto() {
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement("a");
 	a.href = url;
-	a.download = NOMBRE_ARCHIVO;
+	a.download = state.nombreArchivo || NOMBRE_ARCHIVO_DEFECTO;
 	a.click();
 	URL.revokeObjectURL(url);
 }

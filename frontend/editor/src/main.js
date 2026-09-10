@@ -25,7 +25,7 @@ try {
 	if (params.has("menu")) {
 		document.getElementById("menu-file")?.click();
 	}
-	info('<div class="ok">[ok] editor listo</div><div class="dim">File → Export guarda spec/BLOQUES.md</div>');
+	info('<div class="ok">[ok] editor listo</div>');
 } catch (e) {
 	console.error(e);
 	info(`<div class="warn">[error] ${e.message}</div><div class="dim">${e.stack ?? ""}</div>`);
