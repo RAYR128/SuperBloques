@@ -168,6 +168,16 @@ void Emitidor65816::SumaAcumuladorMemoria(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
+void Emitidor65816::RestaAcumuladorConst16(uint16_t valor) {
+	EmitirByte(OP_SBC_IMMM);
+	EmitirPalabra(valor);
+}
+
+void Emitidor65816::RestaAcumuladorMemoria(uint16_t valor) {
+	EmitirByte(OP_SBC_ABS);
+	EmitirPalabra(valor);
+}
+
 void Emitidor65816::ANDAcumuladorConst8(uint8_t valor) {
 	EmitirByte(OP_AND_IMMM);
 	EmitirByte(valor);

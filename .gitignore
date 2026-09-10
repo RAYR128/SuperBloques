@@ -8,4 +8,5 @@ build-*/
 *.exe
 *.sym
 *.log
+*.csv
 superbloques_cli

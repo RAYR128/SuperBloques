@@ -22,7 +22,11 @@ enum {
 
 #define WRAM_DIRECTPAGE 0x0000 // DP, acceso rapido
 
+// WRAM_SCRATCH se usa de dos formas que nunca coinciden en el tiempo:
+// 1) ConRegALlamarJumpTable (dispatch de escena) guarda un word temporal aqui.
+// 2) El evaluador de expresiones usa 16 slots de 16-bit (compile-time) para anidar operaciones.
 #define WRAM_SCRATCH 0x0000 // Variables temporales
+#define WRAM_SCRATCH_SIZE 0x0040 // Tamaño de scratch (0x00-0x3F), utiliza 16-bit (index * 2)
 
 #define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F0 // Datos de control 1 en bits
 #define WRAM_CONTROL1_BYETUDLR_PRESIONADO 0x00F1 // Datos de control 1 en bits, solo para el cuadro actual

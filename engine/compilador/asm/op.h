@@ -361,9 +361,12 @@ class Emitidor65816 {
 	void CargarRegConst8(Registers reg, uint8_t valor);
 	void CargarRegConst16(Registers reg, uint16_t valor);
 
-	// Sumar a acumulador (REG_A)
+	// Sumar a acumulador (REG_A) El caller debe hacer CLC (LimpiarFlags(FLAG_CARRYF)) antes.
 	void SumaAcumuladorConst8(uint8_t valor);
 	void SumaAcumuladorConst16(uint16_t valor);
+
+	// Restar de acumulador (REG_A). El caller debe hacer SEC (SetearFlags(FLAG_CARRYF)) antes.
+	void RestaAcumuladorConst16(uint16_t valor);
 
 	// AND acumulador (REG_A)
 	void ANDAcumuladorConst8(uint8_t valor);
@@ -388,8 +391,9 @@ class Emitidor65816 {
 	void AlmacenarCeroEnMemoria(uint16_t addrHw);
 	void AlmacenarCeroEnMemoria_IndX(uint16_t addrHw);
 
-	// Sumar a acumulador (REG_A)
+	// Sumar / restar acumulador (REG_A) con memoria absoluta
 	void SumaAcumuladorMemoria(uint16_t addrHw);
+	void RestaAcumuladorMemoria(uint16_t addrHw);
 
 	// Incrementar/Decrementar datos en memoria
 	void IncrementarMemoria(uint16_t addrHw);

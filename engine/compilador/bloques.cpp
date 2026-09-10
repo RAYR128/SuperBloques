@@ -6,7 +6,12 @@ struct MapaTipoBloque {
 };
 
 static const MapaTipoBloque kMapaTipos[] = {
-	#define xx(n,s) {BLOQUE_##n,s},
+	#define xx(n,s,c) {BLOQUE_##n,s},
+	#include "listabloques.h"
+};
+
+static const ClaseBloque kClasesBloque[] = {
+	#define xx(n,s,c) c,
 	#include "listabloques.h"
 };
 
@@ -28,6 +33,9 @@ std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada) {
 	return "";
 }
 
-void NodoBloque::Compilar() {
-	
+ClaseBloque ObtenerClaseBloque(TipoBloque Entrada) {
+	if((unsigned)Entrada >= BLOQUE_MAX) {
+		return BLOQUE_CLASE_CATEGORIA;
+	}
+	return kClasesBloque[Entrada];
 }

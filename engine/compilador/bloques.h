@@ -3,9 +3,17 @@
 #include <string>
 #include <vector>
 
+// Clasificacion de un bloque: paleta, sombrero de script, statement o reporter.
+enum ClaseBloque {
+	BLOQUE_CLASE_CATEGORIA,
+	BLOQUE_CLASE_EVENTO,
+	BLOQUE_CLASE_ACCION,
+	BLOQUE_CLASE_VALOR
+};
+
 // Tipos de bloques que pueden existir en un objeto de la escena. Cada bloque tiene un comportamiento distinto y puede contener distintos datos.
 enum TipoBloque {
-	#define xx(n,s) BLOQUE_##n,
+	#define xx(n,s,c) BLOQUE_##n,
 	#include "listabloques.h"
 	BLOQUE_MAX
 };
@@ -13,6 +21,7 @@ enum TipoBloque {
 // Serializer
 TipoBloque ConvertirStringATipoDeBloque(std::string Entrada);
 std::string ConvertirTipoDeBloqueAString(TipoBloque Entrada);
+ClaseBloque ObtenerClaseBloque(TipoBloque Entrada);
 
 // Los bloques actuan como un arbol AST (Abstract Syntax Tree) que representa la logica de un objeto en la escena.
 // Cada bloque puede contener otros bloques como hijos, formando una estructura jerarquica que define el comportamiento del objeto.
@@ -24,7 +33,7 @@ class NodoBloque {
 		  Previo(nullptr) {}
 	~NodoBloque() {}
 
-	// Compilar un bloque y todos sus sub-bloques.
+	// Emitir este nodo (tabla de salto Emit_*). No recorre Siguiente.
 	void Compilar();
 
 	// Tipo de bloque

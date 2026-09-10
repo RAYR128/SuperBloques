@@ -3,5 +3,22 @@
 #include "asm/op.h"
 #include "bloques.h"
 
-#define xx(n,s) extern void Emit_##n(NodoBloque* blk);
+enum ContextoCompilacion {
+	CTX_ESCENA,
+	CTX_OBJETO
+};
+
+void SetContextoCompilacion(ContextoCompilacion ctx);
+ContextoCompilacion ObtenerContextoCompilacion();
+
+uint16_t ScratchPush();
+void ScratchPop();
+
+void CompilarExpresion(NodoBloque *n);
+void CompilarCadenaAcciones(NodoBloque *primero);
+void CargarVariableEnA(int indice);
+void AlmacenarAEnVariable(int indice);
+void EmitirNoImplementado(NodoBloque *blk);
+
+#define xx(n, s, c) extern void Emit_##n(NodoBloque *blk);
 #include "listabloques.h"

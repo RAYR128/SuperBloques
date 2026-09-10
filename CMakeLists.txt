@@ -25,7 +25,14 @@ add_executable(superbloques_cli
 	engine/compilador/serializer/cargar.cpp
 	engine/compilador/serializer/guardar.cpp
 	engine/compilador/serializer/base64.cpp
+	engine/compilador/codegen/codegen.cpp
 	engine/compilador/codegen/bloques_motion.cpp
+	engine/compilador/codegen/bloques_evento.cpp
+	engine/compilador/codegen/bloques_variable.cpp
+	engine/compilador/codegen/bloques_operacion.cpp
+	engine/compilador/codegen/bloques_control.cpp
+	engine/compilador/codegen/bloques_animacion.cpp
+	engine/compilador/codegen/bloques_sonido.cpp
 )
 target_include_directories(superbloques_cli PRIVATE
 	${CMAKE_SOURCE_DIR}/engine/compilador
