@@ -1,108 +1,74 @@
-#include <iostream>
-#include <stdexcept>
-#include "rom.h"
 #include "ensamblador.h"
-#include "instancia.h"
+#include "rom.h"
+#include "serializer/serializer.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
-int main() {
-	EscenasProyecto.clear();
-	ObjetosProyecto.clear();
+static void MostrarAyuda(const char *Programa) {
+	std::cerr << "Uso: " << Programa << " -i <proyecto.json> [-o <salida.sfc>]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "  -i <archivo>    Proyecto JSON a compilar" << std::endl;
+	std::cerr << "  -o <archivo>    Ruta de salida de la ROM (por defecto: salida.sfc)" << std::endl;
+	std::cerr << "  -h, --help      Muestra esta ayuda" << std::endl;
+}
 
-	EscenasProyecto.push_back(Escena{});
-	Escena &EscenaEjemplo = EscenasProyecto.back();
-	EscenaEjemplo.Nombre = "Escena1";
-	EscenaEjemplo.Variables = {"Variable 1", "Variable 2"};
-	EscenaEjemplo.Bloques.resize(6);
+static std::string LeerArchivo(const std::string &Ruta) {
+	std::ifstream Archivo(Ruta);
+	if(!Archivo) {
+		throw std::runtime_error("no se pudo abrir: " + Ruta);
+	}
+	std::ostringstream Contenido;
+	Contenido << Archivo.rdbuf();
+	return Contenido.str();
+}
 
-	NodoBloque &EventoFrame = EscenaEjemplo.Bloques[0];
-	NodoBloque &StoreVar1 = EscenaEjemplo.Bloques[1];
-	NodoBloque &StoreVar2 = EscenaEjemplo.Bloques[2];
-	NodoBloque &SetLayer1X = EscenaEjemplo.Bloques[3];
-	NodoBloque &SetMosaico = EscenaEjemplo.Bloques[4];
-	NodoBloque &SetBrillo = EscenaEjemplo.Bloques[5];
+int main(int argc, char **argv) {
+	const char *Programa = (argc > 0 && argv[0] != nullptr) ? argv[0] : "superbloques_cli";
+	std::string RutaEntrada;
+	std::string RutaSalida = "salida.sfc";
 
-	EventoFrame.TipoDeBloque = BLOQUE_EVENTO_FRAME;
-
-	StoreVar1.TipoDeBloque = BLOQUE_VARIABLE_STORE;
-	StoreVar1.ParametroEspecial = 0;
-	{
-		NodoBloque Suma;
-		Suma.TipoDeBloque = BLOQUE_OPERACION_SUMA;
-		NodoBloque Lit4;
-		Lit4.TipoDeBloque = BLOQUE_NUMERO;
-		Lit4.ParametroEspecial = 4;
-		NodoBloque Lit12;
-		Lit12.TipoDeBloque = BLOQUE_NUMERO;
-		Lit12.ParametroEspecial = 12;
-		Suma.Entradas.push_back(Lit4);
-		Suma.Entradas.push_back(Lit12);
-		StoreVar1.Entradas.push_back(Suma);
+	for(int i = 1; i < argc; i++) {
+		const std::string Arg = argv[i];
+		if(Arg == "-h" || Arg == "--help") {
+			MostrarAyuda(Programa);
+			return 0;
+		}
+		if(Arg == "-i") {
+			if(i + 1 >= argc) {
+				std::cerr << "falta el archivo de entrada para -i" << std::endl;
+				MostrarAyuda(Programa);
+				return 1;
+			}
+			RutaEntrada = argv[++i];
+			continue;
+		}
+		if(Arg == "-o") {
+			if(i + 1 >= argc) {
+				std::cerr << "falta el archivo de salida para -o" << std::endl;
+				MostrarAyuda(Programa);
+				return 1;
+			}
+			RutaSalida = argv[++i];
+			continue;
+		}
+		std::cerr << "argumento desconocido: " << Arg << std::endl;
+		MostrarAyuda(Programa);
+		return 1;
 	}
 
-	StoreVar2.TipoDeBloque = BLOQUE_VARIABLE_STORE;
-	StoreVar2.ParametroEspecial = 1;
-	{
-		NodoBloque GetLayer;
-		GetLayer.TipoDeBloque = BLOQUE_ANIMACION_SCENE_LAYER1_POSITION_X;
-		StoreVar2.Entradas.push_back(GetLayer);
+	if(RutaEntrada.empty()) {
+		MostrarAyuda(Programa);
+		return 1;
 	}
-
-	SetLayer1X.TipoDeBloque = BLOQUE_ANIMACION_SCENE_SET_LAYER1_POSITION_X;
-	{
-		NodoBloque Lit16;
-		Lit16.TipoDeBloque = BLOQUE_NUMERO;
-		Lit16.ParametroEspecial = 16;
-		SetLayer1X.Entradas.push_back(Lit16);
-	}
-
-	SetMosaico.TipoDeBloque = BLOQUE_ANIMACION_SCENE_SET_MOSAIC_FILTER;
-	{
-		NodoBloque Lit;
-		Lit.TipoDeBloque = BLOQUE_NUMERO;
-		Lit.ParametroEspecial = 0xF0;
-		SetMosaico.Entradas.push_back(Lit);
-	}
-
-	SetBrillo.TipoDeBloque = BLOQUE_ANIMACION_SCENE_SET_BRIGHTNESS;
-	{
-		NodoBloque Lit;
-		Lit.TipoDeBloque = BLOQUE_NUMERO;
-		Lit.ParametroEspecial = 0xF0;
-		SetBrillo.Entradas.push_back(Lit);
-	}
-
-	EventoFrame.Siguiente = &StoreVar1;
-	StoreVar1.Previo = &EventoFrame;
-	StoreVar1.Siguiente = &StoreVar2;
-	StoreVar2.Previo = &StoreVar1;
-	StoreVar2.Siguiente = &SetLayer1X;
-	SetLayer1X.Previo = &StoreVar2;
-	SetLayer1X.Siguiente = &SetMosaico;
-	SetMosaico.Previo = &SetLayer1X;
-	SetMosaico.Siguiente = &SetBrillo;
-	SetBrillo.Previo = &SetMosaico;
-
-	ObjetosProyecto.push_back(ObjetoEscena{});
-	ObjetoEscena &ObjetoEjemplo = ObjetosProyecto.back();
-	ObjetoEjemplo.Nombre = "Objeto1";
-	ObjetoEjemplo.Bloques.resize(2);
-	NodoBloque &ObjFrame = ObjetoEjemplo.Bloques[0];
-	NodoBloque &SetSprite = ObjetoEjemplo.Bloques[1];
-	ObjFrame.TipoDeBloque = BLOQUE_EVENTO_FRAME;
-	SetSprite.TipoDeBloque = BLOQUE_ANIMACION_OBJ_SET_SPRITE;
-	{
-		NodoBloque Lit;
-		Lit.TipoDeBloque = BLOQUE_NUMERO;
-		Lit.ParametroEspecial = 3;
-		SetSprite.Entradas.push_back(Lit);
-	}
-	ObjFrame.Siguiente = &SetSprite;
-	SetSprite.Previo = &ObjFrame;
 
 	try {
+		CargarProyectoDesdeString(LeerArchivo(RutaEntrada));
 		InicializarROM();
 		EnsamblarROM();
-		GuardarROMArchivo("salida.sfc");
+		GuardarROMArchivo(RutaSalida.c_str());
 	} catch(const std::exception &ex) {
 		std::cerr << ex.what() << std::endl;
 		return 1;

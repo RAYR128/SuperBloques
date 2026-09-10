@@ -85,6 +85,10 @@ void Emitidor65816::IntercambiarCarryConEmulacion() {
 	EmitirByte(OP_XCE_IMP);
 }
 
+void Emitidor65816::IntercambiarBytesA() {
+	EmitirByte(OP_XBA_IMP);
+}
+
 void Emitidor65816::AlmacenarCeroEnMemoria(uint16_t addrHw) {
 	EmitirByte(OP_STZ_ABS);
 	EmitirPalabra(addrHw);
@@ -104,6 +108,12 @@ void Emitidor65816::ShiftALeft(int veces) {
 void Emitidor65816::ShiftARight(int veces) {
 	for(int i = 0; i < veces; i++) {
 		EmitirByte(OP_LSR_ACC);
+	}
+}
+
+void Emitidor65816::RotarARight(int veces) {
+	for(int i = 0; i < veces; i++) {
+		EmitirByte(OP_ROR_ACC);
 	}
 }
 
@@ -200,6 +210,11 @@ void Emitidor65816::ANDAcumuladorConst8(uint8_t valor) {
 void Emitidor65816::ANDAcumuladorConst16(uint16_t valor) {
 	EmitirByte(OP_AND_IMMM);
 	EmitirPalabra(valor);
+}
+
+void Emitidor65816::ORAcumuladorConst8(uint8_t valor) {
+	EmitirByte(OP_ORA_IMMM);
+	EmitirByte(valor);
 }
 
 void Emitidor65816::ORAcumuladorConst16(uint16_t valor) {

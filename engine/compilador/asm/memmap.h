@@ -11,7 +11,7 @@
 #define OBJETO_VARIABLES_MAX 43
 #define ESCENA_VARIABLES_MAX 128
 
-enum {
+enum ParametrosObjeto {
 	PARAMETRO_OBJ_BHV_SCRIPT_STATUS = 0,  // 1 byte para un estado de este objeto, 0 = no existe, 1-255 = usar como jump table
 	PARAMETRO_OBJ_BHV_SCRIPT_POINTER = 1, // 3 bytes para una ubicacion en PC
 	PARAMETRO_OBJ_POSICION_X = 4,		  // 2 bytes para la posicion X del objeto
@@ -37,6 +37,7 @@ enum {
 #define WRAM_V_LAYER3_Y 0x00DA
 #define WRAM_V_FILTRO_MOSAICO 0x00DC // Filtro mosaico (1 byte)
 #define WRAM_V_BRILLO 0x00DD		 // Brillo de pantalla (1 byte).. valores 0-15
+#define WRAM_V_COLDATA 0x00DE		 // Datos a subir en COLDATA
 
 // La consola nativamente almacena los controladores como variables de 16-bit en HW_CNTRL
 // Esto tiene byetudlraxLRxxxx (bit 15..0). Los bits 0-3 son firma del control (no son botones).
@@ -202,3 +203,18 @@ enum BotonControl {
 #define HW_HDMABANK 0x4307	// HDMA indirect table bank
 #define HW_DMAIDX 0x4308	// HDMA intermediate address (2 bytes)
 #define HW_HDMALINES 0x430A // HDMA line counter
+
+// Parametros de DMA (HW_DMAPARAM). Se combinan con OR.
+enum ParametrosDMA {
+	HW_DMA_1Byte1Addr = 0x00,	// %000
+	HW_DMA_2Byte2Addr = 0x01,	// %001
+	HW_DMA_2Byte1Addr = 0x02,	// %010
+	HW_DMA_4Byte2Addr = 0x03,	// %011
+	HW_DMA_4Byte4Addr = 0x04,	// %100
+	HW_DMA_ABusInc = 0x00,		// %00000
+	HW_DMA_ABusDec = 0x10,		// %10000
+	HW_DMA_ABusFix = 0x08,		// %01000
+	HW_DMA_HDMAIndirect = 0x40, // %01000000
+	HW_DMA_AtoB = 0x00,			// %00000000
+	HW_DMA_BtoA = 0x80			// %10000000
+}

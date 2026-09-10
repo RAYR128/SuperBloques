@@ -354,8 +354,9 @@ class Emitidor65816 {
 	void LimpiarFlags(uint8_t flags);
 	void SetearFlags(uint8_t flags);
 
-	// XCE, operacion especial.
+	// XCE / XBA, operaciones especiales.
 	void IntercambiarCarryConEmulacion();
+	void IntercambiarBytesA();
 
 	// Cargar valor directo/constante a un register
 	void CargarRegConst8(Registers reg, uint8_t valor);
@@ -373,6 +374,7 @@ class Emitidor65816 {
 	void ANDAcumuladorConst16(uint16_t valor);
 
 	// ORA acumulador (REG_A)
+	void ORAcumuladorConst8(uint8_t valor);
 	void ORAcumuladorConst16(uint16_t valor);
 
 	// Comparar register con un valor constante
@@ -413,6 +415,7 @@ class Emitidor65816 {
 	// Operaciones con bits
 	void ShiftALeft(int veces = 1);
 	void ShiftARight(int veces = 1);
+	void RotarARight(int veces = 1);
 
 	// Transferir
 	void Transferir(Registers entrada, Registers destino);

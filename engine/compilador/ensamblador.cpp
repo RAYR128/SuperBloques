@@ -123,15 +123,35 @@ void RutinaControlEscena() {
 }
 
 void RutinaConfiguracionVideo() {
-	// Pantalla: Utilizar WRAM_TIMER (temporal)
-	cc.CargarRegConst8(REG_A, 0x00);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_CGADD);
-	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
-	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER + 1);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
-	cc.CargarRegConst8(REG_A, 0xFF);
+	// Paleta WRAM -> CGRAM (DMA ch0) y conversion de WRAM_V_COLDATA a COLDATA.
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+
+	cc.CargarRegConst16(REG_A, 0x0200);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);
+	cc.CargarRegConst16(REG_A, ((HW_CGDATA & 0xFF) << 8) | HW_DMA_1Byte1Addr);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAPARAM);
+	cc.CargarRegConst16(REG_A, WRAM_PALETA);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR);
+
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_COLDATA);
+	cc.ShiftALeft(3);
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT | FLAG_CARRYF);
+	cc.RotarARight(3);
+	cc.IntercambiarBytesA();
+	cc.ORAcumuladorConst8(0x40);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_COLDATA);
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_COLDATA + 1);
+	cc.ShiftARight();
+	cc.SetearFlags(FLAG_CARRYF);
+	cc.RotarARight();
+	cc.AlmacenarRegEnMemoria(REG_A, HW_COLDATA);
+	cc.IntercambiarBytesA();
+	cc.AlmacenarRegEnMemoria(REG_A, HW_COLDATA);
+
+	cc.AlmacenarCeroEnMemoria(HW_CGADD);
+	cc.AlmacenarCeroEnMemoria(HW_DMAADDR + 2);
+	cc.CargarRegConst8(REG_A, 1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
 }
 
 // $FFDC-$FFDF (LoROM $7FDC-$7FDF): complemento + checksum de 16 bits.
@@ -291,7 +311,7 @@ void RutinaNMI() {
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 	RutinaConfiguracionVideo();
-	cc.CargarRegConst8(REG_A, 0x0F);
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_BRILLO);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 
 	// rescatar estado de CPU, volver a ejecucion normal
