@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 void Emit_OPERACION(NodoBloque *blk) {
-	(void)blk;
+	EmitirNoImplementado(blk);
 }
 
 static void EmitirBinaria(NodoBloque *blk, bool resta) {

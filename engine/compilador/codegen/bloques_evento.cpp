@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 void Emit_EVENTO(NodoBloque *blk) {
-	(void)blk;
+	EmitirNoImplementado(blk);
 }
 
 static void EmitirEvento(NodoBloque *blk) {
