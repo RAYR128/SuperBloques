@@ -100,3 +100,34 @@ void Emit_ANIMACION_SCENE_SET_BRIGHTNESS(NodoBloque *blk) {
 	ClampAUnsigned(0x000F, "BRI");
 	StoreA8(WRAM_V_BRILLO);
 }
+
+static void EmitirCanal5Bit(NodoBloque *entrada, int shift, const char *tag) {
+	CompilarExpresion(entrada);
+	cc.ShiftARight(3);
+	ClampAUnsigned(0x001F, tag);
+	if(shift) {
+		cc.ShiftALeft(shift);
+	}
+}
+
+void Emit_ANIMACION_SCENE_SET_COLOR(NodoBloque *blk) {
+	EsperarEntradas(blk, 4);
+
+	CompilarExpresion(&blk->Entradas[0]);
+	cc.ANDAcumuladorConst16(0x00FF);
+	cc.ShiftALeft(1);
+	cc.Transferir(REG_A, REG_X);
+
+	uint16_t color = ScratchPush();
+	EmitirCanal5Bit(&blk->Entradas[1], 0, "CR");
+	cc.AlmacenarRegEnMemoria(REG_A, color);
+
+	EmitirCanal5Bit(&blk->Entradas[2], 5, "CG");
+	cc.ORAcumuladorMemoria(color);
+	cc.AlmacenarRegEnMemoria(REG_A, color);
+
+	EmitirCanal5Bit(&blk->Entradas[3], 10, "CB");
+	cc.ORAcumuladorMemoria(color);
+	cc.AlmacenarRegEnMemoria_IndX(REG_A, WRAM_PALETA);
+	ScratchPop();
+}

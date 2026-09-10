@@ -13,8 +13,8 @@
 			"Bloques": {
 				"bloque_id_001": {
 					"PosicionVisual": [
-						286,
-						97
+						26,
+						29
 					],
 					"Operacion": "evento_init",
 					"ParametroEspecial": 0,
@@ -41,8 +41,8 @@
 				},
 				"bloque_id_003": {
 					"PosicionVisual": [
-						-41,
-						332
+						454,
+						75
 					],
 					"Operacion": "evento_frame",
 					"ParametroEspecial": 0,
@@ -51,6 +51,99 @@
 					"Previo": null
 				},
 				"bloque_id_004": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "animacion_scene_set_color",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 255,
+							"Entradas": []
+						}
+					],
+					"Siguiente": "bloque_id_005",
+					"Previo": "bloque_id_003"
+				},
+				"bloque_id_005": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "control_if",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "sensor_boton_control_1",
+							"ParametroEspecial": 12,
+							"Entradas": []
+						}
+					],
+					"Siguiente": null,
+					"Previo": "bloque_id_004",
+					"Cuerpo": "bloque_id_006"
+				},
+				"bloque_id_006": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "animacion_scene_set_color",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 255,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						}
+					],
+					"Siguiente": null,
+					"Previo": null
+				},
+				"bloque_id_007": {
+					"PosicionVisual": [
+						-41,
+						332
+					],
+					"Operacion": "evento_frame",
+					"ParametroEspecial": 0,
+					"Entradas": [],
+					"Siguiente": "bloque_id_008",
+					"Previo": null
+				},
+				"bloque_id_008": {
 					"PosicionVisual": [
 						0,
 						0
@@ -75,10 +168,10 @@
 							]
 						}
 					],
-					"Siguiente": "bloque_id_005",
-					"Previo": "bloque_id_003"
+					"Siguiente": "bloque_id_009",
+					"Previo": "bloque_id_007"
 				},
-				"bloque_id_005": {
+				"bloque_id_009": {
 					"PosicionVisual": [
 						0,
 						0
@@ -93,7 +186,7 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_004"
+					"Previo": "bloque_id_008"
 				}
 			}
 		}

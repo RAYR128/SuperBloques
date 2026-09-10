@@ -6,7 +6,7 @@ export const VALUE_INPUTS = {
 	motion_set_posicion_y: ["VAL"],
 	motion_add_posicion_x: ["VAL"],
 	motion_add_posicion_y: ["VAL"],
-	animation_obj_set_sprite: ["VAL"],
+	animacion_obj_set_sprite: ["VAL"],
 	animacion_scene_set_layer1_position_x: ["VAL"],
 	animacion_scene_set_layer1_position_y: ["VAL"],
 	animacion_scene_set_layer2_position_x: ["VAL"],
@@ -15,6 +15,7 @@ export const VALUE_INPUTS = {
 	animacion_scene_set_layer3_position_y: ["VAL"],
 	animacion_scene_set_mosaic_filter: ["VAL"],
 	animacion_scene_set_brightness: ["VAL"],
+	animacion_scene_set_color: ["IDX", "R", "G", "B"],
 	variable_store: ["VAL"],
 	operation_add: ["A", "B"],
 	operation_sub: ["A", "B"],
@@ -171,7 +172,7 @@ const JSON_BLOCKS = [
 		style: "mocion_blocks",
 	},
 	{
-		type: "animation_obj_set_sprite",
+		type: "animacion_obj_set_sprite",
 		message0: "fijar sprite a %1",
 		args0: [{type: "input_value", name: "VAL", check: "Number"}],
 		previousStatement: null,
@@ -274,6 +275,19 @@ const JSON_BLOCKS = [
 		type: "animacion_scene_set_brightness",
 		message0: "cambiar brillo a %1 en escena",
 		args0: [{type: "input_value", name: "VAL", check: "Number"}],
+		previousStatement: null,
+		nextStatement: null,
+		style: "animacion_blocks",
+	},
+	{
+		type: "animacion_scene_set_color",
+		message0: "cambiar color paleta %1 a R %2 G %3 B %4 en escena",
+		args0: [
+			{type: "input_value", name: "IDX", check: "Number"},
+			{type: "input_value", name: "R", check: "Number"},
+			{type: "input_value", name: "G", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
 		previousStatement: null,
 		nextStatement: null,
 		style: "animacion_blocks",
@@ -468,7 +482,7 @@ function bloqueConSombras(type, inputs) {
 // Bloques que no se ofrecen en el toolbox segun el tipo de entidad.
 // La mocion es de objetos (una escena no tiene posicion propia).
 // Los bloques de animacion van a ser especificos de objeto o de escena
-// (p.ej. animation_obj_set_sprite solo en objetos).
+// (p.ej. animacion_obj_set_sprite solo en objetos).
 export const BLOQUES_NO_PERMITIDOS = {
 	escena: new Set([
 		"motion_get_posicion_x",
@@ -477,7 +491,7 @@ export const BLOQUES_NO_PERMITIDOS = {
 		"motion_set_posicion_y",
 		"motion_add_posicion_x",
 		"motion_add_posicion_y",
-		"animation_obj_set_sprite",
+		"animacion_obj_set_sprite",
 	]),
 	objeto: new Set([
 		// bloques especificos a la escena, cuando existan
@@ -529,7 +543,7 @@ const FLYOUT = {
 		bloqueConSombras("motion_add_posicion_y", {VAL: shadowNumero()}),
 	],
 	animacion: [
-		bloqueConSombras("animation_obj_set_sprite", {VAL: shadowNumero()}),
+		bloqueConSombras("animacion_obj_set_sprite", {VAL: shadowNumero()}),
 		{kind: "block", type: "animacion_scene_layer1_position_x"},
 		{kind: "block", type: "animacion_scene_layer1_position_y"},
 		{kind: "block", type: "animacion_scene_layer2_position_x"},
@@ -544,6 +558,12 @@ const FLYOUT = {
 		bloqueConSombras("animacion_scene_set_layer3_position_y", {VAL: shadowNumero()}),
 		bloqueConSombras("animacion_scene_set_mosaic_filter", {VAL: shadowNumero()}),
 		bloqueConSombras("animacion_scene_set_brightness", {VAL: shadowNumero()}),
+		bloqueConSombras("animacion_scene_set_color", {
+			IDX: shadowNumero(),
+			R: shadowNumero(),
+			G: shadowNumero(),
+			B: shadowNumero(),
+		}),
 	],
 	sonido: [{kind: "label", text: "sin bloques"}],
 	control: [

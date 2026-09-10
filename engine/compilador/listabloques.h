@@ -18,7 +18,7 @@ xx(MOTION_ADD_POSICION_Y, "motion_add_posicion_y", BLOQUE_CLASE_ACCION) // PARAM
 
 // Reproduccion de animaciones) control de frames y sprites
 xx(ANIMACION, "animation", BLOQUE_CLASE_CATEGORIA)
-xx(ANIMACION_OBJ_SET_SPRITE, "animation_obj_set_sprite", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_SPRITE = Entradas[0]
+xx(ANIMACION_OBJ_SET_SPRITE, "animacion_obj_set_sprite", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_SPRITE = Entradas[0]
 xx(ANIMACION_SCENE_LAYER1_POSITION_X, "animacion_scene_layer1_position_x", BLOQUE_CLASE_VALOR)
 xx(ANIMACION_SCENE_LAYER1_POSITION_Y, "animacion_scene_layer1_position_y", BLOQUE_CLASE_VALOR)
 xx(ANIMACION_SCENE_LAYER2_POSITION_X, "animacion_scene_layer2_position_x", BLOQUE_CLASE_VALOR)
@@ -33,6 +33,7 @@ xx(ANIMACION_SCENE_SET_LAYER3_POSITION_X, "animacion_scene_set_layer3_position_x
 xx(ANIMACION_SCENE_SET_LAYER3_POSITION_Y, "animacion_scene_set_layer3_position_y", BLOQUE_CLASE_ACCION)
 xx(ANIMACION_SCENE_SET_MOSAIC_FILTER, "animacion_scene_set_mosaic_filter", BLOQUE_CLASE_ACCION)
 xx(ANIMACION_SCENE_SET_BRIGHTNESS, "animacion_scene_set_brightness", BLOQUE_CLASE_ACCION)
+xx(ANIMACION_SCENE_SET_COLOR, "animacion_scene_set_color", BLOQUE_CLASE_ACCION)
 
 // Reproduccion de sonidos y musica
 xx(SONIDO, "sound", BLOQUE_CLASE_CATEGORIA)

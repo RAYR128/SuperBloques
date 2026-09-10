@@ -197,6 +197,11 @@ void Emitidor65816::ANDAcumuladorMemoria(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
+void Emitidor65816::ORAcumuladorMemoria(uint16_t valor) {
+	EmitirByte(OP_ORA_ABS);
+	EmitirPalabra(valor);
+}
+
 void Emitidor65816::EORAcumuladorMemoria(uint16_t valor) {
 	EmitirByte(OP_EOR_ABS);
 	EmitirPalabra(valor);
