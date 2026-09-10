@@ -348,6 +348,60 @@ function bloqueConSombras(type, inputs) {
 	return item;
 }
 
+// Bloques que no se ofrecen en el toolbox segun el tipo de entidad.
+// La mocion es de objetos (una escena no tiene posicion propia).
+// Los bloques de animacion van a ser especificos de objeto o de escena
+// (p.ej. animation_obj_set_sprite solo en objetos).
+export const BLOQUES_NO_PERMITIDOS = {
+	escena: new Set([
+		"motion_get_posicion_x",
+		"motion_get_posicion_y",
+		"motion_set_posicion_x",
+		"motion_set_posicion_y",
+		"motion_add_posicion_x",
+		"motion_add_posicion_y",
+		"animation_obj_set_sprite",
+	]),
+	objeto: new Set([
+		// bloques de animacion de escena, cuando existan
+	]),
+};
+
+export function bloquePermitido(type, tipo) {
+	if (!type || !tipo) {
+		return false;
+	}
+	return !BLOQUES_NO_PERMITIDOS[tipo]?.has(type);
+}
+
+function filtrarFlyout(items, tipo) {
+	const filtrados = items.filter((item) => item.kind !== "block" || bloquePermitido(item.type, tipo));
+	if (!filtrados.some((item) => item.kind === "block" || item.kind === "button")) {
+		return [{kind: "label", text: "sin bloques"}];
+	}
+	return filtrados;
+}
+
+export function categoriaDisponible(cat, tipo) {
+	if (cat === "variable") {
+		return true;
+	}
+	const items = FLYOUT[cat] ?? [];
+	const bloques = items.filter((item) => item.kind === "block");
+	if (!bloques.length) {
+		return true;
+	}
+	return bloques.some((item) => bloquePermitido(item.type, tipo));
+}
+
+export function categoriaTieneBloques(cat, tipo) {
+	if (cat === "variable") {
+		return true;
+	}
+	const items = filtrarFlyout(FLYOUT[cat] ?? [], tipo);
+	return items.some((item) => item.kind === "block" || item.kind === "button");
+}
+
 const FLYOUT = {
 	mocion: [
 		{kind: "block", type: "motion_get_posicion_x"},
@@ -384,9 +438,9 @@ const FLYOUT = {
 	],
 };
 
-export function flyoutDeCategoria(cat, entidad) {
+export function flyoutDeCategoria(cat, entidad, tipo) {
 	if (cat !== "variable") {
-		return FLYOUT[cat] ?? [{kind: "label", text: "sin bloques"}];
+		return filtrarFlyout(FLYOUT[cat] ?? [{kind: "label", text: "sin bloques"}], tipo);
 	}
 
 	const contents = [{kind: "button", text: "Crear variable", callbackkey: "crearVariable"}];

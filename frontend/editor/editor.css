@@ -280,6 +280,17 @@ header .sub {
 
 .cat:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .cat.active { outline: 2px solid #fff; outline-offset: 1px; }
+.cat:disabled {
+	opacity: 0.35;
+	filter: grayscale(0.55);
+	cursor: not-allowed;
+	transform: none;
+	outline: none;
+}
+.cat:disabled:hover {
+	filter: grayscale(0.55);
+	transform: none;
+}
 
 .cat.mocion { background: var(--cat-mocion); }
 .cat.animacion { background: var(--cat-animacion); color: #fff; }

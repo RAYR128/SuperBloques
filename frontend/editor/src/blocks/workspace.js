@@ -8,7 +8,14 @@ import {
 	state,
 	subscribe,
 } from "../project.js";
-import {flyoutDeCategoria, registrarBloques, theme} from "./catalog.js";
+import {
+	CATEGORIAS,
+	categoriaDisponible,
+	categoriaTieneBloques,
+	flyoutDeCategoria,
+	registrarBloques,
+	theme,
+} from "./catalog.js";
 import {loadBloquesIntoWorkspace, workspaceToBloques} from "./serializer.js";
 
 Blockly.setLocale(Es);
@@ -35,11 +42,45 @@ function scheduleFlush() {
 	flushTimer = setTimeout(flushWorkspace, 50);
 }
 
+function tipoSeleccion() {
+	return state.seleccion?.tipo ?? null;
+}
+
 function toolboxJson() {
 	return {
 		kind: "flyoutToolbox",
-		contents: flyoutDeCategoria(categoria, entidadActual()),
+		contents: flyoutDeCategoria(categoria, entidadActual(), tipoSeleccion()),
 	};
+}
+
+function siguienteCategoria(tipo) {
+	return (
+		CATEGORIAS.find((cat) => categoriaDisponible(cat, tipo) && categoriaTieneBloques(cat, tipo)) ??
+		CATEGORIAS.find((cat) => categoriaDisponible(cat, tipo))
+	);
+}
+
+function syncCategorias() {
+	const tipo = tipoSeleccion();
+	const botones = document.querySelectorAll(".cat");
+	botones.forEach((btn) => {
+		const ok = categoriaDisponible(btn.dataset.cat, tipo);
+		btn.disabled = !ok;
+		if (ok) {
+			btn.removeAttribute("title");
+		} else {
+			btn.title = tipo === "escena" ? "No disponible en escenas" : "No disponible en objetos";
+		}
+	});
+	if (categoriaDisponible(categoria, tipo)) {
+		return;
+	}
+	const siguiente = siguienteCategoria(tipo);
+	if (!siguiente) {
+		return;
+	}
+	categoria = siguiente;
+	botones.forEach((btn) => btn.classList.toggle("active", btn.dataset.cat === siguiente));
 }
 
 function registrarCallbacksVariable() {
@@ -63,6 +104,7 @@ function refreshFlyout() {
 	if (!workspace) {
 		return;
 	}
+	syncCategorias();
 	registrarCallbacksVariable();
 	workspace.updateToolbox(toolboxJson());
 }
@@ -120,6 +162,7 @@ function loadEntityIntoWorkspace() {
 
 export function initWorkspace() {
 	registrarBloques();
+	syncCategorias();
 	workspace = Blockly.inject("blocklyDiv", {
 		renderer: "zelos",
 		theme,
@@ -148,6 +191,9 @@ export function initWorkspace() {
 
 	document.querySelectorAll(".cat").forEach((btn) => {
 		btn.addEventListener("click", () => {
+			if (btn.disabled || !categoriaDisponible(btn.dataset.cat, tipoSeleccion())) {
+				return;
+			}
 			document.querySelectorAll(".cat").forEach((b) => b.classList.remove("active"));
 			btn.classList.add("active");
 			categoria = btn.dataset.cat;
