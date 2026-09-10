@@ -7,16 +7,12 @@ void Emit_SENSOR(NodoBloque *blk) {
 }
 
 void Emit_SENSOR_TIEMPO(NodoBloque *blk) {
-	if(!blk->Entradas.empty()) {
-		throw std::runtime_error("SENSOR_TIEMPO no acepta entradas");
-	}
+	EsperarEntradas(blk, 0);
 	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER);
 }
 
 static void EmitirBotonControl(NodoBloque *blk, uint16_t addrControl, const char *nombre) {
-	if(!blk->Entradas.empty()) {
-		throw std::runtime_error(std::string(nombre) + " no acepta entradas");
-	}
+	EsperarEntradas(blk, 0);
 	int bit = blk->ParametroEspecial;
 	if(bit < BOTON_FIRMA_0 || bit > BOTON_B) {
 		throw std::runtime_error(std::string(nombre) + " requiere ParametroEspecial en 0-15");

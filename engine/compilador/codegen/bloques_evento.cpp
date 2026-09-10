@@ -6,9 +6,7 @@ void Emit_EVENTO(NodoBloque *blk) {
 }
 
 static void EmitirEvento(NodoBloque *blk) {
-	if(!blk->Entradas.empty()) {
-		throw std::runtime_error("un evento no acepta entradas");
-	}
+	EsperarEntradas(blk, 0);
 	CompilarCadenaAcciones(blk->Siguiente);
 }
 

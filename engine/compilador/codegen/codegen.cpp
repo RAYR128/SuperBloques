@@ -9,6 +9,16 @@ static void (*const kTablaEmit[BLOQUE_MAX])(NodoBloque *) = {
 	#include "listabloques.h"
 };
 
+void EsperarEntradas(NodoBloque *blk, size_t entradas) {
+	if(blk->Entradas.size() != entradas) {
+		if(entradas) {
+			throw std::runtime_error(ConvertirTipoDeBloqueAString(blk->TipoDeBloque) + " solo acepta " + std::to_string(entradas) + " entradas");
+		} else {
+			throw std::runtime_error(ConvertirTipoDeBloqueAString(blk->TipoDeBloque) + " no acepta entradas");
+		}
+	}
+}
+
 void SetContextoCompilacion(ContextoCompilacion ctx) {
 	contextoCompilacionActual = ctx;
 	compiladorUsoScratch = 0;

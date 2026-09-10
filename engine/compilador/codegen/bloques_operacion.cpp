@@ -6,10 +6,7 @@ void Emit_OPERACION(NodoBloque *blk) {
 }
 
 static void EmitirBinaria(NodoBloque *blk, bool resta) {
-	if(blk->Entradas.size() != 2) {
-		throw std::runtime_error(resta ? "OPERACION_RESTA requiere 2 entradas" : "OPERACION_SUMA requiere 2 entradas");
-	}
-
+	EsperarEntradas(blk, 2);
 	NodoBloque *izq = &blk->Entradas[0];
 	NodoBloque *der = &blk->Entradas[1];
 
@@ -79,15 +76,11 @@ void Emit_OPERACION_RESTA(NodoBloque *blk) {
 }
 
 void Emit_OPERACION_MULTIPLICACION(NodoBloque *blk) {
-	if(blk->Entradas.size() != 2) {
-		throw std::runtime_error("OPERACION_MULTIPLICACION requiere 2 entradas");
-	}
+	EsperarEntradas(blk, 2);
 	EmitirNoImplementado(blk);
 }
 
 void Emit_OPERACION_DIVISION(NodoBloque *blk) {
-	if(blk->Entradas.size() != 2) {
-		throw std::runtime_error("OPERACION_DIVISION requiere 2 entradas");
-	}
+	EsperarEntradas(blk, 2);
 	EmitirNoImplementado(blk);
 }
