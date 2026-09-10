@@ -56,6 +56,12 @@ static json SerializarBloques(const std::vector<NodoBloque> &Bloques, const std:
 		Nodo["PosicionVisual"] = json::array({Bloques[i].PosicionVisualX, Bloques[i].PosicionVisualY});
 		Nodo["Siguiente"] = SerializarEnlace(Bloques[i].Siguiente, Ids);
 		Nodo["Previo"] = SerializarEnlace(Bloques[i].Previo, Ids);
+		if(Bloques[i].Cuerpo) {
+			Nodo["Cuerpo"] = SerializarEnlace(Bloques[i].Cuerpo, Ids);
+		}
+		if(Bloques[i].CuerpoSino) {
+			Nodo["CuerpoSino"] = SerializarEnlace(Bloques[i].CuerpoSino, Ids);
+		}
 		Salida[Ids[&Bloques[i]]] = Nodo;
 	}
 	return Salida;

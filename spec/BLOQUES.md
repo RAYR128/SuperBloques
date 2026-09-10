@@ -19,16 +19,10 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 			"Variables": ["Variable 1"],
 			"Bloques": {
 				"bloque_id_001": {
-					"PosicionVisual": [1, 1],
-					"Operacion": "evento",
+					"PosicionVisual": [40, 40],
+					"Operacion": "evento_init",
 					"ParametroEspecial": 0,
-					"Entradas": [
-						{
-							"Operacion": "numero",
-							"ParametroEspecial": 16,
-							"Entradas": []
-						}
-					],
+					"Entradas": [],
 					"Siguiente": "bloque_id_002",
 					"Previo": null
 				},
@@ -56,8 +50,8 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 			"Variables": ["Variable 1"],
 			"Bloques": {
 				"bloque_id_001": {
-					"PosicionVisual": [0, 0],
-					"Operacion": "evento",
+					"PosicionVisual": [40, 40],
+					"Operacion": "evento_init",
 					"ParametroEspecial": 0,
 					"Entradas": [],
 					"Siguiente": null,
@@ -85,17 +79,29 @@ Entero auxiliar del bloque (por ejemplo el literal de `numero`), o un string con
 
 ### PosicionVisual
 
-Par `[x, y]` en el editor. Solo lo usan los bloques de pila (el bloque mas superior de un script). Los sub-bloques de `Entradas` pueden omitirlo.
+Par `[x, y]` en pixeles del editor. Lo usan los bloques raiz de una pila (sin `Previo` y que no son destino de `Cuerpo` / `CuerpoSino`). Los sub-bloques de `Entradas` pueden omitirlo.
 
 ### Entradas
 
-Array de bloques anidados por valor (no ids). Cada entrada es un objeto con `Operacion`, `ParametroEspecial` y `Entradas` propias.
+Array de bloques anidados por valor (no ids). Cada entrada es un objeto con `Operacion`, `ParametroEspecial` y `Entradas` propias. En `control_if`, `control_while` y `control_ifelse`, `Entradas[0]` es la condicion (bloque de valor).
 
 ### Siguiente / Previo
 
 Id de otro bloque en el mismo mapa `Bloques`, o `null`. El id solo existe en el JSON; en memoria son punteros entre elementos del vector de pila. Los bloques anidados en `Entradas` no participan de este mapa.
 
 Al exportar, los ids se generan como `bloque_id_001`, `bloque_id_002`, ... en el orden del vector.
+
+### Cuerpo / CuerpoSino
+
+Id de otro bloque en el mismo mapa `Bloques`, o se omiten. Encabezan las subpilas de statement de un bloque C:
+
+| Operacion | `Entradas[0]` | `Cuerpo` | `CuerpoSino` |
+|---|---|---|---|
+| `control_if` | condicion (valor) | pila si verdad | no aplicable |
+| `control_while` | condicion (valor) | pila del cuerpo | no aplicable |
+| `control_ifelse` | condicion (valor) | pila si verdad | pila si falso |
+
+Los bloques de esas subpilas viven en `Bloques` y se encadenan con `Siguiente` / `Previo`, igual que el resto de la pila. Un id colgante se rechaza.
 
 ## Encodificacion de datos
 

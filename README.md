@@ -28,7 +28,7 @@ El repo se divide en tres frentes.
 | **Backend** | Plataforma de cuentas + almacenamiento/distribucion de proyectos |
 
 # Instrucciones de compilacion
-## Compilador
+## Compilador (Local)
 Se requiere un toolchain capaz de utilizar CMake (Version 3.16 o superior) y gcc/g++ (Version 11.4 o superior).
 
 En windows:
@@ -50,7 +50,20 @@ cmake --build build --config Release -j"$(nproc)"
 ```
 
 ## Frontend
-Trabajo en progreso.
+Se requiere Node.js y [pnpm](https://pnpm.io/). El editor es una app Vite en `frontend/editor`.
+
+```bash
+cd frontend/editor
+pnpm install
+pnpm build
+```
+
+`pnpm build` escribe `frontend/editor/dist`, que es lo que sirve el backend en `/editor`. Para desarrollar el editor sin el servidor Go:
+
+```bash
+cd frontend/editor
+pnpm dev
+```
 
 ## Backend
 Trabajo en progreso.
@@ -63,4 +76,4 @@ El compilador es compilable localmente, no existe target a WASM aun, pero produc
 Trabajo a empezar, el plan es hacer una plataforma de distribucion y almacenacion de proyectos JSON y un sistema de cuentas.
 
 ## Frontend
-Existe un mockup para un editor visual, aunque no hay codigo de implementacion o WebAssembly aun. Aun no existe implementacion o frontend para el sitio actual.
+El editor visual (Blockly / Zelos) permite armar escenas, objetos, variables y bloques, y exportar el proyecto como JSON `spec/BLOQUES.md`. No hay WebAssembly ni compilacion a ROM desde el navegador aun. Aun no existe frontend para el sitio de cuentas.

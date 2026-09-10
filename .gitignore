@@ -10,3 +10,7 @@ build-*/
 *.log
 *.csv
 superbloques_cli
+
+# Frontend
+node_modules/
+frontend/editor/dist/

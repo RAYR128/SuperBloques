@@ -102,6 +102,8 @@ static void CargarBloques(const json &NodoBloques, std::vector<NodoBloque> &Sali
 		const json &Nodo = NodoBloques[Ids[i]];
 		Salida[i].Siguiente = ResolverEnlace(Nodo, "Siguiente", Salida, IdAIndice);
 		Salida[i].Previo = ResolverEnlace(Nodo, "Previo", Salida, IdAIndice);
+		Salida[i].Cuerpo = ResolverEnlace(Nodo, "Cuerpo", Salida, IdAIndice);
+		Salida[i].CuerpoSino = ResolverEnlace(Nodo, "CuerpoSino", Salida, IdAIndice);
 	}
 }
 

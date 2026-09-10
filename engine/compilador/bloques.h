@@ -30,7 +30,7 @@ class NodoBloque {
   public:
 	NodoBloque()
 		: TipoDeBloque(BLOQUE_NUMERO), ParametroEspecial(0), PosicionVisualX(0), PosicionVisualY(0), Siguiente(nullptr),
-		  Previo(nullptr) {}
+		  Previo(nullptr), Cuerpo(nullptr), CuerpoSino(nullptr) {}
 	~NodoBloque() {}
 
 	// Emitir este nodo (tabla de salto Emit_*). No recorre Siguiente.
@@ -50,4 +50,8 @@ class NodoBloque {
 	// Estructura
 	NodoBloque *Siguiente;
 	NodoBloque *Previo;
+	// Subpilas de bloques C (control_if / control_while / control_ifelse).
+	// Apuntan a elementos del mismo vector de pila; no se usan en Entradas.
+	NodoBloque *Cuerpo;
+	NodoBloque *CuerpoSino;
 };

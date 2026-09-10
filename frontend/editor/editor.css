@@ -42,9 +42,69 @@ header {
 	border-bottom: 1px solid var(--border);
 	display: flex;
 	align-items: center;
-	padding: 0 12px;
+	padding: 0 8px;
 	gap: 10px;
 	flex-shrink: 0;
+	position: relative;
+	z-index: 40;
+}
+
+.menubar {
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+
+.menu {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.menu-btn,
+.menu-item {
+	border: none;
+	background: transparent;
+	color: var(--text);
+	font-family: inherit;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.menu-btn {
+	height: 28px;
+	padding: 0 10px;
+	border-radius: 4px;
+}
+
+.menu-btn:hover,
+.menu.open .menu-btn {
+	background: var(--hover);
+}
+
+.menu-dropdown {
+	position: absolute;
+	top: 32px;
+	left: 0;
+	min-width: 140px;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 4px;
+	z-index: 20;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.menu-item {
+	display: block;
+	width: 100%;
+	text-align: left;
+	padding: 6px 10px;
+	border-radius: 4px;
+}
+
+.menu-item:hover {
+	background: var(--hover);
 }
 
 header .logo {
@@ -107,16 +167,72 @@ header .sub {
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
 	padding: 4px 8px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.tree-add,
+.tree-remove {
+	border: none;
+	background: transparent;
+	color: var(--muted);
+	cursor: pointer;
+	font-family: inherit;
+	line-height: 1;
+	border-radius: 4px;
+	flex-shrink: 0;
+}
+
+.tree-add {
+	width: 20px;
+	height: 20px;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.tree-add:hover,
+.tree-remove:hover {
+	background: var(--hover);
+	color: var(--text);
+}
+
+.tree-remove {
+	width: 18px;
+	height: 18px;
+	font-size: 14px;
+	opacity: 0;
+}
+
+.tree-item:hover .tree-remove,
+.tree-item.active .tree-remove {
+	opacity: 1;
 }
 
 .tree-item {
-	padding: 6px 8px 6px 18px;
+	padding: 6px 6px 6px 10px;
 	border-radius: 6px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	color: var(--text);
+}
+
+.tree-item .item-name {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	overflow: hidden;
+}
+
+.tree-item .item-name span:last-child {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .tree-item:hover { background: var(--hover); }
@@ -136,14 +252,14 @@ header .sub {
 
 .dot.scene { background: #59c059; }
 
-/* bloques: categorias + visor */
-.blocks-panel { width: 280px; flex-direction: row; }
+/* categorias; el flyout de Blockly vive en el workspace */
+.blocks-panel { width: 108px; flex-direction: row; }
 
 .categories {
-	width: 96px;
+	width: 100%;
 	background: var(--panel-2);
 	border-right: 1px solid var(--border);
-	padding: 8px 6px;
+	padding: 8px 8px;
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
@@ -174,30 +290,49 @@ header .sub {
 .cat.operacion { background: var(--cat-operacion); }
 .cat.sensor { background: var(--cat-sensor); }
 
-.blocks-viewer {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	min-width: 0;
-}
-
-.blocks-body {
-	flex: 1;
-	padding: 12px;
-	color: var(--muted);
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
 /* centro */
 .workspace-panel { flex: 1; min-width: 240px; }
 
 .workspace-body {
 	flex: 1;
-	background:
-		radial-gradient(circle at 1px 1px, #1f2636 1px, transparent 0) 0 0 / 18px 18px;
+	background: var(--panel);
 	position: relative;
+	min-height: 0;
+}
+
+.workspace-body .blocklySvg {
+	background: transparent;
+}
+
+.blocklyMainBackground {
+	stroke: none !important;
+}
+
+.blocklyFlyoutBackground {
+	fill: var(--panel-2) !important;
+	fill-opacity: 1 !important;
+}
+
+.blocklyFlyoutButton .blocklyText {
+	fill: var(--text);
+}
+
+.blocklyFlyoutButton:hover {
+	fill: var(--hover);
+}
+
+.blocklyFlyoutButtonDisabled .blocklyText,
+.blocklyFlyoutLabelText {
+	fill: var(--muted) !important;
+}
+
+.blocklyZoom > image,
+.blocklyTrash > image {
+	opacity: 0.7;
+}
+
+.blocklyScrollbarHandle {
+	fill: #3a4458;
 }
 
 /* derecha */

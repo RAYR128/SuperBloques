@@ -11,10 +11,10 @@ xx(NUMERO, "numero", BLOQUE_CLASE_VALOR)
 xx(MOTION, "motion", BLOQUE_CLASE_CATEGORIA)
 xx(MOTION_GET_POSICION_X, "motion_get_posicion_x", BLOQUE_CLASE_VALOR)
 xx(MOTION_GET_POSICION_Y, "motion_get_posicion_y", BLOQUE_CLASE_VALOR)
-xx(MOTION_SET_POSICION_X, "motion_set_posicion_x", BLOQUE_CLASE_ACCION)
-xx(MOTION_SET_POSICION_Y, "motion_set_posicion_y", BLOQUE_CLASE_ACCION)
-xx(MOTION_ADD_POSICION_X, "motion_add_posicion_x", BLOQUE_CLASE_ACCION)
-xx(MOTION_ADD_POSICION_Y, "motion_add_posicion_y", BLOQUE_CLASE_ACCION)
+xx(MOTION_SET_POSICION_X, "motion_set_posicion_x", BLOQUE_CLASE_ACCION) // ObjX = Entradas[0]
+xx(MOTION_SET_POSICION_Y, "motion_set_posicion_y", BLOQUE_CLASE_ACCION) // ObjY = Entradas[0]
+xx(MOTION_ADD_POSICION_X, "motion_add_posicion_x", BLOQUE_CLASE_ACCION) // ObjX += Entradas[0]
+xx(MOTION_ADD_POSICION_Y, "motion_add_posicion_y", BLOQUE_CLASE_ACCION) // ObjY += Entradas[0]
 
 // Reproduccion de animaciones) control de frames y sprites
 xx(ANIMACION, "animation", BLOQUE_CLASE_CATEGORIA)
@@ -24,9 +24,9 @@ xx(SONIDO, "sound", BLOQUE_CLASE_CATEGORIA)
 
 // Condicionales y bucles
 xx(CONTROL, "control", BLOQUE_CLASE_CATEGORIA)
-xx(CONTROL_IF, "control_if", BLOQUE_CLASE_ACCION) // Entradas[0] -> Camino si es verdad
-xx(CONTROL_WHILE, "control_while", BLOQUE_CLASE_ACCION) // Entradas[0] -> Camino si es verdad, repetir
-xx(CONTROL_IFELSE, "control_ifelse", BLOQUE_CLASE_ACCION) // Entradas[0] -> Camino si es verdad, Entradas[1] -> Camino si es falso
+xx(CONTROL_IF, "control_if", BLOQUE_CLASE_ACCION) // Entradas[0] -> condicion; Cuerpo -> pila si verdad
+xx(CONTROL_WHILE, "control_while", BLOQUE_CLASE_ACCION) // Entradas[0] -> condicion; Cuerpo -> pila del cuerpo
+xx(CONTROL_IFELSE, "control_ifelse", BLOQUE_CLASE_ACCION) // Entradas[0] -> condicion; Cuerpo / CuerpoSino -> pilas
 
 // Inicio, labels
 xx(EVENTO, "evento", BLOQUE_CLASE_CATEGORIA)
@@ -54,4 +54,4 @@ xx(SENSOR_BOTON_CONTROL_1_PRESIONADO, "sensor_boton_control_1_presionado", BLOQU
 xx(SENSOR_BOTON_CONTROL_2_PRESIONADO, "sensor_boton_control_2_presionado", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL2_PRESIONADO)
 
 #undef xx
-	// clang-format on
+																								   // clang-format on

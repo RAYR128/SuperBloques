@@ -52,8 +52,8 @@ func resolveEditorDir() (string, error) {
 	}
 
 	candidatos := []string{
-		filepath.Join("frontend", "editor"),
-		filepath.Join("..", "frontend", "editor"),
+		filepath.Join("frontend", "editor", "dist"),
+		filepath.Join("..", "frontend", "editor", "dist"),
 	}
 	for _, c := range candidatos {
 		abs, err := filepath.Abs(c)
@@ -65,7 +65,7 @@ func resolveEditorDir() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("no se encontro frontend/editor (cwd=%s)", mustCwd())
+	return "", fmt.Errorf("no se encontro frontend/editor/dist (cwd=%s); corre pnpm build en frontend/editor", mustCwd())
 }
 
 func mustDir(path string) error {

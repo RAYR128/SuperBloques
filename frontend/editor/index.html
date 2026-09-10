@@ -4,71 +4,61 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SuperBloques - Editor</title>
-<link rel="stylesheet" href="editor.css">
+<link rel="stylesheet" href="./editor.css">
 </head>
 <body>
 <div class="app">
 <header>
-<span class="logo">SuperBloques</span>
-<span class="sub">Nuevo Proyecto</span>
+	<nav class="menubar">
+		<div class="menu" id="menu-file-wrap">
+			<button type="button" class="menu-btn" id="menu-file">Archivo</button>
+			<div class="menu-dropdown" id="menu-file-dropdown" hidden>
+				<button type="button" class="menu-item" id="menu-export">Exportar</button>
+			</div>
+		</div>
+	</nav>
+	<span class="logo">SuperBloques</span>
+	<span class="sub">Nuevo Proyecto</span>
 </header>
 <div class="panels">
-	<!-- 1. escena / objetos -->
 	<aside class="panel objects-panel">
 		<div class="panel-title">Area de Trabajo</div>
 		<div class="tree">
 			<div class="tree-group">
-				<!-- TO-DO: implementar-->
-				<div class="tree-label">Escena</div>
-				<div class="tree-item active" data-item="escena-1">
-					<span class="dot scene"></span>
-					escena 1
+				<div class="tree-label">
+					<span>Escena</span>
+					<button type="button" class="tree-add" id="add-escena" title="Nueva escena">+</button>
 				</div>
+				<div id="tree-escenas"></div>
 			</div>
 			<div class="tree-group">
-				<!-- TO-DO: implementar-->
-				<div class="tree-label">Objetos</div>
-				<div class="tree-item" data-item="objeto-1">
-					<span class="dot"></span>
-					objeto 1
+				<div class="tree-label">
+					<span>Objetos</span>
+					<button type="button" class="tree-add" id="add-objeto" title="Nuevo objeto">+</button>
 				</div>
-				<div class="tree-item" data-item="objeto-2">
-					<span class="dot"></span>
-					objeto 2
-				</div>
+				<div id="tree-objetos"></div>
 			</div>
 		</div>
 	</aside>
 
-	<!-- 2. categorias + visor de bloques -->
 	<aside class="panel blocks-panel">
 		<div class="categories">
-			<button class="cat mocion active" data-cat="mocion">Mocion</button>
-			<button class="cat animacion" data-cat="animacion">Animacion</button>
-			<button class="cat sonido" data-cat="sonido">Sonido</button>
-			<button class="cat control" data-cat="control">Control</button>
-			<button class="cat evento" data-cat="evento">Evento</button>
-			<button class="cat variable" data-cat="variable">Variable</button>
-			<button class="cat operacion" data-cat="operacion">Operacion</button>
-			<button class="cat sensor" data-cat="sensor">Sensor</button>
-		</div>
-		<div class="blocks-viewer">
-			<div class="panel-title" id="cat-title">Mocion</div>
-			<div class="blocks-body">
-				<!-- TO-DO: implementar-->
-			</div>
+			<button type="button" class="cat mocion active" data-cat="mocion">Mocion</button>
+			<button type="button" class="cat animacion" data-cat="animacion">Animacion</button>
+			<button type="button" class="cat sonido" data-cat="sonido">Sonido</button>
+			<button type="button" class="cat control" data-cat="control">Control</button>
+			<button type="button" class="cat evento" data-cat="evento">Evento</button>
+			<button type="button" class="cat variable" data-cat="variable">Variable</button>
+			<button type="button" class="cat operacion" data-cat="operacion">Operacion</button>
+			<button type="button" class="cat sensor" data-cat="sensor">Sensor</button>
 		</div>
 	</aside>
 
-	<!-- 3. workspace de bloques -->
 	<main class="panel workspace-panel">
 		<div class="panel-title">Bloques</div>
-		<div class="workspace-body">
-			<!-- TO-DO: implementar-->
-		</div>
+		<div class="workspace-body" id="blocklyDiv"></div>
 	</main>
 
-	<!-- 4. canvas + debug -->
 	<aside class="panel right-panel">
 		<div class="stage-wrap">
 			<div class="stage-label">Video</div>
@@ -77,15 +67,13 @@
 		<div class="debug">
 			<div class="panel-title">Info</div>
 			<div class="debug-body">
-				<div class="dim">// placeholder</div>
-				<div class="ok">[ok] placeholder</div>
-				<div>placeholder</div>
-				<div class="warn">[warn] placeholder</div>
+				<div class="dim">Editor visual</div>
+				<div class="ok">[ok] proyecto en memoria</div>
 			</div>
 		</div>
 	</aside>
 </div>
 </div>
-<script src="editor.js" defer></script>
+<script type="module" src="./src/main.js"></script>
 </body>
 </html>
