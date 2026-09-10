@@ -217,4 +217,4 @@ enum ParametrosDMA {
 	HW_DMA_HDMAIndirect = 0x40, // %01000000
 	HW_DMA_AtoB = 0x00,			// %00000000
 	HW_DMA_BtoA = 0x80			// %10000000
-}
+};
