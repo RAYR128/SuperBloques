@@ -148,6 +148,14 @@ void RutinaControlEscena() {
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
+	// Limpiar todos los objetos existentes + datos de escena
+	cc.CargarRegConst16(REG_X, (CANTIDAD_DE_OBJETOS * TAMANO_OBJETO) + TAMANO_ESCENA - 2);
+	cc.Etiqueta("LIMPIAR_MEMORIA_OBJETOS");
+	cc.AlmacenarCeroEnMemoria_IndX(WRAM_OBJETOS);
+	cc.DecrementarReg(REG_X);
+	cc.DecrementarReg(REG_X);
+	cc.Branch("LIMPIAR_MEMORIA_OBJETOS", BRANCH_NEGATIVE_CLEAR);
+
 	// Subir los graficos de la escena actual
 	SubirGraficosEscena("TABLA_DATOS_GraficosPrincipales", ADD_VRAM_GRAFICOS_ESCENA, 32768);
 	SubirGraficosEscena("TABLA_DATOS_GraficosHud", ADD_VRAM_GRAFICOS_HUD, 4096);
