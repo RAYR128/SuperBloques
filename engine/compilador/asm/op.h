@@ -33,7 +33,7 @@ enum CpuFlags {
 	FLAG_DECIML = 0x08, // Decimal
 	FLAG_INTERR = 0x04, // Interrupcion
 	FLAG_ZEROEQ = 0x02, // Cero
-	FLAG_CARRYF = 0x01  // Carry
+	FLAG_CARRYF = 0x01	// Carry
 };
 
 enum TipoBranch {

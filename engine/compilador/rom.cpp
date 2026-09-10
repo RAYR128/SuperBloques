@@ -42,7 +42,7 @@ uint32_t CalcularCRC32ROM() {
 		for(uint32_t i = 0; i < 256; i++) {
 			uint32_t c = i;
 			for(int b = 0; b < 8; b++) {
-				c = (c >> 1) ^ (0xEDB88320u & (uint32_t)-(int32_t)(c & 1));
+				c = (c >> 1) ^ (0xEDB88320u & (uint32_t) - (int32_t)(c & 1));
 			}
 			tabla[i] = c;
 		}

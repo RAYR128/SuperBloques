@@ -6,13 +6,13 @@ struct MapaTipoBloque {
 };
 
 static const MapaTipoBloque kMapaTipos[] = {
-	#define xx(n,s,c) {BLOQUE_##n,s},
-	#include "listabloques.h"
+#define xx(n, s, c) {BLOQUE_##n, s},
+#include "listabloques.h"
 };
 
 static const ClaseBloque kClasesBloque[] = {
-	#define xx(n,s,c) c,
-	#include "listabloques.h"
+#define xx(n, s, c) c,
+#include "listabloques.h"
 };
 
 TipoBloque ConvertirStringATipoDeBloque(std::string Entrada) {

@@ -54,4 +54,4 @@ xx(SENSOR_BOTON_CONTROL_1_PRESIONADO, "sensor_boton_control_1_presionado", BLOQU
 xx(SENSOR_BOTON_CONTROL_2_PRESIONADO, "sensor_boton_control_2_presionado", BLOQUE_CLASE_VALOR) // ParametroEspecial -> BotonControl (bit 0-15 de WRAM_CONTROL2_PRESIONADO)
 
 #undef xx
-// clang-format on
+	// clang-format on

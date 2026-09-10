@@ -60,8 +60,7 @@ static NodoBloque DeserializarBloqueAnidado(const json &Nodo, const std::vector<
 	return Bloque;
 }
 
-static NodoBloque *ResolverEnlace(const json &Nodo, const char *Campo, std::vector<NodoBloque> &Bloques,
-								  const std::unordered_map<std::string, size_t> &IdAIndice) {
+static NodoBloque *ResolverEnlace(const json &Nodo, const char *Campo, std::vector<NodoBloque> &Bloques, const std::unordered_map<std::string, size_t> &IdAIndice) {
 	if(!Nodo.contains(Campo) || Nodo[Campo].is_null()) {
 		return nullptr;
 	}

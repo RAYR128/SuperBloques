@@ -13,8 +13,8 @@ enum ClaseBloque {
 
 // Tipos de bloques que pueden existir en un objeto de la escena. Cada bloque tiene un comportamiento distinto y puede contener distintos datos.
 enum TipoBloque {
-	#define xx(n,s,c) BLOQUE_##n,
-	#include "listabloques.h"
+#define xx(n, s, c) BLOQUE_##n,
+#include "listabloques.h"
 	BLOQUE_MAX
 };
 
@@ -46,7 +46,7 @@ class NodoBloque {
 	// Usado en el frontend, para organizacion.
 	// Solo el bloque mas superior (control, inicio de evento) respeta o usa estos valores. Los sub-bloques de un bloque no lo utilizan.
 	int PosicionVisualX, PosicionVisualY;
-	
+
 	// Estructura
 	NodoBloque *Siguiente;
 	NodoBloque *Previo;

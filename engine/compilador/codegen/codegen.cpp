@@ -5,8 +5,8 @@ static ContextoCompilacion contextoCompilacionActual = CTX_ESCENA;
 static int compiladorUsoScratch = 0;
 
 static void (*const kTablaEmit[BLOQUE_MAX])(NodoBloque *) = {
-	#define xx(n, s, c) Emit_##n,
-	#include "listabloques.h"
+#define xx(n, s, c) Emit_##n,
+#include "listabloques.h"
 };
 
 void EsperarEntradas(NodoBloque *blk, size_t entradas) {

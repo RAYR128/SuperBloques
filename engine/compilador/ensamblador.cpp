@@ -10,7 +10,7 @@ void ConRegALlamarJumpTable(std::string tabla) {
 	cc.ShiftALeft();
 	cc.SumaAcumuladorMemoria(WRAM_SCRATCH);
 	cc.Transferir(REG_A, REG_X);
-	
+
 	// Tenemos ahora el puntero a la tabla, usamos esto para conseguir el PC a ejecutar.
 	// WRAM_POSICION_SALTO = tabla[X];
 	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
@@ -18,7 +18,7 @@ void ConRegALlamarJumpTable(std::string tabla) {
 	cc.IncrementarReg(REG_X);
 	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
 	cc.AlmacenarRegEnMemoria(REG_A, WRAM_POSICION_SALTO + 1);
-	
+
 	// Llamamos a la rutina dinamica.
 	cc.LlamadaLong("CALL_DYNAMIC_POSITION");
 }
@@ -41,7 +41,7 @@ void RutinaLoopPrincipal() {
 		cc.AlmacenarRegEnMemoria(REG_A, cntIndex + 2);
 		cc.AlmacenarRegEnMemoria(REG_Y, cntMask);
 	}
-	
+
 	// Correr codigo main de escena
 	cc.LlamadaLong("LLAMAR_ESCENA_ID");
 
@@ -95,14 +95,14 @@ void RutinaControlObjetos() {
 void RutinaControlEscena() {
 	// Rutina de control: Inicializar escena
 	cc.Etiqueta("INICIALIZAR_ESCENA_ID");
-	
+
 	// Desactivar modo 16-bit
 	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
 	// Desactivar pantalla
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
-	
+
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
@@ -128,7 +128,7 @@ void RutinaConfiguracionVideo() {
 	cc.AlmacenarRegEnMemoria(REG_A, HW_CGADD);
 	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
-	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER+1);
+	cc.CargarRegEnMemoria(REG_A, WRAM_TIMER + 1);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_CGDATA);
 	cc.CargarRegConst8(REG_A, 0xFF);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_COLDATA);
@@ -242,7 +242,7 @@ void RutinaRESET() {
 	cc.Etiqueta("PROGRAM_FINALIZAR_FRAME");
 	cc.IncrementarMemoria(WRAM_FLAG_EJECUCION);
 	cc.CargarRegEnMemoria(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
-	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
+	cc.CargarRegConst8(REG_A, 0x81);		// Activar NMI + Auto joypad read
 	cc.AlmacenarRegEnMemoria(REG_A, HW_NMITIMEN);
 	cc.EsperarInterrupcion(); // Esperar una interrupcion
 
@@ -253,7 +253,7 @@ void RutinaRESET() {
 
 	// Repetir
 	cc.Saltar("PROGRAM_LOOP", REF_ABSOLUTE);
-	
+
 	// Rutina de control: Llamar a codigo en WRAM_POSICION_SALTO
 	cc.Etiqueta("CALL_DYNAMIC_POSITION");
 	cc.SaltarLongIndirecto(WRAM_POSICION_SALTO);
@@ -298,7 +298,7 @@ void RutinaNMI() {
 	cc.Etiqueta("FINALIZAR_NMI");
 
 	cc.CargarRegEnMemoria(REG_A, HW_RDNMI); // Leer flag de NMI para evitar que el interrupt se ejecute de inmediato
-	cc.CargarRegConst8(REG_A, 0x81);		 // Activar NMI + Auto joypad read
+	cc.CargarRegConst8(REG_A, 0x81);		// Activar NMI + Auto joypad read
 	cc.AlmacenarRegEnMemoria(REG_A, HW_NMITIMEN);
 
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
