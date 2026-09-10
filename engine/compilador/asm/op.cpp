@@ -202,6 +202,11 @@ void Emitidor65816::ANDAcumuladorConst16(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
+void Emitidor65816::ORAcumuladorConst16(uint16_t valor) {
+	EmitirByte(OP_ORA_IMMM);
+	EmitirPalabra(valor);
+}
+
 void Emitidor65816::CompararRegConst8(Registers reg, uint8_t valor) {
 	switch(reg) {
 	case REG_A:

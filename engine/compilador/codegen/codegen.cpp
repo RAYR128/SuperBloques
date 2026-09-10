@@ -9,6 +9,10 @@ static void (*const kTablaEmit[BLOQUE_MAX])(NodoBloque *) = {
 #include "listabloques.h"
 };
 
+std::string EtiquetaLocal(const char *tag) {
+	return std::string("ANM_") + tag + "_" + std::to_string(cc.ObtenerPC());
+}
+
 void EsperarEntradas(NodoBloque *blk, size_t entradas) {
 	if(blk->Entradas.size() != entradas) {
 		if(entradas) {
@@ -17,6 +21,14 @@ void EsperarEntradas(NodoBloque *blk, size_t entradas) {
 			throw std::runtime_error(ConvertirTipoDeBloqueAString(blk->TipoDeBloque) + " no acepta entradas");
 		}
 	}
+}
+
+void EsperarContexto(NodoBloque *blk, ContextoCompilacion ctx) {
+	if(ObtenerContextoCompilacion() == ctx) {
+		return;
+	}
+	const char *donde = (ctx == CTX_OBJETO) ? "objeto" : "escena";
+	throw std::runtime_error(ConvertirTipoDeBloqueAString(blk->TipoDeBloque) + " solo se puede usar en " + donde);
 }
 
 void SetContextoCompilacion(ContextoCompilacion ctx) {

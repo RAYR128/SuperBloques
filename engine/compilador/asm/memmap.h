@@ -29,14 +29,14 @@ enum {
 #define WRAM_SCRATCH_SIZE 0x0040 // Tamaño de scratch (0x00-0x3F), utiliza 16-bit (index * 2)
 
 // Layers
-#define WRAM_V_LAYER1_X 0x00E0
-#define WRAM_V_LAYER1_Y 0x00E2
-#define WRAM_V_LAYER2_X 0x00E4
-#define WRAM_V_LAYER2_Y 0x00E6
-#define WRAM_V_LAYER3_x 0x00E8
-#define WRAM_V_LAYER3_Y 0x00EA
-#define WRAM_V_FILTRO_MOSAICO 0x00EC // Filtro mosaico (1 byte)
-#define WRAM_V_BRILLO 0x00ED // Brillo de pantalla (1 byte).. valores 0-15
+#define WRAM_V_LAYER1_X 0x00D0
+#define WRAM_V_LAYER1_Y 0x00D2
+#define WRAM_V_LAYER2_X 0x00D4
+#define WRAM_V_LAYER2_Y 0x00D6
+#define WRAM_V_LAYER3_X 0x00D8
+#define WRAM_V_LAYER3_Y 0x00DA
+#define WRAM_V_FILTRO_MOSAICO 0x00DC // Filtro mosaico (1 byte)
+#define WRAM_V_BRILLO 0x00DD		 // Brillo de pantalla (1 byte).. valores 0-15
 
 // La consola nativamente almacena los controladores como variables de 16-bit en HW_CNTRL
 // Esto tiene byetudlraxLRxxxx (bit 15..0). Los bits 0-3 son firma del control (no son botones).
@@ -94,8 +94,12 @@ enum BotonControl {
 // 0x1A00-0x1BFF
 #define WRAM_PALETA 0x1A00
 
-#define WRAM_STACK 0x1FFF // Pila de la CPU
-#define WRAM_SIZE 0x2000  // Tamaño de WRAM total
+// Pila de la CPU
+// 0x1C00-0x1FFF
+#define WRAM_STACK 0x1FFF
+
+// Tamaño de WRAM total
+#define WRAM_SIZE 0x2000
 
 // Registros de hardware (Memoria especial).
 // La consola siempre mapea estos en los bancos $00-$3F, en $2000-$4FFF.

@@ -372,6 +372,9 @@ class Emitidor65816 {
 	void ANDAcumuladorConst8(uint8_t valor);
 	void ANDAcumuladorConst16(uint16_t valor);
 
+	// ORA acumulador (REG_A)
+	void ORAcumuladorConst16(uint16_t valor);
+
 	// Comparar register con un valor constante
 	void CompararRegConst8(Registers reg, uint8_t valor);
 	void CompararRegConst16(Registers reg, uint16_t valor);

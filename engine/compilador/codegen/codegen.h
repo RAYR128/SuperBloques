@@ -20,6 +20,8 @@ void CargarVariableEnA(int indice);
 void AlmacenarAEnVariable(int indice);
 void EmitirNoImplementado(NodoBloque *blk);
 void EsperarEntradas(NodoBloque *blk, size_t entradas);
+void EsperarContexto(NodoBloque *blk, ContextoCompilacion ctx);
+std::string EtiquetaLocal(const char *tag);
 
 #define xx(n, s, c) extern void Emit_##n(NodoBloque *blk);
 #include "listabloques.h"
