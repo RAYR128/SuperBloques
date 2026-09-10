@@ -145,6 +145,29 @@ void RutinaControlEscena() {
 	cc.CargarRegConst8(REG_A, 0x80);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_VMAINC);
 
+	// Configuracion de video
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_ESCENA>>12) | ((ADD_VRAM_GRAFICOS_ESCENA>>12)<<4));
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BG12NBA);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_HUD>>12) | ((ADD_VRAM_GRAFICOS_HUD>>12)<<4));
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BG34NBA);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER1>>8)|HW_BGSC_Size_64x64);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BG1SC);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER2>>8)|HW_BGSC_Size_32x32);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BG2SC);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER3>>8)|HW_BGSC_Size_32x32);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BG3SC);
+	cc.CargarRegConst8(REG_A, HW_Through_BG1 | HW_Through_BG3 | HW_Through_OBJ);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_TM);
+	cc.CargarRegConst8(REG_A, HW_Through_BG2);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_TS);
+	cc.CargarRegConst8(REG_A, 0);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_TMW);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_TSW);
+	cc.CargarRegConst8(REG_A, HW_CGWSEL_USE_SUBSCREEN | HW_CGWSEL_MATH_NEVER | HW_CGWSEL_CLIP_NEVER);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_CGSWSEL);
+	cc.CargarRegConst8(REG_A, HW_CGADSUB_BG1 | HW_CGADSUB_OBJ | HW_CGADSUB_BACKDROP | HW_CGADSUB_HALF);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_CGADSUB);
+
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
