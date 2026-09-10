@@ -25,12 +25,48 @@ void ConRegALlamarJumpTable(std::string tabla) {
 	cc.LlamadaLong("CALL_DYNAMIC_POSITION");
 }
 
+// VRAM
+void ConRegACrearDMAVramConTablaDinamica(std::string tabla, uint16_t size, uint16_t comando = uint16_t((HW_VMDATA<<8)|HW_DMA_2Byte2Addr)) {
+	// X = A * 3;
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SCRATCH);
+	cc.ShiftALeft();
+	cc.SumaAcumuladorMemoria(WRAM_SCRATCH);
+	cc.Transferir(REG_A, REG_X);
+
+	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR);
+	cc.IncrementarReg(REG_X);
+	cc.CargarRegEnMemoria_SymLX(REG_A, tabla);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 1);
+
+	// Parametros de DMA
+	cc.CargarRegConst16(REG_A, comando);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAPARAM);
+
+	cc.CargarRegConst16(REG_A, size);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);
+
+	// Comenzar DMA
+	cc.SetearFlags(FLAG_M_8BIT);
+	cc.CargarRegConst8(REG_A, 1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
+	cc.LimpiarFlags(FLAG_M_8BIT);
+}
+
+void SubirGraficosEscena(std::string tabla, uint16_t vram, uint16_t size) {
+	cc.CargarRegConst16(REG_A, vram);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_VMADD);
+	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
+	cc.ANDAcumuladorConst16(0x00FF);
+	ConRegACrearDMAVramConTablaDinamica(tabla, size);
+}
+
 // Rutinas
 void RutinaLoopPrincipal() {
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
-	// TO-DO: Añadir latch (WRAM_CONTROL1_PRESIONADO)
+	// Recibir entrada de perifericos/controles y crear los latches.
 	for(int i = 0; i < 2; i++) {
 		int hwCntrl = HW_CNTRL1 + i * 2;
 		int cntMask = WRAM_CONTROL1_MASK + i * 2;
@@ -105,10 +141,28 @@ void RutinaControlEscena() {
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 
+	// Modo de DMA a VRAM
+	cc.CargarRegConst8(REG_A, 0x80);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_VMAINC);
+
 	// Activar modo 16-bit
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
-	// TO-DO: Aqui tenemos que implementar el DMA a la VRAM para los recursos utilizados.
+	// Subir los graficos de la escena actual
+	SubirGraficosEscena("TABLA_DATOS_GraficosPrincipales", ADD_VRAM_GRAFICOS_ESCENA, 32768);
+	SubirGraficosEscena("TABLA_DATOS_GraficosHud", ADD_VRAM_GRAFICOS_HUD, 4096);
+	SubirGraficosEscena("TABLA_DATOS_Tilemap1", ADD_VRAM_TILEMAP_LAYER1, 8192);
+	SubirGraficosEscena("TABLA_DATOS_Tilemap2", ADD_VRAM_TILEMAP_LAYER2, 2048);
+	SubirGraficosEscena("TABLA_DATOS_Tilemap3", ADD_VRAM_TILEMAP_LAYER3, 2048);
+
+	// Subir la paleta de la escena actual a WRAM
+	cc.CargarRegConst16(REG_A, WRAM_PALETA);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD);
+	cc.CargarRegConst16(REG_A, WRAM_PALETA >> 8);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD+1);
+	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
+	cc.ANDAcumuladorConst16(0x00FF);
+	ConRegACrearDMAVramConTablaDinamica("TABLA_DATOS_Paleta", 512, (HW_WMDATA << 8)|HW_DMA_1Byte1Addr);
 
 	// Ahora llamamos a la rutina de init de la escena actual.
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
@@ -222,6 +276,10 @@ void RutinaRESET() {
 	// desactivar la pantalla y configurar el registro de control de video
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
+
+	// vamos a siempre utilizar Modo 1, ya que nos da 3 capas de video
+	cc.CargarRegConst8(REG_A, 0x29);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_BGMODE);
 
 	// CLC : XCE, desactivar emulacion de 6502 y activar modo nativo de 65816
 	cc.LimpiarFlags(FLAG_CARRYF);
@@ -339,7 +397,7 @@ void RutinaIRQ() {
 	cc.ReturnInterrupt();
 }
 
-void EmitirTablaEscena(string tabla, string nombre) {
+void EmitirTablaEscena(std::string tabla, std::string nombre) {
 	cc.Etiqueta(tabla);
 	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
 		cc.EscribirEtiqueta(nombre + EscenasProyecto[i].Nombre, true);
