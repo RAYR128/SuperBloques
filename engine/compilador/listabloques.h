@@ -11,13 +11,14 @@ xx(NUMERO, "numero", BLOQUE_CLASE_VALOR)
 xx(MOTION, "motion", BLOQUE_CLASE_CATEGORIA)
 xx(MOTION_GET_POSICION_X, "motion_get_posicion_x", BLOQUE_CLASE_VALOR)
 xx(MOTION_GET_POSICION_Y, "motion_get_posicion_y", BLOQUE_CLASE_VALOR)
-xx(MOTION_SET_POSICION_X, "motion_set_posicion_x", BLOQUE_CLASE_ACCION) // ObjX = Entradas[0]
-xx(MOTION_SET_POSICION_Y, "motion_set_posicion_y", BLOQUE_CLASE_ACCION) // ObjY = Entradas[0]
-xx(MOTION_ADD_POSICION_X, "motion_add_posicion_x", BLOQUE_CLASE_ACCION) // ObjX += Entradas[0]
-xx(MOTION_ADD_POSICION_Y, "motion_add_posicion_y", BLOQUE_CLASE_ACCION) // ObjY += Entradas[0]
+xx(MOTION_SET_POSICION_X, "motion_set_posicion_x", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_POSICION_X = Entradas[0]
+xx(MOTION_SET_POSICION_Y, "motion_set_posicion_y", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_POSICION_Y = Entradas[0]
+xx(MOTION_ADD_POSICION_X, "motion_add_posicion_x", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_POSICION_X += Entradas[0]
+xx(MOTION_ADD_POSICION_Y, "motion_add_posicion_y", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_POSICION_Y += Entradas[0]
 
 // Reproduccion de animaciones) control de frames y sprites
 xx(ANIMACION, "animation", BLOQUE_CLASE_CATEGORIA)
+xx(ANIMACION_OBJ_SET_SPRITE, "animation_obj_set_sprite", BLOQUE_CLASE_ACCION) // PARAMETRO_OBJ_SPRITE = Entradas[0]
 
 // Reproduccion de sonidos y musica
 xx(SONIDO, "sound", BLOQUE_CLASE_CATEGORIA)
