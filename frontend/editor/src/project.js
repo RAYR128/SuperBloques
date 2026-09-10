@@ -1,3 +1,6 @@
+import graficosHudDefectoUrl from "./defaults/GraficosHudDefecto.bin?inline";
+import paletaDefectoUrl from "./defaults/PaletaColoresDefecto.bin?inline";
+
 export const BLOB_SIZES = {
 	GraficosPrincipales: 32768,
 	GraficosHud: 4096,
@@ -6,6 +9,14 @@ export const BLOB_SIZES = {
 	Tilemap3: 2048,
 	Paleta: 512,
 };
+
+function base64DeDataUrl(dataUrl) {
+	const i = dataUrl.indexOf(",");
+	return i >= 0 ? dataUrl.slice(i + 1) : dataUrl;
+}
+
+const GRAFICOS_HUD_DEFECTO = base64DeDataUrl(graficosHudDefectoUrl);
+const PALETA_DEFECTO = base64DeDataUrl(paletaDefectoUrl);
 
 export const ESCENA_VARIABLES_MAX = 128;
 export const OBJETO_VARIABLES_MAX = 43;
@@ -45,11 +56,11 @@ export function zerosBase64(n) {
 export function crearEscena() {
 	return {
 		GraficosPrincipales: zerosBase64(BLOB_SIZES.GraficosPrincipales),
-		GraficosHud: zerosBase64(BLOB_SIZES.GraficosHud),
+		GraficosHud: GRAFICOS_HUD_DEFECTO,
 		Tilemap1: zerosBase64(BLOB_SIZES.Tilemap1),
 		Tilemap2: zerosBase64(BLOB_SIZES.Tilemap2),
 		Tilemap3: zerosBase64(BLOB_SIZES.Tilemap3),
-		Paleta: zerosBase64(BLOB_SIZES.Paleta),
+		Paleta: PALETA_DEFECTO,
 		Variables: [],
 		Bloques: {},
 	};

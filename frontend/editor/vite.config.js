@@ -52,6 +52,7 @@ function blocklyMedia() {
 
 export default defineConfig({
 	base: "/editor/",
+	assetsInclude: ["**/*.bin"],
 	build: {
 		outDir: "dist",
 		emptyOutDir: true,
