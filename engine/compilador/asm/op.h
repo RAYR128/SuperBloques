@@ -330,6 +330,10 @@ class Emitidor65816 {
 	void Emitir24Bit(uint32_t doblePalabra);
 	void EmitirDoblePalabra(uint32_t doblePalabra);
 
+	// 0xFFFF en un op = esa variante no existe.
+	// DP si (addrHw - WRAM_DIRECTPAGE) < 0x100; long solo si addrHw >> 16 > 0.
+	void EmitirInstMemoriaOptimizada(uint16_t opDp, uint16_t opAbs, uint16_t opLong, uint32_t addrHw);
+
 	std::vector<EtiquetaCodigo> etiquetas;
 	std::vector<ReferenciaCodigo> referencias;
 
@@ -382,32 +386,32 @@ class Emitidor65816 {
 	void CompararRegConst16(Registers reg, uint16_t valor);
 
 	// Cargar datos en memoria a un reg
-	void CargarRegEnMemoria(Registers reg, uint16_t addrHw);
-	void CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw);
-	void CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw);
+	void CargarRegEnMemoria(Registers reg, uint32_t addrHw);
+	void CargarRegEnMemoria_IndX(Registers reg, uint32_t addrHw);
+	void CargarRegEnMemoria_IndY(Registers reg, uint32_t addrHw);
 	void CargarRegEnMemoria_SymLX(Registers reg, std::string label);
 
 	// Almacenar datos en memoria a un reg
-	void AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw);
-	void AlmacenarRegEnMemoria_IndX(Registers reg, uint16_t addrHw);
-	void AlmacenarRegEnMemoria_IndY(Registers reg, uint16_t addrHw);
+	void AlmacenarRegEnMemoria(Registers reg, uint32_t addrHw);
+	void AlmacenarRegEnMemoria_IndX(Registers reg, uint32_t addrHw);
+	void AlmacenarRegEnMemoria_IndY(Registers reg, uint32_t addrHw);
 
 	// Almacenar cero a memoria
-	void AlmacenarCeroEnMemoria(uint16_t addrHw);
-	void AlmacenarCeroEnMemoria_IndX(uint16_t addrHw);
+	void AlmacenarCeroEnMemoria(uint32_t addrHw);
+	void AlmacenarCeroEnMemoria_IndX(uint32_t addrHw);
 
-	// Sumar / restar acumulador (REG_A) con memoria absoluta
-	void SumaAcumuladorMemoria(uint16_t addrHw);
-	void RestaAcumuladorMemoria(uint16_t addrHw);
+	// Sumar / restar acumulador (REG_A) con memoria
+	void SumaAcumuladorMemoria(uint32_t addrHw);
+	void RestaAcumuladorMemoria(uint32_t addrHw);
 
-	// AND / ORA / EOR acumulador (REG_A) con memoria absoluta
-	void ANDAcumuladorMemoria(uint16_t addrHw);
-	void ORAcumuladorMemoria(uint16_t addrHw);
-	void EORAcumuladorMemoria(uint16_t addrHw);
+	// AND / ORA / EOR acumulador (REG_A) con memoria
+	void ANDAcumuladorMemoria(uint32_t addrHw);
+	void ORAcumuladorMemoria(uint32_t addrHw);
+	void EORAcumuladorMemoria(uint32_t addrHw);
 
 	// Incrementar/Decrementar datos en memoria
-	void IncrementarMemoria(uint16_t addrHw);
-	void DecrementarMemoria(uint16_t addrHw);
+	void IncrementarMemoria(uint32_t addrHw);
+	void DecrementarMemoria(uint32_t addrHw);
 
 	// Incrementar/Decrementar reg
 	void IncrementarReg(Registers reg);
@@ -428,7 +432,7 @@ class Emitidor65816 {
 	// Etiquetas/Control
 	void EscribirEtiqueta(std::string label, bool grande);
 	void Saltar(std::string label, TipoReferencia tipo);
-	void SaltarLongIndirecto(uint16_t addrHw);
+	void SaltarLongIndirecto(uint32_t addrHw);
 	void Llamada(std::string label);
 	void LlamadaLong(std::string label);
 	void Branch(std::string label, TipoBranch tipo);

@@ -89,14 +89,30 @@ void Emitidor65816::IntercambiarBytesA() {
 	EmitirByte(OP_XBA_IMP);
 }
 
-void Emitidor65816::AlmacenarCeroEnMemoria(uint16_t addrHw) {
-	EmitirByte(OP_STZ_ABS);
-	EmitirPalabra(addrHw);
+void Emitidor65816::EmitirInstMemoriaOptimizada(uint16_t opDp, uint16_t opAbs, uint16_t opLong, uint32_t addrHw) {
+	if(opDp != 0xFFFF && (addrHw - WRAM_DIRECTPAGE) < 0x100) {
+		EmitirByte((uint8_t)opDp);
+		EmitirByte((uint8_t)(addrHw - WRAM_DIRECTPAGE));
+		return;
+	}
+	if(opLong != 0xFFFF && (addrHw >> 16) > 0) {
+		EmitirByte((uint8_t)opLong);
+		Emitir24Bit(addrHw);
+		return;
+	}
+	if(opAbs == 0xFFFF) {
+		throw std::runtime_error("EmitirInstMemoriaOptimizada: no hay variante para la direccion");
+	}
+	EmitirByte((uint8_t)opAbs);
+	EmitirPalabra((uint16_t)addrHw);
 }
 
-void Emitidor65816::AlmacenarCeroEnMemoria_IndX(uint16_t addrHw) {
-	EmitirByte(OP_STZ_ABSX);
-	EmitirPalabra(addrHw);
+void Emitidor65816::AlmacenarCeroEnMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_STZ_DP, OP_STZ_ABS, 0xFFFF, addrHw);
+}
+
+void Emitidor65816::AlmacenarCeroEnMemoria_IndX(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_STZ_DPX, OP_STZ_ABSX, 0xFFFF, addrHw);
 }
 
 void Emitidor65816::ShiftALeft(int veces) {
@@ -117,14 +133,12 @@ void Emitidor65816::RotarARight(int veces) {
 	}
 }
 
-void Emitidor65816::IncrementarMemoria(uint16_t addrHw) {
-	EmitirByte(OP_INC_ABS);
-	EmitirPalabra(addrHw);
+void Emitidor65816::IncrementarMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_INC_DP, OP_INC_ABS, 0xFFFF, addrHw);
 }
 
-void Emitidor65816::DecrementarMemoria(uint16_t addrHw) {
-	EmitirByte(OP_DEC_ABS);
-	EmitirPalabra(addrHw);
+void Emitidor65816::DecrementarMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_DEC_DP, OP_DEC_ABS, 0xFFFF, addrHw);
 }
 
 void Emitidor65816::CargarRegConst8(Registers reg, uint8_t valor) {
@@ -177,9 +191,8 @@ void Emitidor65816::SumaAcumuladorConst16(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
-void Emitidor65816::SumaAcumuladorMemoria(uint16_t valor) {
-	EmitirByte(OP_ADC_ABS);
-	EmitirPalabra(valor);
+void Emitidor65816::SumaAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_ADC_DP, OP_ADC_ABS, OP_ADC_LONG, addrHw);
 }
 
 void Emitidor65816::RestaAcumuladorConst16(uint16_t valor) {
@@ -187,24 +200,20 @@ void Emitidor65816::RestaAcumuladorConst16(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
-void Emitidor65816::RestaAcumuladorMemoria(uint16_t valor) {
-	EmitirByte(OP_SBC_ABS);
-	EmitirPalabra(valor);
+void Emitidor65816::RestaAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_SBC_DP, OP_SBC_ABS, OP_SBC_LONG, addrHw);
 }
 
-void Emitidor65816::ANDAcumuladorMemoria(uint16_t valor) {
-	EmitirByte(OP_AND_ABS);
-	EmitirPalabra(valor);
+void Emitidor65816::ANDAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_AND_DP, OP_AND_ABS, OP_AND_LONG, addrHw);
 }
 
-void Emitidor65816::ORAcumuladorMemoria(uint16_t valor) {
-	EmitirByte(OP_ORA_ABS);
-	EmitirPalabra(valor);
+void Emitidor65816::ORAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_ORA_DP, OP_ORA_ABS, OP_ORA_LONG, addrHw);
 }
 
-void Emitidor65816::EORAcumuladorMemoria(uint16_t valor) {
-	EmitirByte(OP_EOR_ABS);
-	EmitirPalabra(valor);
+void Emitidor65816::EORAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_EOR_DP, OP_EOR_ABS, OP_EOR_LONG, addrHw);
 }
 
 void Emitidor65816::ANDAcumuladorConst8(uint8_t valor) {
@@ -267,19 +276,16 @@ void Emitidor65816::CompararRegConst16(Registers reg, uint16_t valor) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoria(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_LDA_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_LDA_DP, OP_LDA_ABS, OP_LDA_LONG, addrHw);
 		break;
 	case REG_X:
-		EmitirByte(OP_LDX_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_LDX_DP, OP_LDX_ABS, 0xFFFF, addrHw);
 		break;
 	case REG_Y:
-		EmitirByte(OP_LDY_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_LDY_DP, OP_LDY_ABS, 0xFFFF, addrHw);
 		break;
 	default:
 		throw std::runtime_error("CargarRegEnMemoriaW: Register invalido");
@@ -287,11 +293,10 @@ void Emitidor65816::CargarRegEnMemoria(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria_IndX(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_LDA_ABSX);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_LDA_DPX, OP_LDA_ABSX, OP_LDA_LONGX, addrHw);
 		break;
 	default:
 		throw std::runtime_error("CargarRegEnMemoriaWX: Register invalido");
@@ -299,11 +304,10 @@ void Emitidor65816::CargarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::CargarRegEnMemoria_IndY(Registers reg, uint16_t addrHw) {
+void Emitidor65816::CargarRegEnMemoria_IndY(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_LDA_ABSY);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(0xFFFF, OP_LDA_ABSY, 0xFFFF, addrHw);
 		break;
 	default:
 		throw std::runtime_error("CargarRegEnMemoriaWY: Register invalido");
@@ -324,24 +328,20 @@ void Emitidor65816::CargarRegEnMemoria_SymLX(Registers reg, std::string label) {
 	}
 }
 
-void Emitidor65816::SaltarLongIndirecto(uint16_t addrHw) {
-	EmitirByte(OP_JML_INDL);
-	EmitirPalabra(addrHw);
+void Emitidor65816::SaltarLongIndirecto(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(0xFFFF, OP_JML_INDL, 0xFFFF, addrHw);
 }
 
-void Emitidor65816::AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_STA_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_STA_DP, OP_STA_ABS, OP_STA_LONG, addrHw);
 		break;
 	case REG_X:
-		EmitirByte(OP_STX_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_STX_DP, OP_STX_ABS, 0xFFFF, addrHw);
 		break;
 	case REG_Y:
-		EmitirByte(OP_STY_ABS);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_STY_DP, OP_STY_ABS, 0xFFFF, addrHw);
 		break;
 	default:
 		throw std::runtime_error("AlmacenarRegEnMemoriaW: Register invalido");
@@ -349,11 +349,10 @@ void Emitidor65816::AlmacenarRegEnMemoria(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::AlmacenarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria_IndX(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_STA_ABSX);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(OP_STA_DPX, OP_STA_ABSX, OP_STA_LONGX, addrHw);
 		break;
 	default:
 		throw std::runtime_error("AlmacenarRegEnMemoriaWX: Register invalido");
@@ -361,11 +360,10 @@ void Emitidor65816::AlmacenarRegEnMemoria_IndX(Registers reg, uint16_t addrHw) {
 	}
 }
 
-void Emitidor65816::AlmacenarRegEnMemoria_IndY(Registers reg, uint16_t addrHw) {
+void Emitidor65816::AlmacenarRegEnMemoria_IndY(Registers reg, uint32_t addrHw) {
 	switch(reg) {
 	case REG_A:
-		EmitirByte(OP_STA_ABSY);
-		EmitirPalabra(addrHw);
+		EmitirInstMemoriaOptimizada(0xFFFF, OP_STA_ABSY, 0xFFFF, addrHw);
 		break;
 	default:
 		throw std::runtime_error("AlmacenarRegEnMemoriaWY: Register invalido");
