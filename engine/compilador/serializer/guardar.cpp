@@ -17,6 +17,10 @@ static json SerializarParametroEspecial(const NodoBloque &Bloque, const std::vec
 	   (size_t)Bloque.ParametroEspecial < Variables.size()) {
 		return Variables[(size_t)Bloque.ParametroEspecial];
 	}
+	if(Bloque.TipoDeBloque == BLOQUE_EVENTO_CAMBIAR_ESCENA && Bloque.ParametroEspecial >= 0 &&
+	   (size_t)Bloque.ParametroEspecial < EscenasProyecto.size()) {
+		return EscenasProyecto[(size_t)Bloque.ParametroEspecial].Nombre;
+	}
 	return Bloque.ParametroEspecial;
 }
 

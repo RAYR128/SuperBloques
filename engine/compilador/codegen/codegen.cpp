@@ -99,7 +99,12 @@ void CompilarExpresion(NodoBloque *n) {
 void CompilarCadenaAcciones(NodoBloque *primero) {
 	compiladorUsoScratch = 0;
 	for(NodoBloque *n = primero; n; n = n->Siguiente) {
-		if(ObtenerClaseBloque(n->TipoDeBloque) != BLOQUE_CLASE_ACCION) {
+		ClaseBloque clase = ObtenerClaseBloque(n->TipoDeBloque);
+		if(clase == BLOQUE_CLASE_FINALIZADOR) {
+			n->Compilar();
+			break;
+		}
+		if(clase != BLOQUE_CLASE_ACCION) {
 			throw std::runtime_error("la cadena de un evento solo puede contener acciones");
 		}
 		n->Compilar();

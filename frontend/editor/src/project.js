@@ -156,6 +156,10 @@ function siguienteSeleccion(tipo, nombre) {
 
 export function eliminarEntidad(tipo, nombre) {
 	const etiqueta = tipo === "escena" ? "escena" : "objeto";
+	if (tipo === "escena" && escenaEnUso(nombre)) {
+		window.alert(`No se puede eliminar la escena "${nombre}" porque esta en uso`);
+		return false;
+	}
 	if (!window.confirm(`Eliminar ${etiqueta} "${nombre}"?`)) {
 		return false;
 	}
@@ -228,6 +232,33 @@ export function variableEnUso(entidad, nombre) {
 	for (const bloque of Object.values(entidad.Bloques || {})) {
 		if (visitaNodo(bloque, nombre)) {
 			return true;
+		}
+	}
+	return false;
+}
+
+function visitaNodoEscena(nodo, nombre) {
+	if (!nodo) {
+		return false;
+	}
+	if (nodo.Operacion === "evento_cambiar_escena" && nodo.ParametroEspecial === nombre) {
+		return true;
+	}
+	for (const entrada of nodo.Entradas || []) {
+		if (visitaNodoEscena(entrada, nombre)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+export function escenaEnUso(nombre) {
+	const entidades = [...Object.values(state.proyecto.Escenas), ...Object.values(state.proyecto.Objetos)];
+	for (const entidad of entidades) {
+		for (const bloque of Object.values(entidad.Bloques || {})) {
+			if (visitaNodoEscena(bloque, nombre)) {
+				return true;
+			}
 		}
 	}
 	return false;

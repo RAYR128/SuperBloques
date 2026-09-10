@@ -46,14 +46,14 @@ enum ParametrosObjeto {
 #define WRAM_CONTROL1 0x00F0
 #define WRAM_CONTROL1_AXLR_MANTENIDO 0x00F0		// Datos de control 1 en bits
 #define WRAM_CONTROL1_BYETUDLR_MANTENIDO 0x00F1 // Datos de control 1 en bits
-#define WRAM_CONTROL1_PRESIONADO 0x00F0
+#define WRAM_CONTROL1_PRESIONADO 0x00F2
 #define WRAM_CONTROL1_AXLR_PRESIONADO 0x00F2	 // Datos de control 1 en bits, solo para el cuadro actual
 #define WRAM_CONTROL1_BYETUDLR_PRESIONADO 0x00F3 // Datos de control 1 en bits, solo para el cuadro actual
 
 #define WRAM_CONTROL2 0x00F4
 #define WRAM_CONTROL2_AXLR_MANTENIDO 0x00F4		// Datos de control 2 en bits
 #define WRAM_CONTROL2_BYETUDLR_MANTENIDO 0x00F5 // Datos de control 2 en bits
-#define WRAM_CONTROL2_PRESIONADO 0x00F4
+#define WRAM_CONTROL2_PRESIONADO 0x00F6
 #define WRAM_CONTROL2_AXLR_PRESIONADO 0x00F6	 // Datos de control 2 en bits, solo para el cuadro actual
 #define WRAM_CONTROL2_BYETUDLR_PRESIONADO 0x00F7 // Datos de control 2 en bits, solo para el cuadro actual
 

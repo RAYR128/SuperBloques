@@ -47,7 +47,10 @@ xx(CONTROL_IFELSE, "control_ifelse", BLOQUE_CLASE_ACCION) // Entradas[0] -> cond
 // Inicio, labels
 xx(EVENTO, "evento", BLOQUE_CLASE_CATEGORIA)
 xx(EVENTO_INIT, "evento_init", BLOQUE_CLASE_EVENTO) // Siguiente
-xx(EVENTO_FRAME, "evento_frame", BLOQUE_CLASE_EVENTO) // ParametroEspecial -> PARAMETRO_OBJ_BHV_SCRIPT_STATUS en el cual se ejecuta. Si es 0 es en todos los estados (no compila IF)
+xx(EVENTO_FRAME, "evento_frame", BLOQUE_CLASE_EVENTO) // ParametroEspecial -> PARAMETRO_OBJ_BHV_SCRIPT_STATUS / WRAM_ESCENA_STATUS en el cual se ejecuta. Si es 0 es en todos los estados (no compila IF)
+xx(EVENTO_ESTADO, "evento_estado", BLOQUE_CLASE_VALOR) // WRAM_OBJETOS+PARAMETRO_OBJ_BHV_SCRIPT_STATUS o WRAM_ESCENA_STATUS, AND #$00FF
+xx(EVENTO_SET_ESTADO, "evento_set_estado", BLOQUE_CLASE_ACCION) // escribe Entradas[0] como 8-bit (SEP M) al status de arriba
+xx(EVENTO_CAMBIAR_ESCENA, "evento_cambiar_escena", BLOQUE_CLASE_FINALIZADOR) // ParametroEspecial -> indice de escena; STA 8-bit WRAM_ESCENA_ACTUAL; JSL INICIALIZAR_ESCENA_ID; RTL
 
 // Control y asignacion de variables
 // VARIABLE es similar a NUMERO, y usa ParametroEspecial como un offset hacia "Variables" en ObjetoEscena/Escena

@@ -116,12 +116,12 @@ function selKey() {
 	return sel ? `${gen}:${sel.tipo}:${sel.nombre}` : `${gen}:`;
 }
 
-function refreshVariableFields() {
+function refreshDropdownField(fieldName) {
 	if (!workspace) {
 		return;
 	}
 	for (const block of workspace.getAllBlocks(false)) {
-		const field = block.getField("VAR");
+		const field = block.getField(fieldName);
 		if (!field) {
 			continue;
 		}
@@ -132,10 +132,18 @@ function refreshVariableFields() {
 		try {
 			field.setValue(value);
 		} catch {
-			/* la variable pudo desaparecer */
+			/* el valor pudo desaparecer */
 		}
 		block.render();
 	}
+}
+
+function refreshVariableFields() {
+	refreshDropdownField("VAR");
+}
+
+function refreshEscenaFields() {
+	refreshDropdownField("ESCENA");
 }
 
 function loadEntityIntoWorkspace() {
@@ -147,6 +155,7 @@ function loadEntityIntoWorkspace() {
 	if (key === lastSelKey) {
 		refreshFlyout();
 		refreshVariableFields();
+		refreshEscenaFields();
 		return;
 	}
 	lastSelKey = key;

@@ -23,16 +23,22 @@ void CompilarBloquesBhv(std::string init, std::string main, std::string identifi
 	int uid = 0;
 	for(NodoBloque &bloque : lista) {
 		if(bloque.TipoDeBloque == BLOQUE_EVENTO_FRAME) {
+			std::string skip = main + "PR_" + std::to_string(uid) + "_" + identificador;
 			// Parametro especial: Solo ejecutar si el estado del script es el que se espera.
 			if(bloque.ParametroEspecial) {
 				cc.SetearFlags(FLAG_M_8BIT);
-				cc.CargarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_STATUS);
+				if(contexto == CTX_OBJETO) {
+					cc.CargarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_BHV_SCRIPT_STATUS);
+				} else {
+					cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_STATUS);
+				}
 				cc.CompararRegConst8(REG_A, bloque.ParametroEspecial);
 				cc.LimpiarFlags(FLAG_M_8BIT);
-				cc.BranchLong(main + "PR_" + std::to_string(uid) + "_", BRANCH_ZERO_CLEAR);
+				cc.BranchLong(skip, BRANCH_ZERO_CLEAR);
 			}
 			bloque.Compilar();
-			cc.Etiqueta(main + "PR_" + std::to_string(uid) + "_" + identificador);
+			cc.Etiqueta(skip);
+			uid++;
 		}
 	}
 	cc.ReturnLong();

@@ -39,6 +39,9 @@ const OPERACIONES = new Set([
 	"evento",
 	"evento_init",
 	"evento_frame",
+	"evento_estado",
+	"evento_set_estado",
+	"evento_cambiar_escena",
 	"variable",
 	"variable_store",
 	"operation",
@@ -148,6 +151,9 @@ function resolverParametroEspecial(nodo, variables) {
 		return parametro;
 	}
 	if (typeof parametro === "string") {
+		if (nodo.Operacion === "evento_cambiar_escena") {
+			return parametro;
+		}
 		if (!variables.includes(parametro)) {
 			throw new Error("variable inexistente: " + parametro);
 		}
@@ -244,6 +250,39 @@ function parsearBloquesOpcional(entidad, variables) {
 	return parsearBloques(entidad.Bloques, variables);
 }
 
+function visitaNodo(nodo, fn) {
+	if (!nodo) {
+		return;
+	}
+	fn(nodo);
+	for (const entrada of nodo.Entradas || []) {
+		visitaNodo(entrada, fn);
+	}
+}
+
+function validarEscenasReferenciadas(proyecto) {
+	const nombres = new Set(Object.keys(proyecto.Escenas));
+	const revisar = (bloques) => {
+		for (const bloque of Object.values(bloques || {})) {
+			visitaNodo(bloque, (nodo) => {
+				if (nodo.Operacion !== "evento_cambiar_escena") {
+					return;
+				}
+				const parametro = nodo.ParametroEspecial;
+				if (typeof parametro === "string" && !nombres.has(parametro)) {
+					throw new Error("escena inexistente: " + parametro);
+				}
+			});
+		}
+	};
+	for (const escena of Object.values(proyecto.Escenas)) {
+		revisar(escena.Bloques);
+	}
+	for (const objeto of Object.values(proyecto.Objetos)) {
+		revisar(objeto.Bloques);
+	}
+}
+
 function parsearBlob(nodo, clave, tamano) {
 	if (!Object.prototype.hasOwnProperty.call(nodo, clave)) {
 		return zerosBase64(tamano);
@@ -334,5 +373,7 @@ export function parsearProyecto(texto) {
 		};
 	}
 
-	return {Escenas: escenas, Objetos: objetos};
+	const proyecto = {Escenas: escenas, Objetos: objetos};
+	validarEscenasReferenciadas(proyecto);
+	return proyecto;
 }

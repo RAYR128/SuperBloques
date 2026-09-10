@@ -1,5 +1,6 @@
 import * as Blockly from "blockly/core";
 import {STATEMENT_INPUTS, VALUE_INPUTS} from "./catalog.js";
+import {state} from "../project.js";
 
 const TIPOS_CONOCIDOS = new Set([
 	"motion_get_posicion_x",
@@ -29,6 +30,9 @@ const TIPOS_CONOCIDOS = new Set([
 	"control_ifelse",
 	"evento_init",
 	"evento_frame",
+	"evento_estado",
+	"evento_set_estado",
+	"evento_cambiar_escena",
 	"variable",
 	"variable_store",
 	"numero",
@@ -57,6 +61,8 @@ function fieldsToParam(node) {
 			return f.VAR ?? "";
 		case "evento_frame":
 			return Number(f.STATUS) || 0;
+		case "evento_cambiar_escena":
+			return f.ESCENA ?? "";
 		case "sensor_boton_control_1":
 		case "sensor_boton_control_2":
 		case "sensor_boton_control_1_presionado":
@@ -77,6 +83,17 @@ function resolveVarName(param, variables) {
 	return variables[0] ?? "";
 }
 
+function resolveEscenaName(param) {
+	const names = Object.keys(state.proyecto?.Escenas ?? {});
+	if (typeof param === "string") {
+		return names.includes(param) ? param : (names[0] ?? "");
+	}
+	if (typeof param === "number" && names[param] != null) {
+		return names[param];
+	}
+	return names[0] ?? "";
+}
+
 function paramToFields(type, param, variables) {
 	switch (type) {
 		case "numero":
@@ -86,6 +103,8 @@ function paramToFields(type, param, variables) {
 			return {VAR: resolveVarName(param, variables)};
 		case "evento_frame":
 			return {STATUS: Number(param) || 0};
+		case "evento_cambiar_escena":
+			return {ESCENA: resolveEscenaName(param)};
 		case "sensor_boton_control_1":
 		case "sensor_boton_control_2":
 		case "sensor_boton_control_1_presionado":

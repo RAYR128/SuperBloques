@@ -1,5 +1,5 @@
 import * as Blockly from "blockly/core";
-import {variableEnUso, variablesActuales} from "../project.js";
+import {state, variableEnUso, variablesActuales} from "../project.js";
 
 export const VALUE_INPUTS = {
 	motion_set_posicion_x: ["VAL"],
@@ -24,6 +24,7 @@ export const VALUE_INPUTS = {
 	control_if: ["COND"],
 	control_while: ["COND"],
 	control_ifelse: ["COND"],
+	evento_set_estado: ["VAL"],
 };
 
 export const STATEMENT_INPUTS = {
@@ -122,6 +123,14 @@ function variableOptions() {
 	const names = variablesActuales();
 	if (!names.length) {
 		return [["(sin variables)", ""]];
+	}
+	return names.map((n) => [n, n]);
+}
+
+function escenaOptions() {
+	const names = Object.keys(state.proyecto?.Escenas ?? {});
+	if (!names.length) {
+		return [["(sin escenas)", ""]];
 	}
 	return names.map((n) => [n, n]);
 }
@@ -350,6 +359,20 @@ const JSON_BLOCKS = [
 		hat: "cap",
 	},
 	{
+		type: "evento_estado",
+		message0: "estado",
+		output: "Number",
+		style: "evento_blocks",
+	},
+	{
+		type: "evento_set_estado",
+		message0: "fijar estado a %1",
+		args0: [{type: "input_value", name: "VAL", check: "Number"}],
+		previousStatement: null,
+		nextStatement: null,
+		style: "evento_blocks",
+	},
+	{
 		type: "numero",
 		message0: "%1",
 		args0: [
@@ -469,6 +492,16 @@ export function registrarBloques() {
 			this.setStyle("variable_blocks");
 		},
 	};
+
+	Blockly.Blocks.evento_cambiar_escena = {
+		init() {
+			this.appendDummyInput()
+				.appendField("cambiar a escena")
+				.appendField(new Blockly.FieldDropdown(escenaOptions), "ESCENA");
+			this.setPreviousStatement(true, null);
+			this.setStyle("evento_blocks");
+		},
+	};
 }
 
 function bloqueConSombras(type, inputs) {
@@ -574,6 +607,9 @@ const FLYOUT = {
 	evento: [
 		{kind: "block", type: "evento_init"},
 		{kind: "block", type: "evento_frame"},
+		{kind: "block", type: "evento_estado"},
+		bloqueConSombras("evento_set_estado", {VAL: shadowNumero()}),
+		{kind: "block", type: "evento_cambiar_escena"},
 	],
 	operacion: [
 		{kind: "block", type: "numero"},

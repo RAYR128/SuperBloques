@@ -9,7 +9,7 @@
 
 using json = nlohmann::json;
 
-static int ResolverParametroEspecial(const json &Nodo, const std::vector<std::string> &Variables) {
+static int ResolverParametroEspecial(const json &Nodo, TipoBloque Tipo, const std::vector<std::string> &Variables, const std::vector<std::string> &NombresEscenas) {
 	if(!Nodo.contains("ParametroEspecial")) {
 		return 0;
 	}
@@ -19,6 +19,14 @@ static int ResolverParametroEspecial(const json &Nodo, const std::vector<std::st
 	}
 	if(Parametro.is_string()) {
 		const std::string Nombre = Parametro.get<std::string>();
+		if(Tipo == BLOQUE_EVENTO_CAMBIAR_ESCENA) {
+			for(size_t i = 0; i < NombresEscenas.size(); i++) {
+				if(NombresEscenas[i] == Nombre) {
+					return (int)i;
+				}
+			}
+			throw std::runtime_error("escena inexistente: " + Nombre);
+		}
 		for(size_t i = 0; i < Variables.size(); i++) {
 			if(Variables[i] == Nombre) {
 				return (int)i;
@@ -29,7 +37,7 @@ static int ResolverParametroEspecial(const json &Nodo, const std::vector<std::st
 	throw std::runtime_error("ParametroEspecial debe ser entero o string");
 }
 
-static NodoBloque DeserializarBloqueAnidado(const json &Nodo, const std::vector<std::string> &Variables) {
+static NodoBloque DeserializarBloqueAnidado(const json &Nodo, const std::vector<std::string> &Variables, const std::vector<std::string> &NombresEscenas) {
 	if(!Nodo.is_object()) {
 		throw std::runtime_error("bloque debe ser un objeto");
 	}
@@ -44,7 +52,7 @@ static NodoBloque DeserializarBloqueAnidado(const json &Nodo, const std::vector<
 		throw std::runtime_error("Operacion desconocida: " + Operacion);
 	}
 
-	Bloque.ParametroEspecial = ResolverParametroEspecial(Nodo, Variables);
+	Bloque.ParametroEspecial = ResolverParametroEspecial(Nodo, Bloque.TipoDeBloque, Variables, NombresEscenas);
 	if(Nodo.contains("PosicionVisual") && Nodo["PosicionVisual"].is_array() && Nodo["PosicionVisual"].size() >= 2) {
 		Bloque.PosicionVisualX = Nodo["PosicionVisual"][0].get<int>();
 		Bloque.PosicionVisualY = Nodo["PosicionVisual"][1].get<int>();
@@ -54,7 +62,7 @@ static NodoBloque DeserializarBloqueAnidado(const json &Nodo, const std::vector<
 			throw std::runtime_error("Entradas debe ser un array");
 		}
 		for(const auto &Entrada : Nodo["Entradas"]) {
-			Bloque.Entradas.push_back(DeserializarBloqueAnidado(Entrada, Variables));
+			Bloque.Entradas.push_back(DeserializarBloqueAnidado(Entrada, Variables, NombresEscenas));
 		}
 	}
 	return Bloque;
@@ -75,7 +83,7 @@ static NodoBloque *ResolverEnlace(const json &Nodo, const char *Campo, std::vect
 	return &Bloques[It->second];
 }
 
-static void CargarBloques(const json &NodoBloques, std::vector<NodoBloque> &Salida, const std::vector<std::string> &Variables) {
+static void CargarBloques(const json &NodoBloques, std::vector<NodoBloque> &Salida, const std::vector<std::string> &Variables, const std::vector<std::string> &NombresEscenas) {
 	if(!NodoBloques.is_object()) {
 		throw std::runtime_error("Bloques debe ser un objeto");
 	}
@@ -95,7 +103,7 @@ static void CargarBloques(const json &NodoBloques, std::vector<NodoBloque> &Sali
 		}
 		IdAIndice[Id] = Salida.size();
 		Ids.push_back(Id);
-		Salida.push_back(DeserializarBloqueAnidado(It.value(), Variables));
+		Salida.push_back(DeserializarBloqueAnidado(It.value(), Variables, NombresEscenas));
 	}
 
 	for(size_t i = 0; i < Ids.size(); i++) {
@@ -165,6 +173,12 @@ void CargarProyectoDesdeString(std::string JSONStr) {
 	const json &EscenasJson = ObjetoOVacio(Raiz, "Escenas", Vacio);
 	const json &ObjetosJson = ObjetoOVacio(Raiz, "Objetos", Vacio);
 
+	std::vector<std::string> NombresEscenas;
+	NombresEscenas.reserve(EscenasJson.size());
+	for(auto It = EscenasJson.begin(); It != EscenasJson.end(); ++It) {
+		NombresEscenas.push_back(It.key());
+	}
+
 	std::vector<Escena> NuevasEscenas;
 	std::vector<ObjetoEscena> NuevosObjetos;
 	NuevasEscenas.reserve(EscenasJson.size());
@@ -184,7 +198,7 @@ void CargarProyectoDesdeString(std::string JSONStr) {
 		CargarBlob(It.value(), "Paleta", Actual.Paleta, sizeof(Actual.Paleta));
 		CargarVariables(It.value(), Actual.Variables, ESCENA_VARIABLES_MAX);
 		if(It.value().contains("Bloques")) {
-			CargarBloques(It.value()["Bloques"], Actual.Bloques, Actual.Variables);
+			CargarBloques(It.value()["Bloques"], Actual.Bloques, Actual.Variables, NombresEscenas);
 		}
 		NuevasEscenas.push_back(std::move(Actual));
 	}
@@ -197,7 +211,7 @@ void CargarProyectoDesdeString(std::string JSONStr) {
 		Actual.Nombre = It.key();
 		CargarVariables(It.value(), Actual.Variables, OBJETO_VARIABLES_MAX);
 		if(It.value().contains("Bloques")) {
-			CargarBloques(It.value()["Bloques"], Actual.Bloques, Actual.Variables);
+			CargarBloques(It.value()["Bloques"], Actual.Bloques, Actual.Variables, NombresEscenas);
 		}
 		NuevosObjetos.push_back(std::move(Actual));
 	}
