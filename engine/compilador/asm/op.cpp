@@ -604,6 +604,9 @@ void Emitidor65816::GuardarSimbolosArchivo(const char *nombreArchivo) {
 			}
 			fprintf(archivo, "%02X:%04X %s\n", (direccion >> 16) & 0xFF, direccion & 0xFFFF, l.nombre.c_str());
 		}
+		// WRAM/HW de cpumap.h: ya son direcciones de hardware, sin remapear LoROM.
+		#define xx(v, r) fprintf(archivo, "%02X:%04X %s\n", ((uint32_t)(r) >> 16) & 0xFF, (uint32_t)(r) & 0xFFFF, #v);
+		#include "cpumap.h"
 		fprintf(archivo, "\n[source files]\n");
 		fprintf(archivo, "\n[rom checksum]\n%08x\n", CalcularCRC32ROM());
 		fprintf(archivo, "\n[addr-to-line mapping]");

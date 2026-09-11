@@ -343,7 +343,7 @@ class Emitidor65816 {
 	// Resolver referencias a labels, direcciones o valores literales. Se debe llamar al final de la compilacion, cuando se conocen todas las etiquetas y referencias.
 	void ResolverReferencias();
 
-	// Exportar etiquetas a un archivo .sym (direcciones de hardware, banco:addr).
+	// Exportar etiquetas y variables de cpumap.h a un archivo .sym (banco:addr).
 	void GuardarSimbolosArchivo(const char *nombreArchivo);
 
 	// Crear etiquetas y referencias a labels, direcciones o valores literales. Se debe llamar antes de emitir la instruccion que requiere la referencia.
