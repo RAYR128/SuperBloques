@@ -20,8 +20,8 @@ enum ParametrosObjeto {
 };
 
 enum DireccionesCPU {
-	#define xx(v, r) v = r,
-	#include "cpumap.h"
+#define xx(v, r) v = r,
+#include "cpumap.h"
 };
 
 // ParametroEspecial de SENSOR_BOTON_CONTROL_1/2. Los primeros bits de firma (BOTON_FIRMA_0..3) no corresponden a un boton, pero igual deben compilar.
@@ -78,26 +78,26 @@ enum ParametroLayerThrough {
 
 // Para HW_CGWSEL
 enum {
-	HW_CGWSEL_DIRECTCOLOR     = 0x01, // 8bpp modes only
-	HW_CGWSEL_USE_SUBSCREEN   = 0x02, // 0 = fixed color (COLDATA), 1 = TS layers
-	HW_CGWSEL_MATH_NEVER      = 0x00,
+	HW_CGWSEL_DIRECTCOLOR = 0x01,	// 8bpp modes only
+	HW_CGWSEL_USE_SUBSCREEN = 0x02, // 0 = fixed color (COLDATA), 1 = TS layers
+	HW_CGWSEL_MATH_NEVER = 0x00,
 	HW_CGWSEL_MATH_OUTSIDEWIN = 0x10,
-	HW_CGWSEL_MATH_INSIDEWIN  = 0x20,
-	HW_CGWSEL_MATH_ALWAYS     = 0x30,
-	HW_CGWSEL_CLIP_NEVER      = 0x00,
+	HW_CGWSEL_MATH_INSIDEWIN = 0x20,
+	HW_CGWSEL_MATH_ALWAYS = 0x30,
+	HW_CGWSEL_CLIP_NEVER = 0x00,
 	HW_CGWSEL_CLIP_OUTSIDEWIN = 0x40,
-	HW_CGWSEL_CLIP_INSIDEWIN  = 0x80,
-	HW_CGWSEL_CLIP_ALWAYS     = 0xC0
+	HW_CGWSEL_CLIP_INSIDEWIN = 0x80,
+	HW_CGWSEL_CLIP_ALWAYS = 0xC0
 };
 
 // Para HW_CGADSUB
 enum {
-	HW_CGADSUB_BG1      = 0x01,
-	HW_CGADSUB_BG2      = 0x02,
-	HW_CGADSUB_BG3      = 0x04,
-	HW_CGADSUB_BG4      = 0x08,
-	HW_CGADSUB_OBJ      = 0x10, // sprites palettes 4-7 only
+	HW_CGADSUB_BG1 = 0x01,
+	HW_CGADSUB_BG2 = 0x02,
+	HW_CGADSUB_BG3 = 0x04,
+	HW_CGADSUB_BG4 = 0x08,
+	HW_CGADSUB_OBJ = 0x10, // sprites palettes 4-7 only
 	HW_CGADSUB_BACKDROP = 0x20,
-	HW_CGADSUB_HALF     = 0x40,
-	HW_CGADSUB_SUBTRACT = 0x80  // 0 = add
+	HW_CGADSUB_HALF = 0x40,
+	HW_CGADSUB_SUBTRACT = 0x80 // 0 = add
 };

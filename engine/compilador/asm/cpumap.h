@@ -177,4 +177,4 @@ xx(HW_HDMALINES, 0x430A) // HDMA line counter
 
 
 #undef xx
-																								   // clang-format on
+							 // clang-format on

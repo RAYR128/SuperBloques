@@ -226,7 +226,7 @@ void RutinaConfiguracionVideo() {
 	cc.CargarRegConst8(REG_A, 0x80);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_VMAINC);
 	cc.CargarRegConst8(REG_A, WRAM_QUEUE_TILEMAP >> 16);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR+2);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 2);
 	cc.CargarRegConst8(REG_A, 1);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
 
