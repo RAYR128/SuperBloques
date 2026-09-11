@@ -260,6 +260,20 @@ void RutinaConfiguracionVideo() {
 	cc.AlmacenarCeroEnMemoria(HW_DMAADDR + 2);
 	cc.CargarRegConst8(REG_A, 1);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
+
+	// Posicion de capas
+	for(int i = 0; i < 3; i++) {
+		cc.CargarRegEnMemoria(REG_A, WRAM_V_LAYER1_X + i * 4);
+		cc.AlmacenarRegEnMemoria(REG_A, HW_BG1HOFS + i * 2);
+		cc.CargarRegEnMemoria(REG_A, WRAM_V_LAYER1_X + 1 + i * 4);
+		cc.AlmacenarRegEnMemoria(REG_A, HW_BG1HOFS + i * 2);
+		cc.CargarRegEnMemoria(REG_A, WRAM_V_LAYER1_Y + i * 4);
+		cc.AlmacenarRegEnMemoria(REG_A, HW_BG1VOFS + i * 2);
+		cc.CargarRegEnMemoria(REG_A, WRAM_V_LAYER1_Y + 1 + i * 4);
+		cc.AlmacenarRegEnMemoria(REG_A, HW_BG1VOFS + i * 2);
+	}
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_BRILLO);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 }
 
 // $FFDC-$FFDF (LoROM $7FDC-$7FDF): complemento + checksum de 16 bits.
@@ -423,8 +437,6 @@ void RutinaNMI() {
 	cc.CargarRegConst8(REG_A, 0x8F);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 	RutinaConfiguracionVideo();
-	cc.CargarRegEnMemoria(REG_A, WRAM_V_BRILLO);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
 
 	// rescatar estado de CPU, volver a ejecucion normal
 	cc.Etiqueta("FINALIZAR_NMI");

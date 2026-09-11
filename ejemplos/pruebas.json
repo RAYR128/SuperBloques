@@ -305,8 +305,36 @@
 							]
 						}
 					],
-					"Siguiente": null,
+					"Siguiente": "bloque_id_012",
 					"Previo": "bloque_id_010"
+				},
+				"bloque_id_012": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "capa_set_layer3_position_x",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "operation_add",
+							"ParametroEspecial": 0,
+							"Entradas": [
+								{
+									"Operacion": "capa_layer3_position_x",
+									"ParametroEspecial": 0,
+									"Entradas": []
+								},
+								{
+									"Operacion": "numero",
+									"ParametroEspecial": 4,
+									"Entradas": []
+								}
+							]
+						}
+					],
+					"Siguiente": null,
+					"Previo": "bloque_id_011"
 				}
 			}
 		},
