@@ -11,6 +11,7 @@
 	--stage-bg: #000000;
 	--cat-mocion: #4c97ff;
 	--cat-animacion: #9966ff;
+	--cat-capa: #00c2a8;
 	--cat-sonido: #cf63cf;
 	--cat-control: #ff194b;
 	--cat-evento: #ffbf00;
@@ -343,6 +344,7 @@ body.col-resizing .injectionDiv {
 
 .cat.mocion { background: var(--cat-mocion); }
 .cat.animacion { background: var(--cat-animacion); color: #fff; }
+.cat.capa { background: var(--cat-capa); color: #fff; }
 .cat.sonido { background: var(--cat-sonido); color: #fff; }
 .cat.control { background: var(--cat-control); }
 .cat.evento { background: var(--cat-evento); }

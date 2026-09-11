@@ -38,6 +38,7 @@ enum ParametrosObjeto {
 #define WRAM_V_FILTRO_MOSAICO 0x00DC // Filtro mosaico (1 byte)
 #define WRAM_V_BRILLO 0x00DD		 // Brillo de pantalla (1 byte).. valores 0-15
 #define WRAM_V_COLDATA 0x00DE		 // Datos a subir en COLDATA
+#define WRAM_V_QUEUESIZE 0x00E0
 
 // La consola nativamente almacena los controladores como variables de 16-bit en HW_CNTRL
 // Esto tiene byetudlraxLRxxxx (bit 15..0). Los bits 0-3 son firma del control (no son botones).
@@ -101,6 +102,10 @@ enum BotonControl {
 
 // Tamaño de WRAM total
 #define WRAM_SIZE 0x2000
+
+// Queue de modificacion de tilemaps de WRAM
+// 0x7E2000-0x7EFFFF
+#define WRAM_QUEUE_TILEMAP 0x7E2000
 
 // Registros de hardware (Memoria especial).
 // La consola siempre mapea estos en los bancos $00-$3F, en $2000-$4FFF.

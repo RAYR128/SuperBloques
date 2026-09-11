@@ -26,7 +26,7 @@ void ConRegALlamarJumpTable(std::string tabla) {
 }
 
 // VRAM
-void ConRegACrearDMAVramConTablaDinamica(std::string tabla, uint16_t size, uint16_t comando = uint16_t((HW_VMDATA<<8)|HW_DMA_2Byte2Addr)) {
+void ConRegACrearDMAVramConTablaDinamica(std::string tabla, uint16_t size, uint16_t comando = uint16_t((HW_VMDATA << 8) | HW_DMA_2Byte2Addr)) {
 	// X = A * 3;
 	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SCRATCH);
 	cc.ShiftALeft();
@@ -146,15 +146,15 @@ void RutinaControlEscena() {
 	cc.AlmacenarRegEnMemoria(REG_A, HW_VMAINC);
 
 	// Configuracion de video
-	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_ESCENA>>12) | ((ADD_VRAM_GRAFICOS_ESCENA>>12)<<4));
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_ESCENA >> 12) | ((ADD_VRAM_GRAFICOS_ESCENA >> 12) << 4));
 	cc.AlmacenarRegEnMemoria(REG_A, HW_BG12NBA);
-	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_HUD>>12) | ((ADD_VRAM_GRAFICOS_HUD>>12)<<4));
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_GRAFICOS_HUD >> 12) | ((ADD_VRAM_GRAFICOS_HUD >> 12) << 4));
 	cc.AlmacenarRegEnMemoria(REG_A, HW_BG34NBA);
-	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER1>>8)|HW_BGSC_Size_64x64);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER1 >> 8) | HW_BGSC_Size_64x64);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_BG1SC);
-	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER2>>8)|HW_BGSC_Size_32x32);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER2 >> 8) | HW_BGSC_Size_32x32);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_BG2SC);
-	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER3>>8)|HW_BGSC_Size_32x32);
+	cc.CargarRegConst8(REG_A, (ADD_VRAM_TILEMAP_LAYER3 >> 8) | HW_BGSC_Size_32x32);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_BG3SC);
 	cc.CargarRegConst8(REG_A, HW_Through_BG1 | HW_Through_BG3 | HW_Through_OBJ);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_TM);
@@ -190,10 +190,10 @@ void RutinaControlEscena() {
 	cc.CargarRegConst16(REG_A, WRAM_PALETA);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD);
 	cc.CargarRegConst16(REG_A, WRAM_PALETA >> 8);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD+1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD + 1);
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
 	cc.ANDAcumuladorConst16(0x00FF);
-	ConRegACrearDMAVramConTablaDinamica("TABLA_DATOS_Paleta", 512, (HW_WMDATA << 8)|HW_DMA_1Byte1Addr);
+	ConRegACrearDMAVramConTablaDinamica("TABLA_DATOS_Paleta", 512, (HW_WMDATA << 8) | HW_DMA_1Byte1Addr);
 
 	// Ahora llamamos a la rutina de init de la escena actual.
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
@@ -210,8 +210,29 @@ void RutinaControlEscena() {
 }
 
 void RutinaConfiguracionVideo() {
+	// Queue VRAM Tilemap -> VRAM (DMA ch0)
+	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_QUEUESIZE);
+	cc.Branch("NO_VRAM_Q", BRANCH_ZERO_SET);
+	cc.AlmacenarCeroEnMemoria(WRAM_V_QUEUESIZE);
+
+	// Solo hacer esto si hay datos en la queue de VRAM
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);
+	cc.CargarRegConst16(REG_A, ((HW_VMADD & 0xFF) << 8) | HW_DMA_4Byte4Addr);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAPARAM);
+	cc.CargarRegConst16(REG_A, WRAM_QUEUE_TILEMAP);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR);
+	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+	cc.CargarRegConst8(REG_A, 0x80);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_VMAINC);
+	cc.CargarRegConst8(REG_A, WRAM_QUEUE_TILEMAP >> 16);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR+2);
+	cc.CargarRegConst8(REG_A, 1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
+
 	// Paleta WRAM -> CGRAM (DMA ch0) y conversion de WRAM_V_COLDATA a COLDATA.
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
+	cc.Etiqueta("NO_VRAM_Q");
 
 	cc.CargarRegConst16(REG_A, 0x0200);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);

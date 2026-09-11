@@ -19,70 +19,11 @@ static void StoreA8(uint16_t addr) {
 	cc.LimpiarFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 }
 
-static void EmitirGetLayer(NodoBloque *blk, uint16_t addr) {
-	EsperarEntradas(blk, 0);
-	cc.CargarRegEnMemoria(REG_A, addr);
-}
-
-static void EmitirSetLayer(NodoBloque *blk, uint16_t addr) {
-	EsperarEntradas(blk, 1);
-	CompilarExpresion(&blk->Entradas[0]);
-	cc.AlmacenarRegEnMemoria(REG_A, addr);
-}
-
 void Emit_ANIMACION_OBJ_SET_SPRITE(NodoBloque *blk) {
 	EsperarContexto(blk, CTX_OBJETO);
 	EsperarEntradas(blk, 1);
 	CompilarExpresion(&blk->Entradas[0]);
 	cc.AlmacenarRegEnMemoria_IndY(REG_A, WRAM_OBJETOS + PARAMETRO_OBJ_SPRITE);
-}
-
-void Emit_ANIMACION_SCENE_LAYER1_POSITION_X(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER1_X);
-}
-
-void Emit_ANIMACION_SCENE_LAYER1_POSITION_Y(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER1_Y);
-}
-
-void Emit_ANIMACION_SCENE_LAYER2_POSITION_X(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER2_X);
-}
-
-void Emit_ANIMACION_SCENE_LAYER2_POSITION_Y(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER2_Y);
-}
-
-void Emit_ANIMACION_SCENE_LAYER3_POSITION_X(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER3_X);
-}
-
-void Emit_ANIMACION_SCENE_LAYER3_POSITION_Y(NodoBloque *blk) {
-	EmitirGetLayer(blk, WRAM_V_LAYER3_Y);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER1_POSITION_X(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER1_X);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER1_POSITION_Y(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER1_Y);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER2_POSITION_X(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER2_X);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER2_POSITION_Y(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER2_Y);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER3_POSITION_X(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER3_X);
-}
-
-void Emit_ANIMACION_SCENE_SET_LAYER3_POSITION_Y(NodoBloque *blk) {
-	EmitirSetLayer(blk, WRAM_V_LAYER3_Y);
 }
 
 void Emit_ANIMACION_SCENE_SET_MOSAIC_FILTER(NodoBloque *blk) {

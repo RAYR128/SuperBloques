@@ -33,6 +33,7 @@ add_executable(superbloques_cli
 	engine/compilador/codegen/bloques_operacion.cpp
 	engine/compilador/codegen/bloques_control.cpp
 	engine/compilador/codegen/bloques_animacion.cpp
+	engine/compilador/codegen/bloques_capa.cpp
 	engine/compilador/codegen/bloques_sonido.cpp
 	engine/compilador/codegen/bloques_sensor.cpp
 )
