@@ -67,8 +67,22 @@ xx(VARIABLE_STORE, "variable_store", BLOQUE_CLASE_ACCION)
 xx(OPERACION, "operation", BLOQUE_CLASE_CATEGORIA)
 xx(OPERACION_SUMA, "operation_add", BLOQUE_CLASE_VALOR) // (Entradas[0] + Entradas[1])
 xx(OPERACION_RESTA, "operation_sub", BLOQUE_CLASE_VALOR) // (Entradas[0] - Entradas[1])
-xx(OPERACION_MULTIPLICACION, "operation_mul", BLOQUE_CLASE_VALOR) // (Entradas[0] * Entradas[1])
-xx(OPERACION_DIVISION, "operation_div", BLOQUE_CLASE_VALOR) // (Entradas[0] / Entradas[1])
+xx(OPERACION_MULTIPLICACION, "operation_mul", BLOQUE_CLASE_VALOR) // (Entradas[0] * Entradas[1]) 16x8 signed PPU
+xx(OPERACION_DIVISION, "operation_div", BLOQUE_CLASE_VALOR) // (Entradas[0] / Entradas[1]) 16/8 unsigned
+xx(OPERACION_MOD, "operation_mod", BLOQUE_CLASE_VALOR) // (Entradas[0] % Entradas[1]) 16%8 unsigned
+xx(OPERACION_AND, "operation_and", BLOQUE_CLASE_VALOR) // (Entradas[0] AND Entradas[1])
+xx(OPERACION_OR, "operation_or", BLOQUE_CLASE_VALOR) // (Entradas[0] ORA Entradas[1])
+xx(OPERACION_XOR, "operation_xor", BLOQUE_CLASE_VALOR) // (Entradas[0] EOR Entradas[1])
+xx(OPERACION_ASL, "operation_asl", BLOQUE_CLASE_VALOR) // ASL Entradas[0], ParametroEspecial veces (1-15)
+xx(OPERACION_LSR, "operation_lsr", BLOQUE_CLASE_VALOR) // LSR Entradas[0], ParametroEspecial veces (1-15)
+xx(OPERACION_ROL, "operation_rol", BLOQUE_CLASE_VALOR) // ROL Entradas[0], ParametroEspecial veces (1-32)
+xx(OPERACION_ROR, "operation_ror", BLOQUE_CLASE_VALOR) // ROR Entradas[0], ParametroEspecial veces (1-32)
+xx(OPERACION_EQ, "operation_eq", BLOQUE_CLASE_VALOR) // Entradas[0] == Entradas[1] -> 0/1
+xx(OPERACION_NEQ, "operation_neq", BLOQUE_CLASE_VALOR) // Entradas[0] != Entradas[1] -> 0/1
+xx(OPERACION_GT, "operation_gt", BLOQUE_CLASE_VALOR) // Entradas[0] > Entradas[1] signed -> 0/1
+xx(OPERACION_GTE, "operation_gte", BLOQUE_CLASE_VALOR) // Entradas[0] >= Entradas[1] signed -> 0/1
+xx(OPERACION_LT, "operation_lt", BLOQUE_CLASE_VALOR) // Entradas[0] < Entradas[1] signed -> 0/1
+xx(OPERACION_LTE, "operation_lte", BLOQUE_CLASE_VALOR) // Entradas[0] <= Entradas[1] signed -> 0/1
 
 // Lectura de sensores de hardware (timer global y botones)
 xx(SENSOR, "sensor", BLOQUE_CLASE_CATEGORIA)

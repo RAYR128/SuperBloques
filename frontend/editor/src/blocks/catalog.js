@@ -24,6 +24,20 @@ export const VALUE_INPUTS = {
 	operation_sub: ["A", "B"],
 	operation_mul: ["A", "B"],
 	operation_div: ["A", "B"],
+	operation_mod: ["A", "B"],
+	operation_and: ["A", "B"],
+	operation_or: ["A", "B"],
+	operation_xor: ["A", "B"],
+	operation_asl: ["A"],
+	operation_lsr: ["A"],
+	operation_rol: ["A"],
+	operation_ror: ["A"],
+	operation_eq: ["A", "B"],
+	operation_neq: ["A", "B"],
+	operation_gt: ["A", "B"],
+	operation_gte: ["A", "B"],
+	operation_lt: ["A", "B"],
+	operation_lte: ["A", "B"],
 	control_if: ["COND"],
 	control_while: ["COND"],
 	control_ifelse: ["COND"],
@@ -123,6 +137,17 @@ export const theme = Blockly.Theme.defineTheme("superbloques", {
 function shadowNumero(n = 0) {
 	return {shadow: {type: "numero", fields: {NUM: n}}};
 }
+
+function opcionesVeces(max) {
+	const opciones = [];
+	for (let i = 1; i <= max; i++) {
+		opciones.push([String(i), String(i)]);
+	}
+	return opciones;
+}
+
+const VECES_ASL_LSR = opcionesVeces(15);
+const VECES_ROL_ROR = opcionesVeces(32);
 
 function variableOptions() {
 	const names = variablesActuales();
@@ -465,7 +490,7 @@ const JSON_BLOCKS = [
 	},
 	{
 		type: "operation_mul",
-		message0: "%1 × %2",
+		message0: "16-bit %1 × 8-bit %2 con signo",
 		args0: [
 			{type: "input_value", name: "A", check: "Number"},
 			{type: "input_value", name: "B", check: "Number"},
@@ -476,7 +501,161 @@ const JSON_BLOCKS = [
 	},
 	{
 		type: "operation_div",
-		message0: "%1 ÷ %2",
+		message0: "16-bit %1 ÷ 8-bit %2 sin signo",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_mod",
+		message0: "16-bit %1 mod 8-bit %2 sin signo",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_and",
+		message0: "%1 AND %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_or",
+		message0: "%1 OR %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_xor",
+		message0: "%1 XOR %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_asl",
+		message0: "%1 ASL %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "field_dropdown", name: "VECES", options: VECES_ASL_LSR},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_lsr",
+		message0: "%1 LSR %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "field_dropdown", name: "VECES", options: VECES_ASL_LSR},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_rol",
+		message0: "%1 ROL %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "field_dropdown", name: "VECES", options: VECES_ROL_ROR},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_ror",
+		message0: "%1 ROR %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "field_dropdown", name: "VECES", options: VECES_ROL_ROR},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_eq",
+		message0: "%1 es igual a %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_neq",
+		message0: "%1 no es igual a %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_gt",
+		message0: "%1 es mayor que %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_gte",
+		message0: "%1 es mayor o igual que %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_lt",
+		message0: "%1 es menor que %2",
+		args0: [
+			{type: "input_value", name: "A", check: "Number"},
+			{type: "input_value", name: "B", check: "Number"},
+		],
+		inputsInline: true,
+		output: "Number",
+		style: "operacion_blocks",
+	},
+	{
+		type: "operation_lte",
+		message0: "%1 es menor o igual que %2",
 		args0: [
 			{type: "input_value", name: "A", check: "Number"},
 			{type: "input_value", name: "B", check: "Number"},
@@ -699,6 +878,20 @@ const FLYOUT = {
 		bloqueConSombras("operation_sub", {A: shadowNumero(), B: shadowNumero()}),
 		bloqueConSombras("operation_mul", {A: shadowNumero(), B: shadowNumero()}),
 		bloqueConSombras("operation_div", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_mod", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_and", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_or", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_xor", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_asl", {A: shadowNumero()}),
+		bloqueConSombras("operation_lsr", {A: shadowNumero()}),
+		bloqueConSombras("operation_rol", {A: shadowNumero()}),
+		bloqueConSombras("operation_ror", {A: shadowNumero()}),
+		bloqueConSombras("operation_eq", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_neq", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_gt", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_gte", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_lt", {A: shadowNumero(), B: shadowNumero()}),
+		bloqueConSombras("operation_lte", {A: shadowNumero(), B: shadowNumero()}),
 	],
 	sensor: [
 		{kind: "block", type: "sensor_tiempo"},

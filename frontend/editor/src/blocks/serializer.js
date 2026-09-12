@@ -43,6 +43,20 @@ const TIPOS_CONOCIDOS = new Set([
 	"operation_sub",
 	"operation_mul",
 	"operation_div",
+	"operation_mod",
+	"operation_and",
+	"operation_or",
+	"operation_xor",
+	"operation_asl",
+	"operation_lsr",
+	"operation_rol",
+	"operation_ror",
+	"operation_eq",
+	"operation_neq",
+	"operation_gt",
+	"operation_gte",
+	"operation_lt",
+	"operation_lte",
 	"sensor_tiempo",
 	"sensor_boton_control_1",
 	"sensor_boton_control_2",
@@ -71,6 +85,11 @@ function fieldsToParam(node) {
 		case "sensor_boton_control_1_presionado":
 		case "sensor_boton_control_2_presionado":
 			return Number(f.BOTON) || 0;
+		case "operation_asl":
+		case "operation_lsr":
+		case "operation_rol":
+		case "operation_ror":
+			return Number(f.VECES) || 1;
 		default:
 			return 0;
 	}
@@ -113,6 +132,11 @@ function paramToFields(type, param, variables) {
 		case "sensor_boton_control_1_presionado":
 		case "sensor_boton_control_2_presionado":
 			return {BOTON: String(Number(param) || 0)};
+		case "operation_asl":
+		case "operation_lsr":
+		case "operation_rol":
+		case "operation_ror":
+			return {VECES: String(Number(param) || 1)};
 		default:
 			return {};
 	}

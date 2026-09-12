@@ -384,9 +384,13 @@ class Emitidor65816 {
 	void ORAcumuladorConst8(uint8_t valor);
 	void ORAcumuladorConst16(uint16_t valor);
 
+	// EOR acumulador (REG_A)
+	void EORAcumuladorConst16(uint16_t valor);
+
 	// Comparar register con un valor constante
 	void CompararRegConst8(Registers reg, uint8_t valor);
 	void CompararRegConst16(Registers reg, uint16_t valor);
+	void CompararAcumuladorMemoria(uint32_t addrHw);
 
 	// Cargar datos en memoria a un reg
 	void CargarRegEnMemoria(Registers reg, uint32_t addrHw);
@@ -423,7 +427,9 @@ class Emitidor65816 {
 	// Operaciones con bits
 	void ShiftALeft(int veces = 1);
 	void ShiftARight(int veces = 1);
+	void RotarALeft(int veces = 1);
 	void RotarARight(int veces = 1);
+	void Nop(int veces = 1);
 
 	// Transferir
 	void Transferir(Registers entrada, Registers destino);

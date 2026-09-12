@@ -143,9 +143,21 @@ void Emitidor65816::ShiftARight(int veces) {
 	}
 }
 
+void Emitidor65816::RotarALeft(int veces) {
+	for(int i = 0; i < veces; i++) {
+		EmitirByte(OP_ROL_ACC);
+	}
+}
+
 void Emitidor65816::RotarARight(int veces) {
 	for(int i = 0; i < veces; i++) {
 		EmitirByte(OP_ROR_ACC);
+	}
+}
+
+void Emitidor65816::Nop(int veces) {
+	for(int i = 0; i < veces; i++) {
+		EmitirByte(OP_NOP_IMP);
 	}
 }
 
@@ -252,6 +264,11 @@ void Emitidor65816::ORAcumuladorConst16(uint16_t valor) {
 	EmitirPalabra(valor);
 }
 
+void Emitidor65816::EORAcumuladorConst16(uint16_t valor) {
+	EmitirByte(OP_EOR_IMMM);
+	EmitirPalabra(valor);
+}
+
 void Emitidor65816::CompararRegConst8(Registers reg, uint8_t valor) {
 	switch(reg) {
 	case REG_A:
@@ -290,6 +307,10 @@ void Emitidor65816::CompararRegConst16(Registers reg, uint16_t valor) {
 		throw std::runtime_error("CargarRegConst16: Register invalido");
 		break;
 	}
+}
+
+void Emitidor65816::CompararAcumuladorMemoria(uint32_t addrHw) {
+	EmitirInstMemoriaOptimizada(OP_CMP_DP, OP_CMP_ABS, OP_CMP_LONG, addrHw);
 }
 
 void Emitidor65816::CargarRegEnMemoria(Registers reg, uint32_t addrHw) {
