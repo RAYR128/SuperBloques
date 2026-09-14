@@ -12,14 +12,21 @@ void CompilarBloquesBhv(std::string init, std::string main, std::string identifi
 	// Alguien puede poner bloques en el editor los cuales estan desconectados de un evento. Estos compilarian como bloques normales, hay que evitar esto
 	// y solo empezar a compilar desde un bloque de evento real.
 	cc.Etiqueta(init + identificador);
+	cc.Empujar(REG_BANK);
+	cc.Empujar(REG_EXECBANK);
+	cc.Sacar(REG_BANK);
 	for(NodoBloque &bloque : lista) {
 		if(bloque.TipoDeBloque == BLOQUE_EVENTO_INIT) {
 			bloque.Compilar();
 		}
 	}
+	cc.Sacar(REG_BANK);
 	cc.ReturnLong();
 
 	cc.Etiqueta(main + identificador);
+	cc.Empujar(REG_BANK);
+	cc.Empujar(REG_EXECBANK);
+	cc.Sacar(REG_BANK);
 	int uid = 0;
 	for(NodoBloque &bloque : lista) {
 		if(bloque.TipoDeBloque == BLOQUE_EVENTO_FRAME) {
@@ -41,6 +48,7 @@ void CompilarBloquesBhv(std::string init, std::string main, std::string identifi
 			uid++;
 		}
 	}
+	cc.Sacar(REG_BANK);
 	cc.ReturnLong();
 }
 

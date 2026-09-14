@@ -46,6 +46,11 @@ static void EmitirCanal5Bit(NodoBloque *entrada, int shift, const char *tag) {
 	CompilarExpresion(entrada);
 	cc.ShiftARight(3);
 	ClampAUnsigned(0x001F, tag);
+	// Optimizacion: Emitir un XBA
+	if(shift >= 8) {
+		cc.IntercambiarBytesA();
+		shift -= 8;
+	}
 	if(shift) {
 		cc.ShiftALeft(shift);
 	}
