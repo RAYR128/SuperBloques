@@ -1,4 +1,6 @@
 cmake -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=cmake/windows.cm -DCMAKE_BUILD_TYPE=Release . -B build-windows
 cd build-windows
 make -j8
+cd ..
+superbloques_cli.exe -i ejemplos/pruebas.json
 pause

@@ -274,6 +274,8 @@ void RutinaConfiguracionVideo() {
 	}
 	cc.CargarRegEnMemoria(REG_A, WRAM_V_BRILLO);
 	cc.AlmacenarRegEnMemoria(REG_A, HW_INIDISP);
+	cc.CargarRegEnMemoria(REG_A, WRAM_V_FILTRO_MOSAICO);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_MOSAIC);
 }
 
 // $FFDC-$FFDF (LoROM $7FDC-$7FDF): complemento + checksum de 16 bits.

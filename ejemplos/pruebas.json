@@ -184,8 +184,8 @@
 				},
 				"bloque_id_011": {
 					"PosicionVisual": [
-						229,
-						626
+						-476,
+						283
 					],
 					"Operacion": "evento_frame",
 					"ParametroEspecial": 0,
@@ -194,6 +194,138 @@
 					"Previo": null
 				},
 				"bloque_id_012": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "animacion_scene_set_color",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 25,
+							"Entradas": []
+						}
+					],
+					"Siguiente": "bloque_id_013",
+					"Previo": "bloque_id_011"
+				},
+				"bloque_id_013": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "control_if",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "operation_eq",
+							"ParametroEspecial": 0,
+							"Entradas": [
+								{
+									"Operacion": "operation_mod",
+									"ParametroEspecial": 0,
+									"Entradas": [
+										{
+											"Operacion": "sensor_tiempo",
+											"ParametroEspecial": 0,
+											"Entradas": []
+										},
+										{
+											"Operacion": "numero",
+											"ParametroEspecial": 8,
+											"Entradas": []
+										}
+									]
+								},
+								{
+									"Operacion": "numero",
+									"ParametroEspecial": 0,
+									"Entradas": []
+								}
+							]
+						}
+					],
+					"Siguiente": "bloque_id_015",
+					"Previo": "bloque_id_012",
+					"Cuerpo": "bloque_id_014"
+				},
+				"bloque_id_014": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "animacion_scene_set_color",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 255,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						},
+						{
+							"Operacion": "numero",
+							"ParametroEspecial": 25,
+							"Entradas": []
+						}
+					],
+					"Siguiente": null,
+					"Previo": null
+				},
+				"bloque_id_015": {
+					"PosicionVisual": [
+						0,
+						0
+					],
+					"Operacion": "animacion_scene_set_mosaic_filter",
+					"ParametroEspecial": 0,
+					"Entradas": [
+						{
+							"Operacion": "sensor_tiempo",
+							"ParametroEspecial": 0,
+							"Entradas": []
+						}
+					],
+					"Siguiente": null,
+					"Previo": "bloque_id_013"
+				},
+				"bloque_id_016": {
+					"PosicionVisual": [
+						229,
+						626
+					],
+					"Operacion": "evento_frame",
+					"ParametroEspecial": 0,
+					"Entradas": [],
+					"Siguiente": "bloque_id_017",
+					"Previo": null
+				},
+				"bloque_id_017": {
 					"PosicionVisual": [
 						0,
 						0
@@ -237,10 +369,10 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_013",
-					"Previo": "bloque_id_011"
+					"Siguiente": "bloque_id_018",
+					"Previo": "bloque_id_016"
 				},
-				"bloque_id_013": {
+				"bloque_id_018": {
 					"PosicionVisual": [
 						0,
 						0
@@ -265,10 +397,10 @@
 							]
 						}
 					],
-					"Siguiente": "bloque_id_014",
-					"Previo": "bloque_id_012"
+					"Siguiente": "bloque_id_019",
+					"Previo": "bloque_id_017"
 				},
-				"bloque_id_014": {
+				"bloque_id_019": {
 					"PosicionVisual": [
 						0,
 						0
@@ -294,9 +426,9 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_013"
+					"Previo": "bloque_id_018"
 				},
-				"bloque_id_015": {
+				"bloque_id_020": {
 					"PosicionVisual": [
 						664,
 						631
@@ -304,10 +436,10 @@
 					"Operacion": "evento_frame",
 					"ParametroEspecial": 0,
 					"Entradas": [],
-					"Siguiente": "bloque_id_016",
+					"Siguiente": "bloque_id_021",
 					"Previo": null
 				},
-				"bloque_id_016": {
+				"bloque_id_021": {
 					"PosicionVisual": [
 						0,
 						0
@@ -321,11 +453,11 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_019",
-					"Previo": "bloque_id_015",
-					"Cuerpo": "bloque_id_017"
+					"Siguiente": "bloque_id_024",
+					"Previo": "bloque_id_020",
+					"Cuerpo": "bloque_id_022"
 				},
-				"bloque_id_017": {
+				"bloque_id_022": {
 					"PosicionVisual": [
 						0,
 						0
@@ -339,10 +471,10 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_018",
+					"Siguiente": "bloque_id_023",
 					"Previo": null
 				},
-				"bloque_id_018": {
+				"bloque_id_023": {
 					"PosicionVisual": [
 						0,
 						0
@@ -357,9 +489,9 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_017"
+					"Previo": "bloque_id_022"
 				},
-				"bloque_id_019": {
+				"bloque_id_024": {
 					"PosicionVisual": [
 						0,
 						0
@@ -373,11 +505,11 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_022",
-					"Previo": "bloque_id_016",
-					"Cuerpo": "bloque_id_020"
+					"Siguiente": "bloque_id_027",
+					"Previo": "bloque_id_021",
+					"Cuerpo": "bloque_id_025"
 				},
-				"bloque_id_020": {
+				"bloque_id_025": {
 					"PosicionVisual": [
 						0,
 						0
@@ -391,10 +523,10 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_021",
+					"Siguiente": "bloque_id_026",
 					"Previo": null
 				},
-				"bloque_id_021": {
+				"bloque_id_026": {
 					"PosicionVisual": [
 						0,
 						0
@@ -409,9 +541,9 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_020"
+					"Previo": "bloque_id_025"
 				},
-				"bloque_id_022": {
+				"bloque_id_027": {
 					"PosicionVisual": [
 						0,
 						0
@@ -425,11 +557,11 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_025",
-					"Previo": "bloque_id_019",
-					"Cuerpo": "bloque_id_023"
+					"Siguiente": "bloque_id_030",
+					"Previo": "bloque_id_024",
+					"Cuerpo": "bloque_id_028"
 				},
-				"bloque_id_023": {
+				"bloque_id_028": {
 					"PosicionVisual": [
 						0,
 						0
@@ -443,10 +575,10 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_024",
+					"Siguiente": "bloque_id_029",
 					"Previo": null
 				},
-				"bloque_id_024": {
+				"bloque_id_029": {
 					"PosicionVisual": [
 						0,
 						0
@@ -461,9 +593,9 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_023"
+					"Previo": "bloque_id_028"
 				},
-				"bloque_id_025": {
+				"bloque_id_030": {
 					"PosicionVisual": [
 						0,
 						0
@@ -478,10 +610,10 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_022",
-					"Cuerpo": "bloque_id_026"
+					"Previo": "bloque_id_027",
+					"Cuerpo": "bloque_id_031"
 				},
-				"bloque_id_026": {
+				"bloque_id_031": {
 					"PosicionVisual": [
 						0,
 						0
@@ -495,10 +627,10 @@
 							"Entradas": []
 						}
 					],
-					"Siguiente": "bloque_id_027",
+					"Siguiente": "bloque_id_032",
 					"Previo": null
 				},
-				"bloque_id_027": {
+				"bloque_id_032": {
 					"PosicionVisual": [
 						0,
 						0
@@ -513,7 +645,7 @@
 						}
 					],
 					"Siguiente": null,
-					"Previo": "bloque_id_026"
+					"Previo": "bloque_id_031"
 				}
 			}
 		}
