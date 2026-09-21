@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cuenta - SuperBloques</title>
+<link rel="stylesheet" href="/sitio/css/sitio.css" />
+</head>
+<body>
+<header id="nav"></header>
+<main class="page">
+	<h1>Tu cuenta</h1>
+	<p class="lead">Usuario: <span id="username"></span></p>
+	<form class="form" id="account-form">
+		<label>
+			Nombre visible
+			<input type="text" name="display" id="display" required maxlength="40" />
+		</label>
+		<label>
+			Contraseña actual
+			<input type="password" name="passwordActual" autocomplete="current-password" required minlength="8" />
+		</label>
+		<label>
+			Contraseña nueva
+			<input type="password" name="passwordNueva" autocomplete="new-password" minlength="8" placeholder="Dejar vacio para no cambiar" />
+		</label>
+		<div class="error" id="account-error"></div>
+		<div class="ok" id="account-ok"></div>
+		<button type="submit">Guardar</button>
+	</form>
+</main>
+<script type="module" src="/sitio/js/account.js"></script>
+</body>
+</html>

@@ -60,6 +60,15 @@ export default defineConfig({
 	},
 	server: {
 		port: 5173,
+		proxy: {
+			"/api": "http://127.0.0.1:8080",
+			"/project": "http://127.0.0.1:8080",
+			"/login": "http://127.0.0.1:8080",
+			"/register": "http://127.0.0.1:8080",
+			"/account": "http://127.0.0.1:8080",
+			"/u": "http://127.0.0.1:8080",
+			"/sitio": "http://127.0.0.1:8080",
+		},
 	},
 	plugins: [blocklyMedia()],
 });

@@ -2,4 +2,10 @@ module superbloques
 
 go 1.26.2
 
-require github.com/go-chi/chi/v5 v5.3.2
+require (
+	github.com/go-chi/chi/v5 v5.3.2
+	go.etcd.io/bbolt v1.5.0
+	golang.org/x/crypto v0.57.0
+)
+
+require golang.org/x/sys v0.48.0 // indirect

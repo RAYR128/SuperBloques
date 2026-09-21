@@ -29,6 +29,7 @@ export const state = {
 	proyecto: proyectoPorDefecto(),
 	seleccion: {tipo: "escena", nombre: "Escena1"},
 	nombreArchivo: NOMBRE_ARCHIVO_DEFECTO,
+	projectId: null,
 	generation: 0,
 };
 
@@ -296,11 +297,24 @@ function actualizarTitulo() {
 	}
 }
 
-export function cargarProyecto(proyecto, nombreArchivo) {
+export function cargarProyecto(proyecto, nombreArchivo, projectId) {
 	state.proyecto = proyecto;
 	state.nombreArchivo = nombreArchivo || NOMBRE_ARCHIVO_DEFECTO;
+	state.projectId = projectId ?? null;
 	state.generation += 1;
 	state.seleccion = primeraSeleccion(proyecto);
 	actualizarTitulo();
 	notify();
+}
+
+export function marcarPublicado(id, nombre) {
+	state.projectId = id;
+	if (nombre) {
+		state.nombreArchivo = String(nombre).replace(/\.json$/i, "") + ".json";
+	}
+	actualizarTitulo();
+}
+
+export function tituloProyecto() {
+	return tituloDeArchivo(state.nombreArchivo);
 }

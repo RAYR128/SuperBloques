@@ -66,14 +66,34 @@ pnpm dev
 ```
 
 ## Backend
-Trabajo en progreso.
+Go 1.22+ (el `go.mod` del repo fija la version). Desde `backend/`:
+
+```bash
+cd backend
+go run ./cmd/main
+```
+
+Sirve en `:8080` (override `ADDR`). Antes hace falta `pnpm build` en `frontend/editor` para que exista `frontend/editor/dist`.
+
+Variables de entorno:
+
+| Variable | Que hace |
+|---|---|
+| `ADDR` | Direccion de listen (`:8080`) |
+| `DB_PATH` | Archivo bbolt (`data/superbloques.db`) |
+| `EDITOR_DIR` | Dist del editor |
+| `SITIO_DIR` | HTML del sitio |
+| `SUPERBLOQUES_ADMIN_USER` / `SUPERBLOQUES_ADMIN_PASSWORD` | Crea o actualiza una cuenta admin al arrancar |
+| `TRUST_HTTPS` | `1` para marcar la cookie `Secure` |
+
+El primer usuario que se registra es administrador si no hubo bootstrap por env.
 
 # Estado actual
 ## Compilador
 El compilador es compilable localmente, no existe target a WASM aun, pero produce una ROM la cual ya es ejecutable en emuladores. Los objetos no tienen sistema de renderizacion aun.
 
 ## Backend
-Trabajo a empezar, el plan es hacer una plataforma de distribucion y almacenacion de proyectos JSON y un sistema de cuentas.
+Hay cuentas (bcrypt + cookie de sesion), almacenamiento de proyectos JSON en bbolt, y paginas en `/`, `/login`, `/register`, `/account`, `/u/{id}` y `/project/{id}`.
 
 ## Frontend
-El editor visual (Blockly / Zelos) permite armar escenas, objetos, variables y bloques, y exportar el proyecto como JSON `spec/BLOQUES.md`. No hay WebAssembly ni compilacion a ROM desde el navegador aun. Aun no existe frontend para el sitio de cuentas.
+El editor visual (Blockly / Zelos) permite armar escenas, objetos, variables y bloques, exportar el proyecto como JSON `spec/BLOQUES.md`, y publicarlo al backend (Archivo → Publicar). El sitio muestra una galeria con los 5 proyectos mas recientes. No hay WebAssembly ni compilacion a ROM desde el navegador aun.

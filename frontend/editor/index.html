@@ -15,11 +15,13 @@
 			<div class="menu-dropdown" id="menu-file-dropdown" hidden>
 				<button type="button" class="menu-item" id="menu-import">Importar</button>
 				<button type="button" class="menu-item" id="menu-export">Exportar</button>
+				<button type="button" class="menu-item" id="menu-publish">Publicar</button>
 			</div>
 		</div>
 	</nav>
-	<span class="logo">SuperBloques</span>
+	<a class="logo" href="/">SuperBloques</a>
 	<span class="sub">Nuevo Proyecto</span>
+	<div class="header-user" id="header-user"></div>
 </header>
 <div class="panels">
 	<aside class="panel objects-panel">
@@ -82,6 +84,20 @@
 </div>
 </div>
 <input type="file" id="menu-import-file" accept="application/json,.json" hidden>
+<div id="publish-modal" class="modal" hidden>
+	<div class="modal-card">
+		<div class="modal-title" id="publish-title">Publicar proyecto</div>
+		<label class="modal-field" id="publish-name-wrap">
+			<span>Nombre</span>
+			<input type="text" id="publish-name" maxlength="80" />
+		</label>
+		<div class="modal-error" id="publish-error" hidden></div>
+		<div class="modal-actions">
+			<button type="button" class="modal-btn" id="publish-cancel">Cancelar</button>
+			<button type="button" class="modal-btn primary" id="publish-submit">Publicar</button>
+		</div>
+	</div>
+</div>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>

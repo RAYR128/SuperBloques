@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crear cuenta - SuperBloques</title>
+<link rel="stylesheet" href="/sitio/css/sitio.css" />
+</head>
+<body>
+<header id="nav"></header>
+<main class="page">
+	<h1>Crear cuenta</h1>
+	<form class="form" id="auth-form" data-modo="register">
+		<label>
+			Usuario
+			<input type="text" name="nombre" autocomplete="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" />
+		</label>
+		<label>
+			Nombre visible
+			<input type="text" name="display" maxlength="40" placeholder="Opcional" />
+		</label>
+		<label>
+			Contraseña
+			<input type="password" name="password" autocomplete="new-password" required minlength="8" />
+		</label>
+		<div class="error" id="auth-error"></div>
+		<button type="submit">Registrarse</button>
+		<p class="hint">Ya tenes cuenta? <a href="/login">Entrar</a></p>
+	</form>
+</main>
+<script type="module" src="/sitio/js/auth.js"></script>
+</body>
+</html>

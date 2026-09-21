@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Entrar - SuperBloques</title>
+<link rel="stylesheet" href="/sitio/css/sitio.css" />
+</head>
+<body>
+<header id="nav"></header>
+<main class="page">
+	<h1>Entrar</h1>
+	<p class="lead">Inicia sesion para publicar proyectos.</p>
+	<form class="form" id="auth-form" data-modo="login">
+		<label>
+			Usuario
+			<input type="text" name="nombre" autocomplete="username" required minlength="3" maxlength="24" />
+		</label>
+		<label>
+			Contraseña
+			<input type="password" name="password" autocomplete="current-password" required minlength="8" />
+		</label>
+		<div class="error" id="auth-error"></div>
+		<button type="submit">Entrar</button>
+		<p class="hint">No tenes cuenta? <a href="/register">Crear cuenta</a></p>
+	</form>
+</main>
+<script type="module" src="/sitio/js/auth.js"></script>
+</body>
+</html>

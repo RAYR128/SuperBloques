@@ -115,6 +115,21 @@ header .logo {
 	font-weight: 700;
 	letter-spacing: 0.04em;
 	color: var(--accent);
+	text-decoration: none;
+}
+
+header .header-user {
+	margin-left: auto;
+	font-size: 13px;
+}
+
+header .header-user a {
+	color: var(--text);
+	text-decoration: none;
+}
+
+header .header-user a:hover {
+	color: var(--accent);
 }
 
 header .sub {
@@ -460,3 +475,86 @@ body.col-resizing .injectionDiv {
 .debug-body .ok { color: #59c059; }
 .debug-body .warn { color: #ffab19; }
 .debug-body .dim { color: #6b7588; }
+
+.modal {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	z-index: 80;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal[hidden] {
+	display: none;
+}
+
+.modal-card {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 16px;
+	min-width: 280px;
+	max-width: 90vw;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.modal-title {
+	font-size: 14px;
+	font-weight: 700;
+	margin-bottom: 12px;
+}
+
+.modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--muted);
+	margin-bottom: 12px;
+}
+
+.modal-field input {
+	background: var(--panel-2);
+	border: 1px solid var(--border);
+	color: var(--text);
+	font: inherit;
+	padding: 7px 9px;
+	border-radius: 4px;
+}
+
+.modal-field input:focus {
+	outline: 1px solid var(--accent);
+	border-color: var(--accent);
+}
+
+.modal-error {
+	color: #ff6b7a;
+	font-size: 12px;
+	margin-bottom: 10px;
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.modal-btn {
+	border: 1px solid var(--border);
+	background: var(--panel-2);
+	color: var(--text);
+	font: inherit;
+	font-size: 13px;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.modal-btn.primary {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #0b0d12;
+	font-weight: 700;
+}

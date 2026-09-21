@@ -1,6 +1,7 @@
 import {exportarProyecto} from "./export.js";
 import {importarProyecto} from "./import.js";
 import {flushWorkspace} from "./blocks/workspace.js";
+import {initPublish} from "./publish.js";
 
 export function initMenu() {
 	const wrap = document.getElementById("menu-file-wrap");
@@ -8,6 +9,8 @@ export function initMenu() {
 	const dropdown = document.getElementById("menu-file-dropdown");
 	const importBtn = document.getElementById("menu-import");
 	const exportBtn = document.getElementById("menu-export");
+	const publishBtn = document.getElementById("menu-publish");
+	const abrirPublicar = initPublish();
 
 	function cerrar() {
 		dropdown.hidden = true;
@@ -37,6 +40,11 @@ export function initMenu() {
 		flushWorkspace();
 		exportarProyecto();
 		cerrar();
+	});
+
+	publishBtn?.addEventListener("click", () => {
+		cerrar();
+		abrirPublicar?.();
 	});
 
 	document.addEventListener("click", (e) => {
