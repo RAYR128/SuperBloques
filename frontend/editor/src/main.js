@@ -1,3 +1,4 @@
+import {initEmu} from "./emu.js";
 import {initMenu} from "./menu.js";
 import {initTree} from "./tree.js";
 import {initSplitters} from "./splitters.js";
@@ -22,6 +23,7 @@ try {
 	initWorkspace();
 	initTree();
 	initMenu();
+	initEmu();
 	void pintarHeaderUser();
 	const params = new URLSearchParams(location.search);
 	const cat = params.get("cat");

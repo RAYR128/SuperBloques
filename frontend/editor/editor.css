@@ -451,19 +451,66 @@ body.col-resizing .injectionDiv {
 
 .stage-label {
 	width: 512px;
+	max-width: 100%;
 	font-size: 11px;
 	color: var(--muted);
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 	margin-bottom: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.stage-play {
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	border: 1px solid var(--border);
+	background: transparent;
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+}
+
+.stage-play::before {
+	content: "";
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 4px 0 4px 7px;
+	border-color: transparent transparent transparent var(--text);
+	margin-left: 1px;
+}
+
+.stage-play.is-stop::before {
+	width: 7px;
+	height: 7px;
+	margin-left: 0;
+	border: none;
+	background: var(--text);
+}
+
+.stage-play:disabled {
+	opacity: 0.45;
+	cursor: default;
 }
 
 #stage {
 	width: 512px;
-	height: 448px;
+	max-width: 100%;
+	height: auto;
+	aspect-ratio: 512 / 448;
 	background: var(--stage-bg);
 	display: block;
 	image-rendering: pixelated;
+}
+
+#stage:focus {
+	outline: 1px solid var(--accent);
+	outline-offset: 2px;
 }
 
 .debug {

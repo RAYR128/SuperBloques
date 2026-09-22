@@ -41,5 +41,4 @@ EMSCRIPTEN_KEEPALIVE
 const char *sb_ultimo_error() {
 	return gError.c_str();
 }
-
 }

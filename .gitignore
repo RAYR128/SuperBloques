@@ -15,6 +15,7 @@ superbloques_cli
 node_modules/
 frontend/editor/dist/
 frontend/editor/public/compilador/
+frontend/editor/public/emu/
 
 # Backend
 data/

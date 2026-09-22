@@ -50,49 +50,64 @@ function descargar(bytes, nombre) {
 	URL.revokeObjectURL(url);
 }
 
-export async function crearYDescargarRom(boton) {
+let compilacion = Promise.resolve();
+
+async function compilarAhora() {
 	flushWorkspace();
+	informar('<div class="dim">Cargando compilador...</div>');
+	let compilador;
+	try {
+		compilador = await cargarModulo();
+	} catch {
+		informar('<div class="warn">[error] no esta el compilador WASM</div>');
+		return null;
+	}
+
+	informar('<div class="dim">Compilando...</div>');
+	await new Promise((resolver) => setTimeout(resolver, 0));
+
+	const json = JSON.stringify(state.proyecto);
+	const bytes = new TextEncoder().encode(json);
+	const ptr = compilador._malloc(bytes.length + 1);
+	if (!ptr) {
+		informar('<div class="warn">[error] sin memoria para el proyecto</div>');
+		return null;
+	}
+	try {
+		compilador.HEAPU8.set(bytes, ptr);
+		compilador.HEAPU8[ptr + bytes.length] = 0;
+		const rc = compilador._sb_compilar(ptr, bytes.length);
+		if (rc !== 0) {
+			const msg = compilador.UTF8ToString(compilador._sb_ultimo_error());
+			informar(`<div class="warn">[error] ${escapar(msg)}</div>`);
+			return null;
+		}
+		const romPtr = compilador._sb_rom();
+		const n = compilador._sb_rom_tamano();
+		return compilador.HEAPU8.slice(romPtr, romPtr + n);
+	} finally {
+		compilador._free(ptr);
+	}
+}
+
+export function compilarRom() {
+	const siguiente = compilacion.then(() => compilarAhora(), () => compilarAhora());
+	compilacion = siguiente.then(() => undefined, () => undefined);
+	return siguiente;
+}
+
+export async function crearYDescargarRom(boton) {
 	if (boton) {
 		boton.disabled = true;
 	}
 	try {
-		informar('<div class="dim">Cargando compilador...</div>');
-		let compilador;
-		try {
-			compilador = await cargarModulo();
-		} catch {
-			informar('<div class="warn">[error] no esta el compilador WASM</div>');
+		const rom = await compilarRom();
+		if (!rom) {
 			return;
 		}
-
-		informar('<div class="dim">Compilando...</div>');
-		await new Promise((resolver) => setTimeout(resolver, 0));
-
-		const json = JSON.stringify(state.proyecto);
-		const bytes = new TextEncoder().encode(json);
-		const ptr = compilador._malloc(bytes.length + 1);
-		if (!ptr) {
-			informar('<div class="warn">[error] sin memoria para el proyecto</div>');
-			return;
-		}
-		try {
-			compilador.HEAPU8.set(bytes, ptr);
-			compilador.HEAPU8[ptr + bytes.length] = 0;
-			const rc = compilador._sb_compilar(ptr, bytes.length);
-			if (rc !== 0) {
-				const msg = compilador.UTF8ToString(compilador._sb_ultimo_error());
-				informar(`<div class="warn">[error] ${escapar(msg)}</div>`);
-				return;
-			}
-			const romPtr = compilador._sb_rom();
-			const n = compilador._sb_rom_tamano();
-			const rom = compilador.HEAPU8.slice(romPtr, romPtr + n);
-			const nombre = nombreRom();
-			descargar(rom, nombre);
-			informar(`<div class="ok">[ok] ROM descargada</div><div class="dim">${escapar(nombre)} (${n} bytes)</div>`);
-		} finally {
-			compilador._free(ptr);
-		}
+		const nombre = nombreRom();
+		descargar(rom, nombre);
+		informar(`<div class="ok">[ok] ROM descargada</div><div class="dim">${escapar(nombre)} (${rom.length} bytes)</div>`);
 	} finally {
 		if (boton) {
 			boton.disabled = false;
