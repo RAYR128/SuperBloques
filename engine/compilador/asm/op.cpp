@@ -12,6 +12,12 @@ Emitidor65816::Emitidor65816() {
 	PC = 0;
 }
 
+void Emitidor65816::Reiniciar() {
+	PC = 0;
+	etiquetas.clear();
+	referencias.clear();
+}
+
 void Emitidor65816::SetearPC(uint32_t direccion) {
 	PC = direccion;
 }
@@ -613,6 +619,11 @@ void Emitidor65816::BranchLong(std::string label, TipoBranch tipo) {
 }
 
 void Emitidor65816::GuardarSimbolosArchivo(const char *nombreArchivo) {
+#if defined(__EMSCRIPTEN__)
+	// -sFILESYSTEM=0 aborta en fopen. La ROM sale por sb_rom(), no hace falta el .sym.
+	(void)nombreArchivo;
+	return;
+#else
 	FILE *archivo = fopen(nombreArchivo, "w");
 	if(archivo) {
 		// los emuladores esperan esta signatura
@@ -633,6 +644,7 @@ void Emitidor65816::GuardarSimbolosArchivo(const char *nombreArchivo) {
 		fprintf(archivo, "\n[addr-to-line mapping]");
 		fclose(archivo);
 	}
+#endif
 }
 
 void Emitidor65816::ResolverReferencias() {

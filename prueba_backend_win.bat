@@ -1,5 +1,10 @@
 @echo off
 setlocal EnableExtensions
+cd /d "%~dp0"
+
+echo Compilando compilador WASM
+call compilar_editor_wasm.bat
+if errorlevel 1 goto :fail
 
 echo Compilando editor
 cd frontend/editor

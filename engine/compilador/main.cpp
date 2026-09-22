@@ -1,6 +1,5 @@
-#include "ensamblador.h"
+#include "compilar.h"
 #include "rom.h"
-#include "serializer/serializer.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -65,9 +64,7 @@ int main(int argc, char **argv) {
 	}
 
 	try {
-		CargarProyectoDesdeString(LeerArchivo(RutaEntrada));
-		InicializarROM();
-		EnsamblarROM();
+		CompilarProyectoEnMemoria(LeerArchivo(RutaEntrada));
 		GuardarROMArchivo(RutaSalida.c_str());
 	} catch(const std::exception &ex) {
 		std::cerr << ex.what() << std::endl;

@@ -90,7 +90,7 @@ header {
 	position: absolute;
 	top: 32px;
 	left: 0;
-	min-width: 140px;
+	min-width: 220px;
 	background: var(--panel);
 	border: 1px solid var(--border);
 	border-radius: 6px;
@@ -105,10 +105,20 @@ header {
 	text-align: left;
 	padding: 6px 10px;
 	border-radius: 4px;
+	white-space: nowrap;
 }
 
 .menu-item:hover {
 	background: var(--hover);
+}
+
+.menu-item:disabled {
+	opacity: 0.5;
+	cursor: wait;
+}
+
+.menu-item:disabled:hover {
+	background: transparent;
 }
 
 header .logo {

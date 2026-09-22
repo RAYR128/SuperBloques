@@ -471,6 +471,7 @@ void EmitirTablaEscena(std::string tabla, std::string nombre) {
 }
 
 void EnsamblarROM() {
+	cc.Reiniciar();
 	cc.SetearPC(0x000000);
 	RutinaRESET();
 	RutinaControlObjetos();

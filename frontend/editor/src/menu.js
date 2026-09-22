@@ -2,6 +2,7 @@ import {exportarProyecto} from "./export.js";
 import {importarProyecto} from "./import.js";
 import {flushWorkspace} from "./blocks/workspace.js";
 import {initPublish} from "./publish.js";
+import {crearYDescargarRom} from "./rom.js";
 
 export function initMenu() {
 	const wrap = document.getElementById("menu-file-wrap");
@@ -10,6 +11,7 @@ export function initMenu() {
 	const importBtn = document.getElementById("menu-import");
 	const exportBtn = document.getElementById("menu-export");
 	const publishBtn = document.getElementById("menu-publish");
+	const romBtn = document.getElementById("menu-rom");
 	const abrirPublicar = initPublish();
 
 	function cerrar() {
@@ -45,6 +47,11 @@ export function initMenu() {
 	publishBtn?.addEventListener("click", () => {
 		cerrar();
 		abrirPublicar?.();
+	});
+
+	romBtn?.addEventListener("click", () => {
+		cerrar();
+		void crearYDescargarRom(romBtn);
 	});
 
 	document.addEventListener("click", (e) => {

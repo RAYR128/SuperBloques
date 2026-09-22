@@ -340,6 +340,9 @@ class Emitidor65816 {
   public:
 	Emitidor65816();
 
+	// El emitidor es global. Sin esto, una segunda compilacion en el mismo proceso reutiliza etiquetas viejas.
+	void Reiniciar();
+
 	// Resolver referencias a labels, direcciones o valores literales. Se debe llamar al final de la compilacion, cuando se conocen todas las etiquetas y referencias.
 	void ResolverReferencias();
 
