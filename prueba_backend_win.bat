@@ -2,8 +2,8 @@
 setlocal EnableExtensions
 cd /d "%~dp0"
 
-echo Compilando compilador WASM
-call compilar_editor_wasm.bat
+echo Compilando WASM
+call compilar_wasm_win.bat
 if errorlevel 1 goto :fail
 
 echo Compilando editor

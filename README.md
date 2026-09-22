@@ -40,12 +40,6 @@ make -j8
 pause
 ```
 
-En Windows, el compilador tambien se puede armar a WebAssembly para el editor. Emscripten tiene que estar en `../emsdk` (se activa con `../emsdk/emsdk_env.bat`):
-
-```bat
-compilar_editor_wasm.bat
-```
-
 En linux (Ubuntu 22.04 o distribuciones basadas en debian):
 
 ```bat
@@ -96,7 +90,7 @@ El primer usuario que se registra es administrador si no hubo bootstrap por env.
 
 # Estado actual
 ## Compilador
-El compilador produce una ROM ejecutable en emuladores. En Windows, `compilar_editor_wasm.bat` lo arma a WebAssembly para el editor. Los objetos no tienen sistema de renderizacion aun.
+El compilador produce una ROM ejecutable en emuladores. Los objetos no tienen sistema de renderizacion aun. Se puede compilar a WebAssembly y utilizar en el editor.
 
 ## Backend
 Hay cuentas (bcrypt + cookie de sesion), almacenamiento de proyectos JSON en bbolt, y paginas en `/`, `/login`, `/register`, `/account`, `/u/{id}` y `/project/{id}`.
