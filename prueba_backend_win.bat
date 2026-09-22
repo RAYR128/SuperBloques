@@ -1,7 +1,10 @@
 @echo off
 setlocal EnableExtensions
 
-cd backend
+echo Compilando editor
+cd frontend/editor
+call pnpm build
+cd ../../backend
 
 echo Instalando dependencias
 go mod tidy
@@ -19,5 +22,6 @@ exit /b %EXITCODE%
 :fail
 echo.
 echo Fallo script de prueba de backend.
+pause
 popd
 exit /b 1
