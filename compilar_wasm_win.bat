@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 cd /d "%~dp0"
 
 if not exist "..\emsdk\emsdk_env.bat" (
@@ -31,6 +31,13 @@ echo Compilador WASM listo en frontend\editor\public\compilador
 
 if not exist "frontend\editor\public\emu" mkdir "frontend\editor\public\emu"
 
+set "EMU_SRCS="
+for %%F in ("engine\emu\*.c") do set "EMU_SRCS=!EMU_SRCS! engine/emu/%%~nxF"
+if "!EMU_SRCS!"=="" (
+	echo No se encontraron fuentes en engine\emu
+	exit /b 1
+)
+
 emcc -O3 -fno-exceptions -fno-rtti ^
 	-s WASM=1 ^
 	-s MODULARIZE=1 ^
@@ -41,7 +48,7 @@ emcc -O3 -fno-exceptions -fno-rtti ^
 	-s "EXPORTED_FUNCTIONS=[_startWithRom,_stopEmulator,_mainLoop,_getScreenBuffer,_getSoundBuffer,_setJoypadInput,_malloc,_free]" ^
 	-s "EXPORTED_RUNTIME_METHODS=[HEAP8,HEAP16,HEAP32,HEAPU8,HEAPU16,HEAPU32,HEAPF32]" ^
 	-I engine/emu ^
-	engine/emu/*.c ^
+	!EMU_SRCS! ^
 	-o frontend\editor\public\emu\snes9x.js
 if errorlevel 1 exit /b 1
 
