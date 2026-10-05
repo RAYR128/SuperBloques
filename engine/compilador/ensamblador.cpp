@@ -2,6 +2,8 @@
 #include "datos.h"
 #include "ensamblador.h"
 #include "instancia.h"
+#include "spc700/spcasm.h"
+#include <fstream>
 #include <cstring>
 #include <stdexcept>
 
@@ -496,6 +498,16 @@ void EnsamblarROM() {
 	for(size_t i = 0; i < EscenasProyecto.size(); i++) {
 		EscenasProyecto[i].Compilar();
 	}
+
+	// engine/datos/driverspc.asm
+	cc.Etiqueta("DRIVER_AUDIO");
+	std::ifstream archivoDriver("engine/datos/driverspc.asm");
+	if(!archivoDriver.is_open()) {
+		throw std::runtime_error("No se pudo abrir el archivo engine/datos/driverspc.asm");
+	}
+	std::string codigoDriver((std::istreambuf_iterator<char>(archivoDriver)), std::istreambuf_iterator<char>());
+	archivoDriver.close();
+	int DatosMusica = EnsamblarPrograma(codigoDriver);
 
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
 		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");
