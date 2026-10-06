@@ -1786,7 +1786,7 @@ Valor Ensamblador::parsePrim(const std::string &s, size_t &i) {
 } // namespace
 
 // entrada
-int EnsamblarPrograma(std::string &Codigo) {
+int EnsamblarProgramaSPC700(std::string &Codigo) {
 	Ensamblador ens;
 	std::vector<Bloque> bloques = ens.ensamblar(Codigo);
 	int retorno = 0;

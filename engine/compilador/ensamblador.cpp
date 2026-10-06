@@ -502,7 +502,7 @@ void EnsamblarROM() {
 	// engine/datos/driverspc.asm, embebido para que el build WASM no necesite filesystem.
 	cc.Etiqueta("DRIVER_AUDIO");
 	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
-	int DatosMusica = EnsamblarPrograma(codigoDriver);
+	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
 	(void)DatosMusica;
 
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {

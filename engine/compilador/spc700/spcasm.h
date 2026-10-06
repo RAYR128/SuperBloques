@@ -7,4 +7,4 @@
 //  0x04-...: datos
 // Devuelve la direccion ARAM final del ultimo bloque (direccion de carga + tamaño).
 // Si no hay datos, devuelve 0.
-int EnsamblarPrograma(std::string &Codigo);
+int EnsamblarProgramaSPC700(std::string &Codigo);
