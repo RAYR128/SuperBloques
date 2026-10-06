@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include "datos.h"
 
 // Ensambla codigo SPC700 y lo escribe en el PC actual de la ROM. Cada base/org emite un bloque little-endian:
 //  0x00-0x01: tamaño de los datos (0 para indicar fin)
@@ -12,7 +13,7 @@
 int EnsamblarProgramaSPC700(std::string &Codigo);
 
 // Ensamblar codigo de driver para subida de audio
-void CrearCodigoDriverSPC700();
+void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos);
 
 // Rutina de inicializacion de audio
 void RutinaInicializarAudioSPC700();

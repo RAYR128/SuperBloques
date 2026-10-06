@@ -11,7 +11,7 @@
 // Esos bytes coinciden con WRAM_SCRATCH. El caller no puede estar a mitad del evaluador de expresiones.
 // Y indexa el bloque en 16 bits (tope 65532 bytes de datos).
 // https://wiki.superfamicom.org/spc700-reference#ipl-rom-1567
-void CrearCodigoDriverSPC700() {
+void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	// engine/datos/driverspc.asm, embebido para que el build WASM no necesite filesystem.
 	cc.Etiqueta("DRIVER_AUDIO");
 	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
