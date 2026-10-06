@@ -3,7 +3,7 @@
 #include "ensamblador.h"
 #include "instancia.h"
 #include "spc700/spcasm.h"
-#include <fstream>
+#include "driverspc_fuente.h"
 #include <cstring>
 #include <stdexcept>
 
@@ -499,15 +499,11 @@ void EnsamblarROM() {
 		EscenasProyecto[i].Compilar();
 	}
 
-	// engine/datos/driverspc.asm
+	// engine/datos/driverspc.asm, embebido para que el build WASM no necesite filesystem.
 	cc.Etiqueta("DRIVER_AUDIO");
-	std::ifstream archivoDriver("engine/datos/driverspc.asm");
-	if(!archivoDriver.is_open()) {
-		throw std::runtime_error("No se pudo abrir el archivo engine/datos/driverspc.asm");
-	}
-	std::string codigoDriver((std::istreambuf_iterator<char>(archivoDriver)), std::istreambuf_iterator<char>());
-	archivoDriver.close();
+	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
 	int DatosMusica = EnsamblarPrograma(codigoDriver);
+	(void)DatosMusica;
 
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
 		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");

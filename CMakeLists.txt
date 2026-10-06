@@ -38,11 +38,26 @@ set(COMPILADOR_SOURCES
 	engine/compilador/codegen/bloques_capa.cpp
 	engine/compilador/codegen/bloques_sonido.cpp
 	engine/compilador/codegen/bloques_sensor.cpp
+	engine/compilador/spc700/spcasm.cpp
 )
+
+set(GENERADO_DIR "${CMAKE_BINARY_DIR}/generado")
+set(DRIVER_SPC_HEADER "${GENERADO_DIR}/driverspc_fuente.h")
+add_custom_command(
+	OUTPUT "${DRIVER_SPC_HEADER}"
+	COMMAND ${CMAKE_COMMAND} -E make_directory "${GENERADO_DIR}"
+	COMMAND ${CMAKE_COMMAND} -DSRC=${CMAKE_SOURCE_DIR}/engine/datos/driverspc.asm -DDEST=${DRIVER_SPC_HEADER} -P ${CMAKE_SOURCE_DIR}/cmake/embedir_asm.cmake
+	DEPENDS
+		"${CMAKE_SOURCE_DIR}/engine/datos/driverspc.asm"
+		"${CMAKE_SOURCE_DIR}/cmake/embedir_asm.cmake"
+	VERBATIM
+)
+list(APPEND COMPILADOR_SOURCES "${DRIVER_SPC_HEADER}")
 
 set(COMPILADOR_INCLUDES
 	${CMAKE_SOURCE_DIR}/engine/compilador
 	${CMAKE_SOURCE_DIR}/engine/lib
+	${GENERADO_DIR}
 )
 
 if(SUPERBLOQUES_WASM)

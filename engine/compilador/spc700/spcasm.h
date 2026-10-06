@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
 
-// Esto crea el programa en el PC actual con un header de 4 bytes separado en 2:
-// 0x00-0x01: tamaño del bloque (base $XXXX)
-// 0x02-0x03: dirección de carga del bloque
-// Devuelve la direccion final (tamaño del bloque + direccion de carga) para poder encadenar bloques.
+// Ensambla codigo SPC700 y lo escribe en el PC actual de la ROM. Cada base/org emite un bloque little-endian:
+//  0x00-0x01: tamaño de los datos (0 para indicar fin)
+//  0x02-0x03: direccion de carga en ARAM
+//  0x04-...: datos
+// Devuelve la direccion ARAM final del ultimo bloque (direccion de carga + tamaño).
+// Si no hay datos, devuelve 0.
 int EnsamblarPrograma(std::string &Codigo);
