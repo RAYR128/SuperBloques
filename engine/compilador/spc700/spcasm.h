@@ -8,3 +8,9 @@
 // Devuelve la direccion ARAM final del ultimo bloque (direccion de carga + tamaño).
 // Si no hay datos, devuelve 0.
 int EnsamblarProgramaSPC700(std::string &Codigo);
+
+// Ensamblar codigo de driver para subida de audio
+void CrearCodigoDriverSPC700();
+
+// Rutina de inicializacion de audio
+void RutinaInicializarAudioSPC700();

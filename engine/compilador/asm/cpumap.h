@@ -13,6 +13,11 @@ xx(WRAM_DIRECTPAGE, 0x0000) // DP, acceso rapido
 xx(WRAM_SCRATCH, 0x0000)		 // Variables temporales
 xx(WRAM_SCRATCH_SIZE, 0x0040) // Tamaño de scratch (0x00-0x3F), utiliza 16-bit (index * 2)
 
+// Argumentos de SUBIR_DATOS_SPC700
+xx(WRAM_SPC_PTR_BLOQUE, 0x0000) // 3 bytes, puntero al bloque (long)
+xx(WRAM_SPC_ARAM_SALTO, 0x0003) // 2 bytes, direccion ARAM al terminar
+xx(WRAM_SPC_TAMANO, 0x0005)		// 2 bytes, tamaño del bloque (lo escribe la rutina)
+
 // Layers
 xx(WRAM_V_LAYER1_X, 0x00D0)
 xx(WRAM_V_LAYER1_Y, 0x00D2)

@@ -399,6 +399,7 @@ class Emitidor65816 {
 	void CargarRegEnMemoria(Registers reg, uint32_t addrHw);
 	void CargarRegEnMemoria_IndX(Registers reg, uint32_t addrHw);
 	void CargarRegEnMemoria_IndY(Registers reg, uint32_t addrHw);
+	void CargarAcumuladorIndirectoLargo_IndY(uint32_t addrHw);
 	void CargarRegEnMemoria_SymLX(Registers reg, std::string label);
 
 	// Almacenar datos en memoria a un reg

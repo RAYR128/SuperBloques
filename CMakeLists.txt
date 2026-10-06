@@ -39,6 +39,7 @@ set(COMPILADOR_SOURCES
 	engine/compilador/codegen/bloques_sonido.cpp
 	engine/compilador/codegen/bloques_sensor.cpp
 	engine/compilador/spc700/spcasm.cpp
+	engine/compilador/spc700/driver.cpp
 )
 
 set(GENERADO_DIR "${CMAKE_BINARY_DIR}/generado")

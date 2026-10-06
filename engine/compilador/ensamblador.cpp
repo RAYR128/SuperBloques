@@ -377,6 +377,9 @@ void RutinaRESET() {
 	// SEP #$30
 	cc.SetearFlags(FLAG_X_8BIT | FLAG_M_8BIT);
 
+	// Audio
+	RutinaInicializarAudioSPC700();
+
 	// Loop de programa
 	cc.Etiqueta("PROGRAM_LOOP");
 
@@ -504,6 +507,11 @@ void EnsamblarROM() {
 	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
 	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
 	(void)DatosMusica;
+
+	// Codigo de driver de audio
+	cc.Etiqueta("PUNTEROS_AUDIO");
+	cc.EscribirEtiqueta("DRIVER_AUDIO", true);
+	CrearCodigoDriverSPC700();
 
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
 		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");
