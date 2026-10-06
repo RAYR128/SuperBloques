@@ -23,6 +23,14 @@
 !VolumenCanalR = $11
 !InstrumentoCanal = $20
 !NotaActualCanal = $21
+!TicCountActualCanal = $30
+!TicCountSiguienteCanal = $31
+
+;16-bit: puntero del canal actual.
+!PunteroDatosCanal1 = $40
+!PunteroDatosCanal2 = $41
+!PunteroComienzoCanal1 = $50
+!PunteroComienzoCanal2 = $51
 
 ;el programa comienza en 0x0100
 ;nota que el IPL de la consola limpia 0x00-0xEF
@@ -40,6 +48,22 @@ InicializarDsp:
 
 	;frecuencia timer 0 = 2ms
 	mov $fa, #$10
+
+	;resetear puertos input y correr timer 0, IPL visible
+	mov $f1, #$b1
+InicializarCancion:
+	;-------------------------------TO-DO: cuando se añada codigo para hacer uploads actual hay que reemplazar esto!!!------------------------------
+	;datos de prueba
+	mov !TempoMusica, #$30
+
+	;inicializar los 8 canales
+	mov x, #$0F
+LoopInitCanal:
+	mov a, DatosMusica+x
+	mov !PunteroDatosCanal1+x, a
+	mov !PunteroComienzoCanal1+x, a
+	dec x : bpl LoopInitCanal
+	;------------------------------------------------------------------------------------------------------------------------------------------------
 ;esto corre siempre
 BucleSonido:
 	;leer timer 0, esperar a una respuesta
@@ -70,6 +94,65 @@ ValoresDefectoDSP:
 	db $7D,$00 ;EDL = 0 (desact.)
 	db $6D,$00 ;ESA = 0x0000
 
+;Leer byte de comando para canal (compartido)
+LeerByteComandoCanal:
+	mov a, (!PunteroDatosCanal1+x)
+	inc !PunteroDatosCanal1+x : bne NoIncrementarHbLeerByte
+		inc !PunteroDatosCanal2+x
+NoIncrementarHbLeerByte:
+	mov y, a
+ret
+
 ;ciclo actual de musica
 CicloMusica:
+	;$0E
+	;correr codigo para todos los canales.
+	mov x, #$0E
+	mov !CanalActualBflag, #$80
+IteracionCanal:
+	mov !CanalActual, x
+	dec !TicCountActualCanal+x : bne NoEjecutarSiguienteComando
+LeerComandos:
+	;lista de comandos
+	;00: final de canal
+	;01-7F: duracion de nota
+	;80-EF: notas
+	;F0-FB: percusion
+	;FC [XX]: instrumento
+	;FD [XX]: tempo
+	;FE: silencio
+	;FF: rest (no hace nada)
+	call LeerByteComandoCanal : bmi EsComandoSpec
+		bne EsComandoDuracion
+			mov a, !PunteroComienzoCanal1+x
+			mov !PunteroDatosCanal1+x, a
+			mov a, !PunteroComienzoCanal2+x
+			mov !PunteroDatosCanal2+x, a
+			bra LeerComandos
+EsComandoDuracion:
+		mov !TicCountSiguienteCanal+x, a
+		bra LeerComandos
+EsComandoSpec:
+	;TO-DO: implementar comando de notas
+	mov a, !TicCountSiguienteCanal+x
+	mov !TicCountActualCanal+x, a
+NoEjecutarSiguienteComando:
+	lsr !CanalActualBflag : dec x : dec x : bpl IteracionCanal
 ret
+
+;datos musica
+;8 punteros (16-bit) para pointers para cada canal
+DatosMusica:
+	dw DatosTestCanal1
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+	dw DatosTestCanalVacio
+
+DatosTestCanal1:
+	db $7F,$F0,$00
+DatosTestCanalVacio:
+	db $7F,$F0,$00

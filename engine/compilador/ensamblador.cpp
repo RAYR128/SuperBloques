@@ -2,8 +2,7 @@
 #include "datos.h"
 #include "ensamblador.h"
 #include "instancia.h"
-#include "spc700/spcasm.h"
-#include "driverspc_fuente.h"
+#include "spc700/spc700.h"
 #include <cstring>
 #include <stdexcept>
 
@@ -502,15 +501,6 @@ void EnsamblarROM() {
 		EscenasProyecto[i].Compilar();
 	}
 
-	// engine/datos/driverspc.asm, embebido para que el build WASM no necesite filesystem.
-	cc.Etiqueta("DRIVER_AUDIO");
-	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
-	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
-	(void)DatosMusica;
-
-	// Codigo de driver de audio
-	cc.Etiqueta("PUNTEROS_AUDIO");
-	cc.EscribirEtiqueta("DRIVER_AUDIO", true);
 	CrearCodigoDriverSPC700();
 
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {

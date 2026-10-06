@@ -1,6 +1,7 @@
 // Rutinas de audio para comunicacion entre la S-CPU y el SPC700
 #include "asm/op.h"
-#include "spcasm.h"
+#include "driverspc_fuente.h"
+#include "spc700.h"
 
 // Sube un bloque al SPC700 con el protocolo del IPL. D debe ser 0 (lo deja RutinaRESET). PHP/PLP devuelven P. A, X e Y quedan sucios.
 // WRAM_SPC_PTR_BLOQUE ($00-$02): puntero de 24 bits al bloque
@@ -11,6 +12,17 @@
 // Y indexa el bloque en 16 bits (tope 65532 bytes de datos).
 // https://wiki.superfamicom.org/spc700-reference#ipl-rom-1567
 void CrearCodigoDriverSPC700() {
+	// engine/datos/driverspc.asm, embebido para que el build WASM no necesite filesystem.
+	cc.Etiqueta("DRIVER_AUDIO");
+	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
+	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
+	(void)DatosMusica;
+
+	// Codigo de driver de audio
+	cc.Etiqueta("PUNTEROS_AUDIO");
+	cc.EscribirEtiqueta("DRIVER_AUDIO", true);
+
+	// Rutina de subida de datos al SPC700
 	cc.Etiqueta("SUBIR_DATOS_SPC700");
 	cc.Empujar(REG_FLAGS);
 	cc.LimpiarFlags(FLAG_M_8BIT | FLAG_X_8BIT);

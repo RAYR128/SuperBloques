@@ -1,6 +1,6 @@
 // Ensamblador de codigo para SPC700
 // https://snes.nesdev.org/wiki/SPC-700_instruction_set
-#include "spcasm.h"
+#include "spc700.h"
 #include "asm/op.h"
 
 #include <cctype>
