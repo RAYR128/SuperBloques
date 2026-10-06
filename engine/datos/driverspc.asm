@@ -15,27 +15,40 @@
 !CanalActualBflag = $09
 !TempoMusica = $0A
 !ContadorTick = $0B
+!CanalEncenderLatch = $0D
+
+;Valor temporal 16-bit
+!ValorTemporalA = $0E
+!ValorTemporalB = $0F
 
 ;usamos indices interleaved
 ;existen 8 canales, usamos x * 2 para acceder a canales
 ;por lo tanto $00-$0E es usado y $01-$0F respectivamente
 !VolumenCanalL = $10
 !VolumenCanalR = $11
-!InstrumentoCanal = $20
-!NotaActualCanal = $21
-!TicCountActualCanal = $30
-!TicCountSiguienteCanal = $31
+
+;tics
+!TicCountActualCanal = $20
+!TicCountSiguienteCanal = $21
 
 ;16-bit: puntero del canal actual.
-!PunteroDatosCanal1 = $40
-!PunteroDatosCanal2 = $41
-!PunteroComienzoCanal1 = $50
-!PunteroComienzoCanal2 = $51
+!PunteroDatosCanal1 = $30
+!PunteroDatosCanal2 = $31
 
-;el programa comienza en 0x0100
+;16-bit: puntero de inicio del canal.
+!PunteroComienzoCanal1 = $40
+!PunteroComienzoCanal2 = $41
+
+;16-bit: frecuencia del instrumento actual.
+!FrecuenciaInstrumento1 = $50
+!FrecuenciaInstrumento2 = $51
+
+;el programa comienza en 0x0200
+;vamos a utilizar 0x100-0x1FF para SRCN
+;el stack del SPC700 vive en 01E0-01EF
 ;nota que el IPL de la consola limpia 0x00-0xEF
 ;asi que almacenamos las variables del programa ahi
-base $0100
+base $0200
 SpcArranque:
 	clrp
 
@@ -53,6 +66,9 @@ InicializarDsp:
 	mov $f1, #$b1
 InicializarCancion:
 	;-------------------------------TO-DO: cuando se añada codigo para hacer uploads actual hay que reemplazar esto!!!------------------------------
+	mov !TablaInstrumento, #DatosInstrumento&$FF
+	mov !TablaInstrumento+1, #DatosInstrumento>>8
+
 	;datos de prueba
 	mov !TempoMusica, #$30
 
@@ -63,6 +79,14 @@ LoopInitCanal:
 	mov !PunteroDatosCanal1+x, a
 	mov !PunteroComienzoCanal1+x, a
 	dec x : bpl LoopInitCanal
+
+	;dp
+	mov x, #$0E
+LoopInitParCanal:
+	mov a, #$00 : call CambiarInstrumentoCanal
+	mov a, #$40 : mov !VolumenCanalL+x, a : mov !VolumenCanalR+x, a
+	dec x : dec x : bpl LoopInitParCanal
+
 	;------------------------------------------------------------------------------------------------------------------------------------------------
 ;esto corre siempre
 BucleSonido:
@@ -119,7 +143,7 @@ LeerComandos:
 	;80-EF: notas
 	;F0-FB: percusion
 	;FC [XX]: instrumento
-	;FD [XX]: tempo
+	;FD [XX] [...]: control
 	;FE: silencio
 	;FF: rest (no hace nada)
 	call LeerByteComandoCanal : bmi EsComandoSpec
@@ -133,14 +157,106 @@ EsComandoDuracion:
 		mov !TicCountSiguienteCanal+x, a
 		bra LeerComandos
 EsComandoSpec:
-	;TO-DO: implementar comando de notas
+	cmp a, #$ff : beq FinalizarComando
+		cmp a, #$fc : bne NoEsComandoInstrumento
+			;instrumento
+			call LeerByteComandoCanal
+			call CambiarInstrumentoCanal
+			bra LeerComandos
+NoEsComandoInstrumento:
+		cmp a, #$fd : bne NoEsComandoControl
+			;control
+			mov a, (!PunteroDatosCanal1+x)
+			inc !PunteroDatosCanal1+x : bne NoIncrementarHbLeerByteControl
+				inc !PunteroDatosCanal2+x
+NoIncrementarHbLeerByteControl:
+			mov x, a
+			call LlamarComandoControl
+			bra LeerComandos
+NoEsComandoControl:
+		;antes de reproducir una siguiente nota deberiamos apagar la nota actual.
+		mov $f2, #$5c
+		mov $f3, !CanalActualBflag
+
+		;silencio
+		cmp a, #$fe : beq FinalizarComando
+			;diferencia entre percusion/nota
+			cmp a, #$f0 : bcc EsNota
+				;percusion
+				and a, #$0f : call CambiarInstrumentoCanal
+				mov a, #$c4 ;forzar nota especifica
+EsNota:
+				;TO-DO: calculacion de frecuencia
+				;nota
+				or (!CanalEncenderLatch), (!CanalActualBflag)
+FinalizarComando:
 	mov a, !TicCountSiguienteCanal+x
 	mov !TicCountActualCanal+x, a
 NoEjecutarSiguienteComando:
 	lsr !CanalActualBflag : dec x : dec x : bpl IteracionCanal
+
+	;Fin de iteraciones, encender canales pendientes.
+	mov $f2, #$5c
+	mov $f3, #$00
+	mov $f2, #$4c
+	mov $f3, !CanalEncenderLatch
+	mov !CanalEncenderLatch, #$00
+ret
+
+;entrada
+;X = numero de canal
+;A = numero de instrumento
+CambiarInstrumentoCanal:
+	mov y, #$06
+	mul ya
+	addw ya, !TablaInstrumento
+	movw !ValorTemporalA, ya
+
+	;deberiamos tener el registro DSP correcto para el instrumento actual.
+	;esto es $x4, donde x es canal ($04, $14, $24, $34...)
+	mov a, x
+	xcn a
+	lsr a
+	or a, #$04
+	mov $f2, a
+
+	;(!ValorTemporalA) ahora contiene la tabla del instrumento actual
+	mov y, #$00
+RellenarValoresDSP:
+	;$x4 = sample
+	;$x5 = adsr 1
+	;$x6 = adsr 2
+	;$x7 = adsr 3
+	mov a, (!ValorTemporalA)+y
+	mov $f3, a : inc $f2
+	inc y : cmp y, #$04 : bcc RellenarValoresDSP
+
+	;ahora leemos los bytes de frecuencia.
+	mov a, (!ValorTemporalA)+y
+	mov !FrecuenciaInstrumento1+x, a
+	inc y
+	mov a, (!ValorTemporalA)+y
+	mov !FrecuenciaInstrumento2+x, a
+ret
+
+;entrada
+;X = comando
+;nota que X efectivamente destruye en esta funcion y tiene que ser restaurado por cada comando especial
+LlamarComandoControl:
+jmp (TablaComandoControl+x)
+
+;tabla de comandos
+TablaComandoControl:
+	dw Comando0VolumenCanal
+
+;-------------------------------comandos-------------------------------
+Comando0VolumenCanal:
+	mov x, !CanalActual
 ret
 
 ;datos musica
+;-------------------------------TO-DO: cuando se añada codigo para hacer uploads actual hay que reemplazar esto!!!------------------------------
+;estos son datos de ejemplo.
 ;8 punteros (16-bit) para pointers para cada canal
 DatosMusica:
 	dw DatosTestCanal1
@@ -152,7 +268,16 @@ DatosMusica:
 	dw DatosTestCanalVacio
 	dw DatosTestCanalVacio
 
+;formato
+;sample, adsr 1/2/3, frecuencia (LE)
+DatosInstrumento:
+	db $00,$8f,$e0,$7f : dw $0300
+
 DatosTestCanal1:
-	db $7F,$F0,$00
+	db $20,$C4
+	db $20,$C4
+	db $20,$C4
+	db $00
 DatosTestCanalVacio:
-	db $7F,$F0,$00
+	db $60,$FF
+	db $00

@@ -512,6 +512,9 @@ void EnsamblarROM() {
 		datos.push_back({"ESCENA_DATO_Tilemap3" + escena.Nombre, escena.Tilemap3, (uint32_t)sizeof(escena.Tilemap3)});
 	}
 	CrearCodigoDriverSPC700(datos);
+	if(cc.ObtenerPC() >= ((uint32_t)0x8000)) {
+		throw std::runtime_error("codigo boot utiliza mas de 1 bank");
+	}
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
 		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");
 	}

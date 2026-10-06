@@ -125,7 +125,7 @@ void RutinaInicializarAudioSPC700() {
 
     // Saltar a 0x100 (inicio del programa)
     // TO-DO: Deberiamos sacar esto del programa si mismo, enves de tenerlo aqui hardcodeado
-    cc.CargarRegConst16(REG_A, 0x100);
+    cc.CargarRegConst16(REG_A, 0x0200);
     cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_ARAM_SALTO);
 	cc.SetearFlags(FLAG_M_8BIT);
 

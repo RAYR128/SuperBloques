@@ -40,7 +40,7 @@ enum ComandosAudio : uint8_t {
 
     // Comandos de control de audio
     SB_ACMD_INSTRUMENTO = 0xFC, // 2 bytes, 0xFC + 0x00-0xFF = instrumento
-    SB_ACMD_TEMPO = 0xFD, // 2 bytes, 0xFD + 0x00-0xFF = tempo
+    SB_ACMD_CONTROL = 0xFD, // 2...+ bytes, 0xFD + 0x00-0xFF + ....
     SB_ACMD_SILENCIO = 0xFE,
     SB_ACMD_REST = 0xFF
 };
