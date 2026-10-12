@@ -103,8 +103,11 @@ func nextID(tx *bolt.Tx, key string) (uint64, error) {
 	return n, nil
 }
 
+// CostoBcrypt es 12 en produccion. Los tests lo bajan a bcrypt.MinCost.
+var CostoBcrypt = 12
+
 func hashPassword(password string) ([]byte, error) {
-	return bcrypt.GenerateFromPassword([]byte(password), 12)
+	return bcrypt.GenerateFromPassword([]byte(password), CostoBcrypt)
 }
 
 func checkPassword(hash []byte, password string) bool {

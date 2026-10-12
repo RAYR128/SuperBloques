@@ -73,6 +73,13 @@ cd backend
 go run ./cmd/main
 ```
 
+Los tests corren desde `backend/` y no necesitan el dist del editor:
+
+```bash
+cd backend
+go test ./...
+```
+
 Sirve en `:8080` (override `ADDR`). Antes hace falta `pnpm build` en `frontend/editor` para que exista `frontend/editor/dist`.
 
 Variables de entorno:

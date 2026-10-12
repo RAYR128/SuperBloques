@@ -42,3 +42,22 @@ jobs:
             exit 1
           fi
           echo "ROM generado: salida.sfc (${actual} bytes)"
+
+  backend:
+    name: Tests del backend Go
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Test
+        run: go test -race -count=1 ./...
