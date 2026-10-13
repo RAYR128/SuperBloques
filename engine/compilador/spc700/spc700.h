@@ -49,12 +49,18 @@ enum ComandosAudio : uint8_t {
 class SonidoProyecto {
 public:
     std::string Nombre;
+
+    // Exactamente 9 bytes por cada bloque BRR
+    // PuntoLoop es multiplo de 9
     std::vector<uint8_t> Datos;
+    uint16_t PuntoLoop;
 };
 
 class InstrumentoMusica {
 public:
     std::string Nombre;
+
+    // Referencia a un sonido de la lista de sonidos del proyecto
     int Sonido;
     uint8_t ADSR[3];
     uint16_t Frecuencia;
@@ -62,9 +68,13 @@ public:
 
 class NotaMusica {
 public:
+    // Referencia a un instrumento de la lista de instrumentos del proyecto
     int Instrumento;
+
+    // 0x00-0x7F: Notas normales, 0x80-0xFF: Notas de percusion (solo 12)
     uint8_t Nota;
-    uint16_t Duracion;
+    int Posicion;
+    int Duracion;
 };
 
 class MusicaProyecto {
