@@ -15,33 +15,42 @@
 !CanalActualBflag = $09
 !TempoMusica = $0A
 !ContadorTick = $0B
-!CanalEncenderLatch = $0D
 
 ;Valor temporal 16-bit
-!ValorTemporalA = $0E
-!ValorTemporalB = $0F
+!ValorTemporalA = $0C
+!ValorTemporalB = $0D
+
+;Valor temporal 16-bit
+!ValorTemporalC = $0E
+!ValorTemporalD = $0F
+
+!CanalEncenderLatch = $10
 
 ;usamos indices interleaved
 ;existen 8 canales, usamos x * 2 para acceder a canales
 ;por lo tanto $00-$0E es usado y $01-$0F respectivamente
-!VolumenCanalL = $10
-!VolumenCanalR = $11
+!VolumenCanalL = $20
+!VolumenCanalR = $21
 
 ;tics
-!TicCountActualCanal = $20
-!TicCountSiguienteCanal = $21
+!TicCountActualCanal = $30
+!TicCountSiguienteCanal = $31
 
 ;16-bit: puntero del canal actual.
-!PunteroDatosCanal1 = $30
-!PunteroDatosCanal2 = $31
+!PunteroDatosCanal1 = $40
+!PunteroDatosCanal2 = $41
 
 ;16-bit: puntero de inicio del canal.
-!PunteroComienzoCanal1 = $40
-!PunteroComienzoCanal2 = $41
+!PunteroComienzoCanal1 = $50
+!PunteroComienzoCanal2 = $51
 
 ;16-bit: frecuencia del instrumento actual.
-!FrecuenciaInstrumento1 = $50
-!FrecuenciaInstrumento2 = $51
+!FrecuenciaInstrumentoSub = $60
+!FrecuenciaInstrumentoHi = $61
+
+;16-bit: Nota actual del canal.
+!SubNotaActualCanal = $70
+!NotaActualCanal = $71
 
 ;el programa comienza en 0x0200
 ;vamos a utilizar 0x100-0x1FF para SRCN
@@ -186,9 +195,7 @@ NoEsComandoControl:
 				and a, #$0f : call CambiarInstrumentoCanal
 				mov a, #$c4 ;forzar nota especifica
 EsNota:
-				;TO-DO: calculacion de frecuencia
-				;nota
-				or (!CanalEncenderLatch), (!CanalActualBflag)
+				call ReproducirNota
 FinalizarComando:
 	mov a, !TicCountSiguienteCanal+x
 	mov !TicCountActualCanal+x, a
@@ -233,11 +240,79 @@ RellenarValoresDSP:
 
 	;ahora leemos los bytes de frecuencia.
 	mov a, (!ValorTemporalA)+y
-	mov !FrecuenciaInstrumento1+x, a
+	mov !FrecuenciaInstrumentoSub+x, a
 	inc y
 	mov a, (!ValorTemporalA)+y
-	mov !FrecuenciaInstrumento2+x, a
+	mov !FrecuenciaInstrumentoHi+x, a
 ret
+
+;entrada
+;X = numero de canal
+;A = nota (00-7F)
+ReproducirNota:
+	;nota
+	or (!CanalEncenderLatch), (!CanalActualBflag)
+	
+	;en Y/A almacenamos la frecuencia original
+	;la cual se pone en ValorTemporalC/D
+	and a, #$7f
+	mov !NotaActualCanal+x, a
+	mov !ValorTemporalD, a
+	mov !ValorTemporalC, #$00
+
+	;frecuencia 1
+	mov a, !ValorTemporalD
+	mov y, #$00
+	mov x, #$0c
+	div ya, x
+	mov x, a
+
+	;multiplicar por tabla de frecuencia
+	mov a, TablaFrecuenciaMSB+y : mov !ValorTemporalB, a
+	mov a, TablaFrecuenciaLSB+y : mov !ValorTemporalA, a
+	mov a, TablaFrecuenciaLSB+1+y : sbc a, !ValorTemporalA
+	mov y, !ValorTemporalC : mul ya
+	mov a, y : mov y, #$00
+	addw ya, !ValorTemporalA
+
+	;+1oct
+	mov !ValorTemporalB, y
+	asl a : rol !ValorTemporalB
+
+	;calcular frecuencia
+	bra FreqListo
+FreqSuma:
+	lsr !ValorTemporalB
+	ror a
+	inc x
+FreqListo:
+	cmp x, #$06
+	bne FreqSuma
+	mov !ValorTemporalA, a
+
+	;registro DSP
+	mov x, !CanalActual
+	mov a, x
+	xcn a
+	lsr a
+	or a, #$02
+	mov $f2, a
+
+	;almacenar
+	mov a, !FrecuenciaInstrumentoSub+x : mov y, !ValorTemporalB : mul ya : movw !ValorTemporalC, ya ;sub
+	mov a, !FrecuenciaInstrumentoSub+x : mov y, !ValorTemporalA : mul ya : push y ;lob
+	mov a, !FrecuenciaInstrumentoHi+x : mov y, !ValorTemporalA : mul ya : addw ya, !ValorTemporalC : movw !ValorTemporalC, ya ;multiplicador
+	mov a, !FrecuenciaInstrumentoHi+x : mov y, !ValorTemporalB : mul ya : mov y, a : pop a : addw ya, !ValorTemporalC ;lob
+	mov $f3, a
+	inc $f2
+	mov $f3, y
+ret
+
+TablaFrecuenciaLSB:
+	db $5f,$de,$65,$f4,$8c,$2c,$d6,$8b,$4a,$14,$ea,$cd,$be
+
+TablaFrecuenciaMSB:
+	db $08,$08,$09,$09,$0a,$0b,$0b,$0c,$0d,$0e,$0e,$0f
 
 ;entrada
 ;X = comando
@@ -274,9 +349,9 @@ DatosInstrumento:
 	db $00,$8f,$e0,$7f : dw $0300
 
 DatosTestCanal1:
-	db $20,$C4
-	db $20,$C4
-	db $20,$C4
+	db $20,$94
+	db $20,$A4
+	db $20,$B4
 	db $00
 DatosTestCanalVacio:
 	db $60,$FF

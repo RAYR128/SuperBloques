@@ -52,11 +52,28 @@ public:
     std::vector<uint8_t> Datos;
 };
 
+class InstrumentoMusica {
+public:
+    std::string Nombre;
+    int Sonido;
+    uint8_t ADSR[3];
+    uint16_t Frecuencia;
+};
+
+class NotaMusica {
+public:
+    int Instrumento;
+    uint8_t Nota;
+    uint16_t Duracion;
+};
+
 class MusicaProyecto {
 public:
     std::string Nombre;
     std::vector<uint8_t> DatosCanal[8];
+    std::vector<NotaMusica> NotasCanal[8];
 };
 
+extern std::vector<InstrumentoMusica> InstrumentosProyecto;
 extern std::vector<SonidoProyecto> SonidosProyecto;
 extern std::vector<MusicaProyecto> MusicasProyecto;
