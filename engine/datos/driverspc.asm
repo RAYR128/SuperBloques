@@ -189,11 +189,14 @@ ValoresDefectoDSP:
 	db $2D,$00 ;PmodX = 0 (desact.)
 	db $3D,$00 ;NoiseX = 0 (desact.)
 	db $4D,$00 ;EcoEnX = 0 (desact.)
+	db $5D,$01 ;SRCN = x100
 	db $6C,$20 ;FLG = Reset
 	db $7D,$00 ;EDL = 0 (desact.)
 	db $6D,$00 ;ESA = 0x0000
 
 ;Leer byte de comando para canal (compartido)
+LeerByteComandoCanalX:
+	mov x, !CanalActual
 LeerByteComandoCanal:
 	mov a, (!PunteroDatosCanal1+x)
 	inc !PunteroDatosCanal1+x : bne NoIncrementarHbLeerByte
@@ -392,7 +395,15 @@ TablaComandoControl:
 
 ;-------------------------------comandos-------------------------------
 Comando0VolumenCanal:
-	mov x, !CanalActual
+	call LeerByteComandoCanalX
+	mov a, x
+	xcn a
+	lsr a
+	mov $f2, a
+	mov $f3, y
+	inc $f2
+	call LeerByteComandoCanal
+	mov $f2, a
 ret
 
 ;datos musica
@@ -415,6 +426,7 @@ DatosInstrumento:
 	db $00,$8f,$e0,$7f : dw $0300
 
 DatosTestCanal1:
+	db $FD,$00,$20,$20
 	db $20,$94
 	db $20,$A4
 	db $20,$B4
