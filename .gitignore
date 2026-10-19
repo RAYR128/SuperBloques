@@ -20,3 +20,8 @@ frontend/editor/public/emu/
 # Backend
 data/
 *.db
+
+# Playwright
+frontend/e2e/test-results/
+frontend/e2e/playwright-report/
+frontend/e2e/blob-report/

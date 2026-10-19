@@ -65,6 +65,15 @@ cd frontend/editor
 pnpm dev
 ```
 
+Los tests de punta a punta del sitio y del editor estan en `frontend/e2e` (Playwright, Chromium). Levantan el backend Go en `127.0.0.1:8099` con una base vacia. Hace falta Go en el PATH. `pnpm test` compila el dist del editor antes de abrir el navegador.
+
+```bash
+cd frontend/e2e
+pnpm install
+pnpm browsers
+pnpm test
+```
+
 ## Backend
 Go 1.22+ (el `go.mod` del repo fija la version). Desde `backend/`:
 
