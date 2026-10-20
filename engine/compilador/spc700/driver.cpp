@@ -17,12 +17,6 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
 	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
 
-	// Codigo de driver de audio
-	cc.Etiqueta("PUNTEROS_AUDIO");
-	cc.EscribirEtiqueta("DRIVER_AUDIO", true);
-	cc.EscribirEtiqueta("DRIVER_AUDIO_SRCN", true);
-	cc.EscribirEtiqueta("DRIVER_AUDIO_SAMPLES", true);
-
 	// Rutina de subida de datos al SPC700
 	cc.Etiqueta("SUBIR_DATOS_SPC700");
 	cc.Empujar(REG_FLAGS);
@@ -139,6 +133,7 @@ void RutinaInicializarAudioSPC700() {
 	// 0xFFC0 es el IPL
 	RealizarSubidaSPC(SB_APTR_DRIVER_AUDIO, 0xFFC0);
 	RealizarSubidaSPC(SB_APTR_DRIVER_SRCN, 0xFFC0);
+	RealizarSubidaSPC(SB_APTR_DRIVER_MUSICA, 0xFFC0);
 	
 	// Saltar a 0x200 (inicio del driver)
     // TO-DO: Deberiamos sacar esto del programa si mismo, enves de tenerlo aqui hardcodeado

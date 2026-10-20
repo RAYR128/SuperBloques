@@ -93,8 +93,11 @@ public:
     std::vector<uint8_t> DatosCanal[8];
     std::vector<NotaMusica> NotasCanal[8];
     std::vector<uint8_t> GeneracionFinal;
+    std::vector<InstrumentoMusica> Instrumentos;
+
+    void Ensamblar();
+    int Generar(int InicioDatos);
 };
 
-extern std::vector<InstrumentoMusica> InstrumentosProyecto;
 extern std::vector<SonidoProyecto> SonidosProyecto;
 extern std::vector<MusicaProyecto> MusicasProyecto;
