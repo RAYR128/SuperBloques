@@ -9,10 +9,13 @@
 ;.6 -
 ;.7 = musica desactivada
 !EstadoEjecucion = $04
+!CanalEncenderLatch = $05
 
 !TablaInstrumento = $06
+
 !CanalActual = $08
 !CanalActualBflag = $09
+
 !TempoMusica = $0A
 !ContadorTick = $0B
 
@@ -24,33 +27,31 @@
 !ValorTemporalC = $0E
 !ValorTemporalD = $0F
 
-!CanalEncenderLatch = $10
-
 ;usamos indices interleaved
 ;existen 8 canales, usamos x * 2 para acceder a canales
 ;por lo tanto $00-$0E es usado y $01-$0F respectivamente
-!VolumenCanalL = $20
-!VolumenCanalR = $21
+!VolumenCanalL = $10
+!VolumenCanalR = $11
 
 ;tics
-!TicCountActualCanal = $30
-!TicCountSiguienteCanal = $31
+!TicCountActualCanal = $20
+!TicCountSiguienteCanal = $21
 
 ;16-bit: puntero del canal actual.
-!PunteroDatosCanal1 = $40
-!PunteroDatosCanal2 = $41
+!PunteroDatosCanal1 = $30
+!PunteroDatosCanal2 = $31
 
 ;16-bit: puntero de inicio del canal.
-!PunteroComienzoCanal1 = $50
-!PunteroComienzoCanal2 = $51
+!PunteroComienzoCanal1 = $40
+!PunteroComienzoCanal2 = $41
 
 ;16-bit: frecuencia del instrumento actual.
-!FrecuenciaInstrumentoSub = $60
-!FrecuenciaInstrumentoHi = $61
+!FrecuenciaInstrumentoSub = $50
+!FrecuenciaInstrumentoHi = $51
 
 ;16-bit: Nota actual del canal.
-!SubNotaActualCanal = $70
-!NotaActualCanal = $71
+!SubNotaActualCanal = $60
+!NotaActualCanal = $61
 
 ;el programa comienza en 0x0200
 ;vamos a utilizar 0x100-0x1FF para SRCN
