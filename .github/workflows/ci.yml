@@ -61,3 +61,53 @@ jobs:
 
       - name: Test
         run: go test -race -count=1 ./...
+
+  frontend:
+    name: Tests Playwright del frontend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/**/pnpm-lock.yaml
+
+      - name: Instalar dependencias del editor
+        working-directory: frontend/editor
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar dependencias de e2e
+        working-directory: frontend/e2e
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar Chromium
+        working-directory: frontend/e2e
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Test
+        working-directory: frontend/e2e
+        run: pnpm test
+
+      - name: Subir trazas si fallan
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-resultados
+          path: frontend/e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 7
