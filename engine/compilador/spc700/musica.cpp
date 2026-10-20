@@ -48,9 +48,27 @@ void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos) {
 		DatosSamples.insert(DatosSamples.end(), snd.Datos.begin(), snd.Datos.end());
 		ptrMusica += snd.Datos.size();
 	}
+	// El SRCN va en 0x100
+	uint8_t cabeceraSRCN[4] = {
+		(uint8_t)(SRCN.size() & 0xFF),
+		(uint8_t)((SRCN.size() >> 8) & 0xFF),
+		0x00,
+		0x01,
+	};
+	// Los samples van en Posicion
+	uint8_t cabeceraSamples[4] = {
+		(uint8_t)(DatosSamples.size() & 0xFF),
+		(uint8_t)((DatosSamples.size() >> 8) & 0xFF),
+		(uint8_t)(Posicion & 0xFF),
+		(uint8_t)((Posicion >> 8) & 0xFF),
+	};
+	SRCN.insert(SRCN.begin(), cabeceraSRCN, cabeceraSRCN + 4);
+	DatosSamples.insert(DatosSamples.begin(), cabeceraSamples, cabeceraSamples + 4);
 	Datos.push_back({"DRIVER_AUDIO_SRCN", SRCN.data(), (uint32_t)SRCN.size()});
 	Datos.push_back({"DRIVER_AUDIO_SAMPLES", DatosSamples.data(), (uint32_t)DatosSamples.size()});
 	if(ptrMusica > 0xFFFF) {
 		throw std::runtime_error("Los datos de sonido superan el limite de 64KB");
 	}
+
+	// ptrMusica ahora tiene la ubicacion de la musica (despues de samples)
 }

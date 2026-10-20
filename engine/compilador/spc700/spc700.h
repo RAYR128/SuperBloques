@@ -48,6 +48,13 @@ enum ComandosAudio : uint8_t {
     SB_ACMD_REST = 0xFF
 };
 
+enum ListaPointers : uint8_t {
+    SB_APTR_DRIVER_AUDIO = 0x00,
+    SB_APTR_DRIVER_SRCN = 0x01,
+    SB_APTR_DRIVER_SAMPLES = 0x02,
+    SB_APTR_DRIVER_MUSICA = 0x03
+};
+
 // Clases para almacenar los datos de audio del proyecto
 class SonidoProyecto {
 public:
