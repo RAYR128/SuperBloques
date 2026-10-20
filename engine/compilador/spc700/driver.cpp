@@ -16,7 +16,6 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	cc.Etiqueta("DRIVER_AUDIO");
 	std::string codigoDriver(reinterpret_cast<const char *>(kDriverSpcFuente), kDriverSpcFuenteLen);
 	int DatosMusica = EnsamblarProgramaSPC700(codigoDriver);
-	(void)DatosMusica;
 
 	// Codigo de driver de audio
 	cc.Etiqueta("PUNTEROS_AUDIO");
@@ -109,6 +108,8 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	cc.Branch("SUBIR_DATOS_SPC700_ESPERAR_SALTO", BRANCH_ZERO_CLEAR);
 	cc.Sacar(REG_FLAGS);
 	cc.ReturnLong();
+
+	EnsamblarDatosMusicaSPC700(DatosMusica, Datos);
 }
 
 void RutinaInicializarAudioSPC700() {

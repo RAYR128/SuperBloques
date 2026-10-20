@@ -15,6 +15,9 @@ int EnsamblarProgramaSPC700(std::string &Codigo);
 // Ensamblar codigo de driver para subida de audio
 void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos);
 
+// Ensamblar datos de musica para el SPC700
+void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos);
+
 // Rutina de inicializacion de audio
 void RutinaInicializarAudioSPC700();
 
@@ -82,6 +85,7 @@ public:
     std::string Nombre;
     std::vector<uint8_t> DatosCanal[8];
     std::vector<NotaMusica> NotasCanal[8];
+    std::vector<uint8_t> GeneracionFinal;
 };
 
 extern std::vector<InstrumentoMusica> InstrumentosProyecto;
