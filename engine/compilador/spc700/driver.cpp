@@ -109,9 +109,9 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 }
 
 void RealizarSubidaSPC(uint8_t bloque, int punteroCodigo) {
-    cc.CargarRegConst8(REG_X, bloque * 3);
+	cc.CargarRegConst8(REG_X, bloque * 3);
 
-    // Poner puntero all audio
+	// Poner puntero all audio
 	cc.LimpiarFlags(FLAG_M_8BIT);
 	cc.CargarRegEnMemoria_SymLX(REG_A, "PUNTEROS_AUDIO");
 	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_PTR_BLOQUE);
@@ -119,25 +119,25 @@ void RealizarSubidaSPC(uint8_t bloque, int punteroCodigo) {
 	cc.CargarRegEnMemoria_SymLX(REG_A, "PUNTEROS_AUDIO");
 	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_PTR_BLOQUE + 1);
 
-    // Saltar a destino
-    cc.CargarRegConst16(REG_A, punteroCodigo);
-    cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_ARAM_SALTO);
+	// Saltar a destino
+	cc.CargarRegConst16(REG_A, punteroCodigo);
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_ARAM_SALTO);
 	cc.SetearFlags(FLAG_M_8BIT);
 
-    cc.LlamadaLong("SUBIR_DATOS_SPC700");
+	cc.LlamadaLong("SUBIR_DATOS_SPC700");
 }
 
 void RutinaInicializarAudioSPC700() {
-    cc.Etiqueta("INICIALIZACION_SPC");
-	
+	cc.Etiqueta("INICIALIZACION_SPC");
+
 	// 0xFFC0 es el IPL
 	RealizarSubidaSPC(SB_APTR_DRIVER_AUDIO, 0xFFC0);
 	RealizarSubidaSPC(SB_APTR_DRIVER_SRCN, 0xFFC0);
 	RealizarSubidaSPC(SB_APTR_DRIVER_MUSICA, 0xFFC0);
-	
+
 	// Saltar a 0x200 (inicio del driver)
-    // TO-DO: Deberiamos sacar esto del programa si mismo, enves de tenerlo aqui hardcodeado
+	// TO-DO: Deberiamos sacar esto del programa si mismo, enves de tenerlo aqui hardcodeado
 	RealizarSubidaSPC(SB_APTR_DRIVER_SAMPLES, 0x200);
-	
-    cc.Etiqueta("INICIALIZACION_SPC_FINALIZADA");
+
+	cc.Etiqueta("INICIALIZACION_SPC_FINALIZADA");
 }

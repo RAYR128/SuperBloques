@@ -4,7 +4,7 @@ Especificacion en progreso
 
 ## Formato
 
-Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son los nombres. Los blobs binarios de cada escena van como strings base64 RFC 4648 (alfabeto `A-Za-z0-9+/`, padding `=`).
+Un proyecto es un objeto JSON con cuatro mapas: `Escenas`, `Objetos`, `Sonidos` y `Musica`. Las keys son los nombres. Los blobs binarios van como strings base64 RFC 4648 (alfabeto `A-Za-z0-9+/`, padding `=`).
 
 ```json
 {
@@ -63,7 +63,57 @@ Un proyecto es un objeto JSON con dos mapas: `Escenas` y `Objetos`. Las keys son
 }
 ```
 
-`Escenas` y `Objetos` pueden omitirse (se tratan como `{}`). Un blob omitido se carga como ceros. Un JSON malformado no modifica el proyecto en memoria, un error de contenido despues del parse (Operacion desconocida, base64 de tamaño incorrecto, id colgante, variable inexistente o duplicada, demasiadas variables) tampoco, porque se construye un proyecto temporal y solo se publica al terminar.
+`Escenas`, `Objetos`, `Sonidos` y `Musica` pueden omitirse (se tratan como `{}`). Un blob de escena omitido se carga como ceros. Un JSON malformado no modifica el proyecto en memoria, un error de contenido despues del parse (Operacion desconocida, base64 de tamaño incorrecto, id colgante, variable inexistente o duplicada, demasiadas variables, BRR invalido, instrumento o nota fuera de rango) tampoco, porque se construye un proyecto temporal y solo se publica al terminar.
+
+### Sonidos
+
+Mapa de samples BRR. Como maximo 32. Cada valor es:
+
+```json
+{ "Datos": "<base64>", "PuntoLoop": 36 }
+```
+
+`Datos` es el BRR sin los 2 bytes iniciales del archivo. Al decodificar tiene que medir mas de 0, multiplo de 9 y como maximo 32760 bytes. `PuntoLoop` es el uint16 little-endian de esos 2 bytes: un offset dentro de `Datos`, multiplo de 9, estrictamente menor que el tamaño. En el archivo, 0 es el primer bloque y 9 el segundo.
+
+Un archivo importado mide como maximo 32768 bytes y exactamente `2 + bloques * 9`.
+
+### Musica
+
+Mapa de canciones. Cada valor tiene `Instrumentos` y `Notas`.
+
+```json
+{
+  "Instrumentos": {
+    "Inst1": {
+      "Sonido": "Trompeta",
+      "Frecuencia": 768,
+      "EsGain": false,
+      "A": 0,
+      "D": 0,
+      "S": 0,
+      "R": 0,
+      "Gain": 127
+    }
+  },
+  "Notas": {
+    "Canal1": [
+      { "Instrumento": "Inst1", "Nota": 0, "Posicion": 0, "Duracion": 192 }
+    ]
+  }
+}
+```
+
+`Sonido` nombra una entrada de `Sonidos`. `Frecuencia` es un entero 0-65535; si falta, vale 768 (`0x0300`), que es C-4 para los BRR de la libreria. `A` es 0-15, `D` 0-7, `S` 0-7, `R` 0-31 y `Gain` 0-127. `EsGain` es bool. Los campos que faltan usan esos ceros, `EsGain` false y `Gain` 127. `Gain` se guarda aunque `EsGain` sea false.
+
+Al generar la ROM el instrumento se empaqueta, y no se guarda empaquetado en el JSON:
+
+- `ADSR[0] = (EsGain ? 0x80 : 0x00) + D * 0x10 + A`
+- `ADSR[1] = S * 0x20 + R`
+- `ADSR[2] = EsGain ? Gain : 0x7F`
+
+`Notas` usa solo las claves `Canal1`-`Canal8`. Cada una es un array. Una clave ausente es un canal vacio. `Nota` es 0-111, `Posicion` es un entero `>= 0` y `Duracion` es un entero `>= 1`. `Instrumento` nombra un instrumento de esa misma cancion.
+
+El orden de las claves de `Sonidos` es el orden de sample. El orden de `Instrumentos` es el orden de instrumento. El editor no los reordena al guardar.
 
 ### Operacion
 

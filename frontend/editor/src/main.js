@@ -1,5 +1,9 @@
 import {initEmu} from "./emu.js";
 import {initMenu} from "./menu.js";
+import {initModo} from "./modo.js";
+import {initInstrumentos} from "./musica/instrumentos.js";
+import {initPiano} from "./musica/piano.js";
+import {initSonidos} from "./sonido/menu.js";
 import {initTree} from "./tree.js";
 import {initSplitters} from "./splitters.js";
 import {initWorkspace} from "./blocks/workspace.js";
@@ -22,6 +26,10 @@ try {
 	initSplitters();
 	initWorkspace();
 	initTree();
+	initSonidos();
+	initInstrumentos();
+	initPiano();
+	initModo();
 	initMenu();
 	initEmu();
 	void pintarHeaderUser();

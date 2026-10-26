@@ -1,9 +1,11 @@
+import {CANALES, FRECUENCIA_C4, NOTA_MAX} from "./musica/notas.js";
 import {
 	BLOB_SIZES,
 	ESCENA_VARIABLES_MAX,
 	OBJETO_VARIABLES_MAX,
 	zerosBase64,
 } from "./project.js";
+import {BRR_DATOS_MAX, SONIDOS_MAX} from "./sonido/brr.js";
 
 const OPERACIONES = new Set([
 	"numero",
@@ -94,7 +96,7 @@ function valorBase64(c) {
 	return -1;
 }
 
-function decodificarBase64(entrada, tamanoEsperado) {
+function longitudBase64(entrada) {
 	let limpia = "";
 	for (let i = 0; i < entrada.length; i++) {
 		const c = entrada[i];
@@ -103,44 +105,36 @@ function decodificarBase64(entrada, tamanoEsperado) {
 		}
 		limpia += c;
 	}
-	if (limpia.length % 4 !== 0) {
-		return false;
+	if (limpia.length === 0 || limpia.length % 4 !== 0) {
+		return -1;
 	}
 
 	let escrito = 0;
 	for (let i = 0; i < limpia.length; i += 4) {
 		let pad = 0;
-		const v = [0, 0, 0, 0];
 		for (let k = 0; k < 4; k++) {
 			const c = limpia[i + k];
 			if (c === "=") {
 				if (i + 4 !== limpia.length || k < 2) {
-					return false;
+					return -1;
 				}
-				v[k] = 0;
 				pad++;
 			} else {
-				if (pad !== 0) {
-					return false;
-				}
-				v[k] = valorBase64(c.charCodeAt(0));
-				if (v[k] < 0) {
-					return false;
+				if (pad !== 0 || valorBase64(c.charCodeAt(0)) < 0) {
+					return -1;
 				}
 			}
 		}
 		if (pad > 2) {
-			return false;
+			return -1;
 		}
-		const bytes = 3 - pad;
-		for (let b = 0; b < bytes; b++) {
-			if (escrito >= tamanoEsperado) {
-				return false;
-			}
-			escrito++;
-		}
+		escrito += 3 - pad;
 	}
-	return escrito === tamanoEsperado;
+	return escrito;
+}
+
+function decodificarBase64(entrada, tamanoEsperado) {
+	return longitudBase64(entrada) === tamanoEsperado;
 }
 
 function esObjeto(v) {
@@ -343,6 +337,139 @@ function parsearVariables(nodo, maximo) {
 	return salida;
 }
 
+function enteroEnRango(nodo, clave, min, max, defecto) {
+	if (!Object.prototype.hasOwnProperty.call(nodo, clave)) {
+		return defecto;
+	}
+	const valor = nodo[clave];
+	if (!Number.isInteger(valor) || valor < min || valor > max) {
+		throw new Error(clave + " fuera de rango");
+	}
+	return valor;
+}
+
+function boolOpcional(nodo, clave, defecto) {
+	if (!Object.prototype.hasOwnProperty.call(nodo, clave)) {
+		return defecto;
+	}
+	if (typeof nodo[clave] !== "boolean") {
+		throw new Error(clave + " debe ser bool");
+	}
+	return nodo[clave];
+}
+
+function parsearSonidos(sonidosJson) {
+	const nombres = Object.keys(sonidosJson);
+	if (nombres.length > SONIDOS_MAX) {
+		throw new Error("demasiados sonidos (max " + SONIDOS_MAX + ")");
+	}
+	const sonidos = {};
+	for (const nombre of nombres) {
+		if (nombre === "") {
+			throw new Error("nombre de sonido vacio");
+		}
+		const valor = sonidosJson[nombre];
+		if (!esObjeto(valor)) {
+			throw new Error("sonido debe ser un objeto");
+		}
+		if (typeof valor.Datos !== "string") {
+			throw new Error("Datos debe ser string base64");
+		}
+		const longitud = longitudBase64(valor.Datos);
+		if (longitud < 0) {
+			throw new Error("base64 invalido: Datos");
+		}
+		if (longitud === 0 || longitud % 9 !== 0 || longitud > BRR_DATOS_MAX) {
+			throw new Error("Datos BRR invalidos: " + nombre);
+		}
+		if (!Number.isInteger(valor.PuntoLoop)) {
+			throw new Error("PuntoLoop debe ser entero");
+		}
+		if (valor.PuntoLoop < 0 || valor.PuntoLoop >= longitud || valor.PuntoLoop % 9 !== 0) {
+			throw new Error("PuntoLoop invalido: " + nombre);
+		}
+		sonidos[nombre] = {Datos: valor.Datos, PuntoLoop: valor.PuntoLoop};
+	}
+	return sonidos;
+}
+
+function parsearInstrumento(nombre, valor, sonidos) {
+	if (!esObjeto(valor)) {
+		throw new Error("instrumento debe ser un objeto");
+	}
+	if (typeof valor.Sonido !== "string" || !Object.prototype.hasOwnProperty.call(sonidos, valor.Sonido)) {
+		throw new Error("sonido inexistente: " + valor.Sonido);
+	}
+	return {
+		Sonido: valor.Sonido,
+		Frecuencia: enteroEnRango(valor, "Frecuencia", 0, 65535, FRECUENCIA_C4),
+		EsGain: boolOpcional(valor, "EsGain", false),
+		A: enteroEnRango(valor, "A", 0, 15, 0),
+		D: enteroEnRango(valor, "D", 0, 7, 0),
+		S: enteroEnRango(valor, "S", 0, 7, 0),
+		R: enteroEnRango(valor, "R", 0, 31, 0),
+		Gain: enteroEnRango(valor, "Gain", 0, 127, 127),
+	};
+}
+
+function parsearNota(valor, instrumentos) {
+	if (!esObjeto(valor)) {
+		throw new Error("nota debe ser un objeto");
+	}
+	if (typeof valor.Instrumento !== "string" || !instrumentos.has(valor.Instrumento)) {
+		throw new Error("instrumento inexistente: " + valor.Instrumento);
+	}
+	if (!Number.isInteger(valor.Nota) || valor.Nota < 0 || valor.Nota > NOTA_MAX) {
+		throw new Error("Nota fuera de rango");
+	}
+	if (!Number.isInteger(valor.Posicion) || valor.Posicion < 0) {
+		throw new Error("Posicion fuera de rango");
+	}
+	if (!Number.isInteger(valor.Duracion) || valor.Duracion < 1) {
+		throw new Error("Duracion fuera de rango");
+	}
+	return {
+		Instrumento: valor.Instrumento,
+		Nota: valor.Nota,
+		Posicion: valor.Posicion,
+		Duracion: valor.Duracion,
+	};
+}
+
+function parsearMusica(musicaJson, sonidos) {
+	const musica = {};
+	for (const [nombre, valor] of Object.entries(musicaJson)) {
+		if (nombre === "") {
+			throw new Error("nombre de musica vacio");
+		}
+		if (!esObjeto(valor)) {
+			throw new Error("musica debe ser un objeto");
+		}
+		const instrumentosJson = objetoOVacio(valor, "Instrumentos");
+		const instrumentos = {};
+		for (const [instNombre, instValor] of Object.entries(instrumentosJson)) {
+			if (instNombre === "") {
+				throw new Error("nombre de instrumento vacio");
+			}
+			instrumentos[instNombre] = parsearInstrumento(instNombre, instValor, sonidos);
+		}
+		const notasJson = objetoOVacio(valor, "Notas");
+		const notas = {};
+		const nombresInst = new Set(Object.keys(instrumentos));
+		for (const [canal, lista] of Object.entries(notasJson)) {
+			if (!CANALES.includes(canal)) {
+				throw new Error("canal desconocido: " + canal);
+			}
+			if (!Array.isArray(lista)) {
+				throw new Error(canal + " debe ser un array");
+			}
+			notas[canal] = lista.map((nota) => parsearNota(nota, nombresInst));
+		}
+		musica[nombre] = {Instrumentos: instrumentos, Notas: notas};
+	}
+	return musica;
+}
+
 export function parsearProyecto(texto) {
 	if (typeof texto === "string" && texto.charCodeAt(0) === 0xfeff) {
 		texto = texto.slice(1);
@@ -391,7 +518,9 @@ export function parsearProyecto(texto) {
 		};
 	}
 
-	const proyecto = {Escenas: escenas, Objetos: objetos};
+	const sonidos = parsearSonidos(objetoOVacio(raiz, "Sonidos"));
+	const musica = parsearMusica(objetoOVacio(raiz, "Musica"), sonidos);
+	const proyecto = {Escenas: escenas, Objetos: objetos, Sonidos: sonidos, Musica: musica};
 	validarEscenasReferenciadas(proyecto);
 	return proyecto;
 }

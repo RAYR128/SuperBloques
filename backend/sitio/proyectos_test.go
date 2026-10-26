@@ -129,6 +129,20 @@ func TestCrearProyectoThumbYNombre(t *testing.T) {
 	if msg := errorJSON(t, arr); msg != "Escenas debe ser un objeto" {
 		t.Fatalf("escenas: %q", msg)
 	}
+
+	sonidos := e.postJSON(e.authed, "/project", cuerpoProyecto("Juego", `{"Sonidos":[]}`, ""))
+	exigirStatus(t, sonidos, http.StatusBadRequest)
+	if msg := errorJSON(t, sonidos); msg != "Sonidos debe ser un objeto" {
+		t.Fatalf("sonidos: %q", msg)
+	}
+	musica := e.postJSON(e.authed, "/project", cuerpoProyecto("Juego", `{"Musica":[]}`, ""))
+	exigirStatus(t, musica, http.StatusBadRequest)
+	if msg := errorJSON(t, musica); msg != "Musica debe ser un objeto" {
+		t.Fatalf("musica: %q", msg)
+	}
+	audio := e.postJSON(e.authed, "/project", cuerpoProyecto("Juego", `{"Sonidos":{},"Musica":{}}`, ""))
+	exigirStatus(t, audio, http.StatusCreated)
+	_ = leerCuerpo(t, audio)
 }
 
 func TestPermisosDeProyecto(t *testing.T) {

@@ -9,6 +9,12 @@ std::vector<InstrumentoMusica> InstrumentosProyecto;
 std::vector<SonidoProyecto> SonidosProyecto;
 std::vector<MusicaProyecto> MusicasProyecto;
 
+void InstrumentoMusica::EmpaquetarADSR(uint8_t Salida[3]) const {
+	Salida[0] = (uint8_t)((EsGain ? 0x80 : 0x00) + (D * 0x10) + A);
+	Salida[1] = (uint8_t)((S * 0x20) + R);
+	Salida[2] = EsGain ? Gain : (uint8_t)0x7F;
+}
+
 void MusicaProyecto::Ensamblar() {
 	for(size_t canal = 0; canal < 8; canal++) {
 		std::sort(NotasCanal[canal].begin(), NotasCanal[canal].end(), [](const NotaMusica &a, const NotaMusica &b) {
@@ -36,11 +42,12 @@ int MusicaProyecto::Generar(int InicioDatos) {
 		if(i.Sonido < 0 || i.Sonido >= (int)SonidosProyecto.size()) {
 			throw std::runtime_error("Instrumento " + i.Nombre + " tiene referencia a sonido invalido");
 		}
-		const SonidoProyecto &s = SonidosProyecto[i.Sonido];
-		GeneracionFinal.push_back(inst & 0xFF); // sample
-		GeneracionFinal.push_back(i.ADSR[0]);
-		GeneracionFinal.push_back(i.ADSR[1]);
-		GeneracionFinal.push_back(i.ADSR[2]);
+		uint8_t adsr[3];
+		i.EmpaquetarADSR(adsr);
+		GeneracionFinal.push_back((uint8_t)i.Sonido);
+		GeneracionFinal.push_back(adsr[0]);
+		GeneracionFinal.push_back(adsr[1]);
+		GeneracionFinal.push_back(adsr[2]);
 		GeneracionFinal.push_back(i.Frecuencia & 0xFF);
 		GeneracionFinal.push_back((i.Frecuencia >> 8) & 0xFF);
 	}
@@ -54,40 +61,78 @@ int MusicaProyecto::Generar(int InicioDatos) {
 		(uint8_t)(TamanoFinal & 0xFF),
 		(uint8_t)((TamanoFinal >> 8) & 0xFF),
 		(uint8_t)(InicioDatos & 0xFF),
-		(uint8_t)((InicioDatos >> 8) & 0xFF)
-	};
+		(uint8_t)((InicioDatos >> 8) & 0xFF)};
 	GeneracionFinal.insert(GeneracionFinal.begin(), cabecera, cabecera + 4);
 	GeneracionFinal.push_back(0);
 	GeneracionFinal.push_back(0);
 	return InicioDatos + TamanoFinal;
 }
 
-void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos) {
-	/* stub temporal
-	db $C0,$44,$44,$44,$44,$44,$44,$44,$44
-	db $C0,$44,$44,$44,$44,$44,$44,$44,$44
-	db $C0,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-	db $C3,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-	*/
-	SonidosProyecto.clear();
-	// 4 bloques de sonido, esto produce un square wave 50%
+void InstalarStubMusica() {
+	// stub temporal, square wave 50% y un instrumento
 	SonidoProyecto s;
 	s.Nombre = "SquareWave";
 	s.Datos = {
-		0xC0, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, // fase 1
-		0xC0, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, // fase 2
-		0xC0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // fase 3
-		0xC3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF // fase 4
-	};
+		0xC0,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0xC0,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0x44,
+		0xC0,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xC3,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF};
 	s.PuntoLoop = 0;
 	SonidosProyecto.push_back(s);
 
-	// stub temporal de musica
 	MusicaProyecto m;
 	m.Nombre = "Musica1";
-	m.Instrumentos.push_back({ "Inst1", 0, {0x8F, 0xE0, 0x7F}, 0x300 });
-	m.NotasCanal[0].push_back({ 0, 0x3C, 0, 100 });
+	InstrumentoMusica inst;
+	inst.Nombre = "Inst1";
+	inst.Sonido = 0;
+	inst.EsGain = true;
+	inst.A = 15;
+	inst.D = 0;
+	inst.S = 7;
+	inst.R = 0;
+	inst.Gain = 0x7F;
+	inst.Frecuencia = 0x0300;
+	m.Instrumentos.push_back(inst);
+	m.NotasCanal[0].push_back({0, 0x3C, 0, 100});
 	MusicasProyecto.push_back(m);
+}
+
+void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos) {
+	if(SonidosProyecto.empty() && MusicasProyecto.empty()) {
+		InstalarStubMusica();
+	}
 
 	// ptrMusica es donde iran los datos de la musica cuando sea generada
 	int ptrMusica = Posicion;
@@ -148,7 +193,7 @@ void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos) {
 		}
 		Datos.push_back({"MUSICA_" + mus.Nombre, mus.GeneracionFinal.data(), (uint32_t)mus.GeneracionFinal.size()});
 	}
-	
+
 	// punteros de audio final
 	cc.Etiqueta("PUNTEROS_AUDIO");
 	cc.EscribirEtiqueta("DRIVER_AUDIO", true);

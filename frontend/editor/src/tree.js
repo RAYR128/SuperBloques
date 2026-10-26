@@ -1,5 +1,6 @@
 import {
 	agregarEscena,
+	agregarMusica,
 	agregarObjeto,
 	eliminarEntidad,
 	seleccionar,
@@ -19,7 +20,8 @@ function itemEl(tipo, nombre) {
 	const name = document.createElement("div");
 	name.className = "item-name";
 	const dot = document.createElement("span");
-	dot.className = "dot" + (tipo === "escena" ? " scene" : "");
+	const marca = tipo === "escena" ? " scene" : tipo === "sonido" ? " sound" : tipo === "musica" ? " music" : "";
+	dot.className = "dot" + marca;
 	const label = document.createElement("span");
 	label.textContent = nombre;
 	name.append(dot, label);
@@ -56,6 +58,8 @@ function renderLista(el, tipo, mapa) {
 export function renderTree() {
 	renderLista(document.getElementById("tree-escenas"), "escena", state.proyecto.Escenas);
 	renderLista(document.getElementById("tree-objetos"), "objeto", state.proyecto.Objetos);
+	renderLista(document.getElementById("tree-sonidos"), "sonido", state.proyecto.Sonidos);
+	renderLista(document.getElementById("tree-musicas"), "musica", state.proyecto.Musica);
 }
 
 export function initTree() {
@@ -66,6 +70,10 @@ export function initTree() {
 	document.getElementById("add-objeto").addEventListener("click", () => {
 		flushWorkspace();
 		agregarObjeto();
+	});
+	document.getElementById("add-musica").addEventListener("click", () => {
+		flushWorkspace();
+		agregarMusica();
 	});
 	subscribe(renderTree);
 	renderTree();

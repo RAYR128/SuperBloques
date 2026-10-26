@@ -4,6 +4,7 @@ import {
 	agregarVariable,
 	eliminarVariable,
 	entidadActual,
+	esEditorDeBloques,
 	guardarBloquesActuales,
 	state,
 	subscribe,
@@ -29,10 +30,17 @@ let lastSelKey = null;
 
 export function flushWorkspace() {
 	clearTimeout(flushTimer);
-	if (!workspace || loading) {
+	if (!workspace || loading || !esEditorDeBloques(state.seleccion?.tipo)) {
 		return;
 	}
 	guardarBloquesActuales(workspaceToBloques(workspace));
+}
+
+export function redimensionarWorkspace() {
+	if (!workspace) {
+		return;
+	}
+	requestAnimationFrame(() => Blockly.svgResize(workspace));
 }
 
 function scheduleFlush() {
@@ -102,7 +110,7 @@ function registrarCallbacksVariable() {
 }
 
 function refreshFlyout() {
-	if (!workspace) {
+	if (!workspace || !esEditorDeBloques(tipoSeleccion())) {
 		return;
 	}
 	syncCategorias();
@@ -153,18 +161,22 @@ function loadEntityIntoWorkspace() {
 	clearTimeout(flushTimer);
 	const key = selKey();
 	if (key === lastSelKey) {
-		refreshFlyout();
-		refreshVariableFields();
-		refreshEscenaFields();
+		if (esEditorDeBloques(tipoSeleccion())) {
+			refreshFlyout();
+			refreshVariableFields();
+			refreshEscenaFields();
+		}
 		return;
 	}
 	lastSelKey = key;
 
 	loading = true;
 	workspace.clear();
-	const entidad = entidadActual();
-	if (entidad) {
-		loadBloquesIntoWorkspace(workspace, entidad.Bloques || {}, entidad.Variables || []);
+	if (esEditorDeBloques(tipoSeleccion())) {
+		const entidad = entidadActual();
+		if (entidad) {
+			loadBloquesIntoWorkspace(workspace, entidad.Bloques || {}, entidad.Variables || []);
+		}
 	}
 	loading = false;
 	refreshFlyout();

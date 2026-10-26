@@ -1,4 +1,5 @@
 #include "base64.h"
+#include <cstring>
 
 static const char kTabla[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -54,7 +55,7 @@ static int ValorBase64(unsigned char c) {
 	return -1;
 }
 
-bool DecodificarBase64(const std::string &Entrada, uint8_t *Salida, size_t TamanoEsperado) {
+static bool DecodificarBase64Vector(const std::string &Entrada, std::vector<uint8_t> &Salida) {
 	std::string Limpia;
 	Limpia.reserve(Entrada.size());
 	for(unsigned char c : Entrada) {
@@ -64,11 +65,12 @@ bool DecodificarBase64(const std::string &Entrada, uint8_t *Salida, size_t Taman
 		Limpia.push_back((char)c);
 	}
 
+	Salida.clear();
 	if(Limpia.size() % 4 != 0) {
 		return false;
 	}
 
-	size_t Escrito = 0;
+	Salida.reserve((Limpia.size() / 4) * 3);
 	for(size_t i = 0; i < Limpia.size(); i += 4) {
 		int Pad = 0;
 		int v[4];
@@ -76,33 +78,48 @@ bool DecodificarBase64(const std::string &Entrada, uint8_t *Salida, size_t Taman
 			char c = Limpia[i + k];
 			if(c == '=') {
 				if(i + 4 != Limpia.size() || k < 2) {
+					Salida.clear();
 					return false;
 				}
 				v[k] = 0;
 				Pad++;
 			} else {
 				if(Pad != 0) {
+					Salida.clear();
 					return false;
 				}
 				v[k] = ValorBase64((unsigned char)c);
 				if(v[k] < 0) {
+					Salida.clear();
 					return false;
 				}
 			}
 		}
 		if(Pad > 2) {
+			Salida.clear();
 			return false;
 		}
 
 		uint32_t n = ((uint32_t)v[0] << 18) | ((uint32_t)v[1] << 12) | ((uint32_t)v[2] << 6) | (uint32_t)v[3];
 		int Bytes = 3 - Pad;
 		for(int b = 0; b < Bytes; b++) {
-			if(Escrito >= TamanoEsperado) {
-				return false;
-			}
-			Salida[Escrito++] = (uint8_t)((n >> (16 - 8 * b)) & 0xFF);
+			Salida.push_back((uint8_t)((n >> (16 - 8 * b)) & 0xFF));
 		}
 	}
+	return true;
+}
 
-	return Escrito == TamanoEsperado;
+bool DecodificarBase64(const std::string &Entrada, uint8_t *Salida, size_t TamanoEsperado) {
+	std::vector<uint8_t> Tmp;
+	if(!DecodificarBase64Vector(Entrada, Tmp) || Tmp.size() != TamanoEsperado) {
+		return false;
+	}
+	if(TamanoEsperado > 0) {
+		std::memcpy(Salida, Tmp.data(), TamanoEsperado);
+	}
+	return true;
+}
+
+bool DecodificarBase64(const std::string &Entrada, std::vector<uint8_t> &Salida) {
+	return DecodificarBase64Vector(Entrada, Salida);
 }

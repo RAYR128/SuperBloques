@@ -150,6 +150,8 @@ test("exportar descarga el JSON del proyecto", async ({page}) => {
 	const json = JSON.parse(await fs.readFile(archivo, "utf8"));
 	expect(json.Escenas).toHaveProperty("Escena1");
 	expect(json.Objetos).toEqual({});
+	expect(json.Sonidos).toEqual({});
+	expect(json.Musica).toEqual({});
 });
 
 test("importar restaura el proyecto exportado", async ({page}) => {
@@ -247,4 +249,147 @@ test("publicar con sesion muestra el proyecto en el sitio", async ({page}) => {
 
 	await page.goto(`/u/${user.id}`);
 	await expect(page.locator("a.card-title", {hasText: nombre})).toBeVisible();
+});
+
+test("el arbol muestra sonidos y musica", async ({page}) => {
+	await abrirEditor(page);
+	await expect(page.getByText("Sonidos", {exact: true})).toBeVisible();
+	await expect(page.getByText("Musica", {exact: true})).toBeVisible();
+	await expect(page.locator("#add-sonido")).toBeVisible();
+	await expect(page.locator("#add-musica")).toBeVisible();
+});
+
+async function importarDeLibreria(page, nombre) {
+	await page.locator("#add-sonido").click();
+	await expect(page.locator("#sound-menu")).toBeVisible();
+	await page.locator("#sound-menu-library").click();
+	await page.locator(`#sound-library [data-lib="${nombre}"]`).click();
+	await expect(page.locator(`[data-tipo="sonido"][data-nombre="${nombre}"]`)).toHaveClass(/active/);
+}
+
+test("la libreria importa BRR y un archivo invalido se rechaza", async ({page}) => {
+	await abrirEditor(page);
+	await importarDeLibreria(page, "Trompeta");
+	await expect(page.locator("#sound-detail")).toContainText("Punto de loop: 36");
+	await expect(page.locator("#sound-detail")).toContainText("63 bytes");
+	await expect(page.locator("#blocklyDiv")).toBeHidden();
+
+	await importarDeLibreria(page, "Bateria");
+	await expect(page.locator("#sound-detail")).toContainText("Punto de loop: 2673");
+	await importarDeLibreria(page, "Cuerda");
+	await expect(page.locator("#sound-detail")).toContainText("Punto de loop: 36");
+	await importarDeLibreria(page, "Synth");
+	await expect(page.locator("#sound-detail")).toContainText("63 bytes");
+
+	let mensaje = "";
+	const alerta = new Promise((resolve, reject) => {
+		page.once("dialog", (dialog) => {
+			mensaje = dialog.message();
+			dialog.accept().then(resolve, reject);
+		});
+	});
+	await page.locator("#sound-file").setInputFiles({
+		name: "malo.brr",
+		mimeType: "application/octet-stream",
+		buffer: Buffer.from([1, 2, 3, 4, 5]),
+	});
+	await alerta;
+	expect(mensaje).toContain("2 + (bloques * 9)");
+	await expect(page.locator("#tree-sonidos .tree-item")).toHaveCount(4);
+
+	mensaje = "";
+	const grande = new Promise((resolve, reject) => {
+		page.once("dialog", (dialog) => {
+			mensaje = dialog.message();
+			dialog.accept().then(resolve, reject);
+		});
+	});
+	await page.locator("#sound-file").setInputFiles({
+		name: "grande.brr",
+		mimeType: "application/octet-stream",
+		buffer: Buffer.alloc(32769),
+	});
+	await grande;
+	expect(mensaje).toContain("supera 32KB");
+
+	const loop = Buffer.alloc(11);
+	loop[0] = 9;
+	mensaje = "";
+	const loopMal = new Promise((resolve, reject) => {
+		page.once("dialog", (dialog) => {
+			mensaje = dialog.message();
+			dialog.accept().then(resolve, reject);
+		});
+	});
+	await page.locator("#sound-file").setInputFiles({
+		name: "loop.brr",
+		mimeType: "application/octet-stream",
+		buffer: loop,
+	});
+	await loopMal;
+	expect(mensaje).toContain("no cae en un bloque");
+});
+
+test("el piano roll reemplaza los bloques", async ({page}) => {
+	await abrirEditor(page);
+	await importarDeLibreria(page, "Trompeta");
+	await aceptarPrompt(page, () => page.locator("#add-musica").click(), "Tema");
+	await expect(page.locator("#piano-roll")).toBeVisible();
+	await expect(page.locator("#instruments-panel")).toBeVisible();
+	await expect(page.locator("#blocklyDiv")).toBeHidden();
+	await expect(page.locator("#workspace-title")).toHaveText("Tema");
+	await expect(page.locator("#piano-hint")).toContainText("Agrega un instrumento");
+
+	await aceptarPrompt(page, () => page.locator("#add-instrumento").click(), "Inst1");
+	await expect(page.locator("#instrument-form")).toBeVisible();
+	await expect(page.locator("#inst-adsr")).toBeVisible();
+	await expect(page.locator("#inst-sonido")).toHaveValue("Trompeta");
+	await expect(page.locator("#inst-frecuencia")).toHaveValue("768");
+
+	await page.locator("#piano-grid").click({position: {x: 20, y: 8}});
+	const nota = page.locator(".piano-note");
+	await expect(nota).toHaveCount(1);
+	await expect(nota).toHaveAttribute("data-nota", "111");
+	await expect(nota).toHaveAttribute("data-pos", "0");
+	await expect(nota).toHaveAttribute("data-dur", "192");
+
+	await nota.click({position: {x: 12, y: 8}});
+	await page.keyboard.press("Delete");
+	await expect(page.locator(".piano-note")).toHaveCount(0);
+
+	await page.locator("#piano-grid").click({position: {x: 20, y: 8}});
+	await expect(page.locator(".piano-note")).toHaveCount(1);
+	const caja = await page.locator(".piano-note").boundingBox();
+	expect(caja).toBeTruthy();
+	const x = caja.x + caja.width - 3;
+	const y = caja.y + caja.height / 2;
+	await page.mouse.move(x, y);
+	await page.mouse.down();
+	await page.mouse.move(x + 48, y, {steps: 4});
+	await page.mouse.up();
+	await expect(page.locator(".piano-note")).toHaveAttribute("data-dur", "240");
+
+	await page.locator("#piano-delete").click();
+	await expect(page.locator(".piano-note")).toHaveCount(0);
+
+	await page.locator("#inst-esgain").check();
+	await expect(page.locator("#inst-adsr")).toBeHidden();
+	await expect(page.locator("#inst-gain-wrap")).toBeVisible();
+
+	let aviso = "";
+	const enUso = new Promise((resolve, reject) => {
+		page.once("dialog", (dialog) => {
+			aviso = dialog.message();
+			dialog.accept().then(resolve, reject);
+		});
+	});
+	await page.locator('[data-tipo="sonido"][data-nombre="Trompeta"] .tree-remove').click();
+	await enUso;
+	expect(aviso).toBe('No se puede eliminar el sonido "Trompeta" porque esta en uso');
+	await expect(page.locator('[data-tipo="sonido"][data-nombre="Trompeta"]')).toBeVisible();
+
+	await page.locator('[data-tipo="escena"][data-nombre="Escena1"]').click();
+	await expect(page.locator("#piano-roll")).toBeHidden();
+	await expect(page.locator("#blocklyDiv .blocklySvg")).toBeVisible();
+	await expect(page.locator("#workspace-title")).toHaveText("Bloques");
 });

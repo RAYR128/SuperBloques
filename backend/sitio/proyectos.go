@@ -75,7 +75,7 @@ func validarJSONProyecto(raw json.RawMessage) error {
 	if err := json.Unmarshal(raw, &obj); err != nil {
 		return errors.New("el proyecto no es un objeto json")
 	}
-	for _, k := range []string{"Escenas", "Objetos"} {
+	for _, k := range []string{"Escenas", "Objetos", "Sonidos", "Musica"} {
 		v, ok := obj[k]
 		if !ok || len(bytes.TrimSpace(v)) == 0 {
 			continue

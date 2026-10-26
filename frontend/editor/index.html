@@ -42,11 +42,25 @@
 				</div>
 				<div id="tree-objetos"></div>
 			</div>
+			<div class="tree-group">
+				<div class="tree-label">
+					<span>Sonidos</span>
+					<button type="button" class="tree-add" id="add-sonido" title="Nuevo sonido">+</button>
+				</div>
+				<div id="tree-sonidos"></div>
+			</div>
+			<div class="tree-group">
+				<div class="tree-label">
+					<span>Musica</span>
+					<button type="button" class="tree-add" id="add-musica" title="Nueva musica">+</button>
+				</div>
+				<div id="tree-musicas"></div>
+			</div>
 		</div>
 	</aside>
 	<div class="splitter" data-split="objects" role="separator" aria-orientation="vertical" aria-label="Redimensionar area de trabajo" title="Redimensionar area de trabajo"></div>
 
-	<aside class="panel blocks-panel">
+	<aside class="panel blocks-panel" id="blocks-panel">
 		<div class="categories">
 			<button type="button" class="cat mocion active" data-cat="mocion">Mocion</button>
 			<button type="button" class="cat animacion" data-cat="animacion">Animacion</button>
@@ -59,11 +73,53 @@
 			<button type="button" class="cat sensor" data-cat="sensor">Sensor</button>
 		</div>
 	</aside>
+	<aside class="panel instruments-panel" id="instruments-panel" hidden>
+		<div class="panel-title">
+			<span>Instrumentos</span>
+			<button type="button" class="tree-add" id="add-instrumento" title="Nuevo instrumento">+</button>
+		</div>
+		<div id="instrument-list" class="instrument-list"></div>
+		<div id="instrument-form" class="instrument-form" hidden>
+			<label>Sonido
+				<select id="inst-sonido"></select>
+			</label>
+			<label>Frecuencia
+				<select id="inst-nota"></select>
+				<input id="inst-frecuencia" type="number" min="0" max="65535" step="1" />
+			</label>
+			<label class="instrument-check">
+				<input id="inst-esgain" type="checkbox" />
+				<span>GAIN</span>
+			</label>
+			<div id="inst-adsr" class="instrument-adsr">
+				<label>A <select id="inst-a"></select></label>
+				<label>D <select id="inst-d"></select></label>
+				<label>S <select id="inst-s"></select></label>
+				<label>R <select id="inst-r"></select></label>
+			</div>
+			<label id="inst-gain-wrap">Gain
+				<input id="inst-gain" type="number" min="0" max="127" step="1" />
+			</label>
+			<button type="button" class="instrument-remove" id="remove-instrumento">Eliminar instrumento</button>
+		</div>
+	</aside>
 
 	<main class="panel workspace-panel">
-		<div class="panel-title">Bloques</div>
+		<div class="panel-title" id="workspace-title">Bloques</div>
 		<div class="workspace-body">
 			<div id="blocklyDiv"></div>
+			<div id="sound-detail" class="sound-detail" hidden></div>
+			<div id="piano-roll" class="piano" hidden>
+				<div class="piano-toolbar">
+					<div id="piano-channels" class="piano-channels"></div>
+					<button type="button" id="piano-delete" title="Eliminar nota">Borrar</button>
+					<span id="piano-hint" class="piano-hint"></span>
+				</div>
+				<div id="piano-scroll" class="piano-scroll">
+					<div id="piano-keys" class="piano-keys"></div>
+					<div id="piano-grid" class="piano-grid"></div>
+				</div>
+			</div>
 			<div class="splitter flyout-splitter" data-split="flyout" role="separator" aria-orientation="vertical" aria-label="Redimensionar lista de bloques" title="Redimensionar lista de bloques"></div>
 		</div>
 	</main>
@@ -85,6 +141,12 @@
 </div>
 </div>
 <input type="file" id="menu-import-file" accept="application/json,.json" hidden>
+<div id="sound-menu" class="menu-dropdown sound-menu" hidden>
+	<button type="button" class="menu-item" id="sound-menu-library">Importar de la libreria</button>
+	<div id="sound-library" hidden></div>
+	<button type="button" class="menu-item" id="sound-menu-upload">Subir archivo</button>
+</div>
+<input type="file" id="sound-file" accept=".brr" hidden>
 <div id="publish-modal" class="modal" hidden>
 	<div class="modal-card">
 		<div class="modal-title" id="publish-title">Publicar proyecto</div>

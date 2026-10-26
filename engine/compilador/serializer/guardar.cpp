@@ -1,7 +1,9 @@
 #include "serializer.h"
 #include "base64.h"
+#include "spc700/spc700.h"
 #include <cstdio>
 #include <json.hpp>
+#include <stdexcept>
 #include <unordered_map>
 
 using json = nlohmann::json;
@@ -94,8 +96,61 @@ std::string ExportarProyectoAString() {
 		Objetos[ObjetoActual.Nombre] = Nodo;
 	}
 
+	json Sonidos = json::object();
+	for(const auto &Sonido : SonidosProyecto) {
+		json Nodo;
+		Nodo["Datos"] = CodificarBase64(Sonido.Datos.data(), Sonido.Datos.size());
+		Nodo["PuntoLoop"] = Sonido.PuntoLoop;
+		Sonidos[Sonido.Nombre] = Nodo;
+	}
+
+	json Musica = json::object();
+	for(const auto &Mus : MusicasProyecto) {
+		json Instrumentos = json::object();
+		for(const auto &Inst : Mus.Instrumentos) {
+			if(Inst.Sonido < 0 || (size_t)Inst.Sonido >= SonidosProyecto.size()) {
+				throw std::runtime_error("instrumento sin sonido: " + Inst.Nombre);
+			}
+			json Item;
+			Item["Sonido"] = SonidosProyecto[(size_t)Inst.Sonido].Nombre;
+			Item["Frecuencia"] = Inst.Frecuencia;
+			Item["EsGain"] = Inst.EsGain;
+			Item["A"] = Inst.A;
+			Item["D"] = Inst.D;
+			Item["S"] = Inst.S;
+			Item["R"] = Inst.R;
+			Item["Gain"] = Inst.Gain;
+			Instrumentos[Inst.Nombre] = Item;
+		}
+		json Notas = json::object();
+		for(int Canal = 0; Canal < 8; Canal++) {
+			if(Mus.NotasCanal[Canal].empty()) {
+				continue;
+			}
+			json Lista = json::array();
+			for(const auto &Nota : Mus.NotasCanal[Canal]) {
+				if(Nota.Instrumento < 0 || (size_t)Nota.Instrumento >= Mus.Instrumentos.size()) {
+					throw std::runtime_error("nota sin instrumento");
+				}
+				json Item;
+				Item["Instrumento"] = Mus.Instrumentos[(size_t)Nota.Instrumento].Nombre;
+				Item["Nota"] = Nota.Nota;
+				Item["Posicion"] = Nota.Posicion;
+				Item["Duracion"] = Nota.Duracion;
+				Lista.push_back(std::move(Item));
+			}
+			Notas["Canal" + std::to_string(Canal + 1)] = std::move(Lista);
+		}
+		json Nodo;
+		Nodo["Instrumentos"] = std::move(Instrumentos);
+		Nodo["Notas"] = std::move(Notas);
+		Musica[Mus.Nombre] = std::move(Nodo);
+	}
+
 	json Raiz;
 	Raiz["Escenas"] = Escenas;
 	Raiz["Objetos"] = Objetos;
+	Raiz["Sonidos"] = Sonidos;
+	Raiz["Musica"] = Musica;
 	return Raiz.dump(1, '\t');
 }

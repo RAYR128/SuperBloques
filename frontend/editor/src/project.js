@@ -1,5 +1,7 @@
 import graficosHudDefectoUrl from "./defaults/GraficosHudDefecto.bin?inline";
 import paletaDefectoUrl from "./defaults/PaletaColoresDefecto.bin?inline";
+import {FRECUENCIA_C4} from "./musica/notas.js";
+import {SONIDOS_MAX} from "./sonido/brr.js";
 
 export const BLOB_SIZES = {
 	GraficosPrincipales: 32768,
@@ -74,15 +76,53 @@ export function crearObjeto() {
 	};
 }
 
+export function crearInstrumento(sonido) {
+	return {
+		Sonido: sonido,
+		Frecuencia: FRECUENCIA_C4,
+		EsGain: false,
+		A: 0,
+		D: 0,
+		S: 0,
+		R: 0,
+		Gain: 127,
+	};
+}
+
+export function crearMusica() {
+	return {
+		Instrumentos: {},
+		Notas: {},
+	};
+}
+
 export function proyectoPorDefecto() {
 	return {
 		Escenas: {Escena1: crearEscena()},
 		Objetos: {},
+		Sonidos: {},
+		Musica: {},
 	};
 }
 
+export function esEditorDeBloques(tipo) {
+	return tipo === "escena" || tipo === "objeto";
+}
+
 export function mapaDe(tipo) {
-	return tipo === "escena" ? state.proyecto.Escenas : state.proyecto.Objetos;
+	if (tipo === "escena") {
+		return state.proyecto.Escenas;
+	}
+	if (tipo === "objeto") {
+		return state.proyecto.Objetos;
+	}
+	if (tipo === "sonido") {
+		return state.proyecto.Sonidos;
+	}
+	if (tipo === "musica") {
+		return state.proyecto.Musica;
+	}
+	return {};
 }
 
 export function entidadActual() {
@@ -142,23 +182,138 @@ export function agregarObjeto() {
 	return nombre;
 }
 
+export function incorporarSonido(nombreInicial, datos, puntoLoop) {
+	if (Object.keys(state.proyecto.Sonidos).length >= SONIDOS_MAX) {
+		window.alert(`Maximo de ${SONIDOS_MAX} sonidos`);
+		return null;
+	}
+	const ocupados = new Set(Object.keys(state.proyecto.Sonidos));
+	let nombre = (nombreInicial || "").trim();
+	if (!nombre || ocupados.has(nombre)) {
+		nombre = pedirNombre("Nombre del sonido", ocupados);
+		if (!nombre) {
+			return null;
+		}
+	}
+	state.proyecto.Sonidos[nombre] = {Datos: datos, PuntoLoop: puntoLoop};
+	state.seleccion = {tipo: "sonido", nombre};
+	notify();
+	return nombre;
+}
+
+export function agregarMusica() {
+	const nombre = pedirNombre("Nombre de la musica", new Set(Object.keys(state.proyecto.Musica)));
+	if (!nombre) {
+		return null;
+	}
+	state.proyecto.Musica[nombre] = crearMusica();
+	state.seleccion = {tipo: "musica", nombre};
+	notify();
+	return nombre;
+}
+
+export function agregarInstrumento(musicaNombre) {
+	const musica = state.proyecto.Musica[musicaNombre];
+	if (!musica) {
+		return null;
+	}
+	const sonidos = Object.keys(state.proyecto.Sonidos);
+	if (!sonidos.length) {
+		window.alert("Agrega un sonido antes de crear un instrumento");
+		return null;
+	}
+	const nombre = pedirNombre("Nombre del instrumento", new Set(Object.keys(musica.Instrumentos)));
+	if (!nombre) {
+		return null;
+	}
+	musica.Instrumentos[nombre] = crearInstrumento(sonidos[0]);
+	notify();
+	return nombre;
+}
+
+export function eliminarInstrumento(musicaNombre, nombre) {
+	const musica = state.proyecto.Musica[musicaNombre];
+	if (!musica || !musica.Instrumentos[nombre]) {
+		return false;
+	}
+	if (instrumentoEnUso(musicaNombre, nombre)) {
+		window.alert(`No se puede eliminar el instrumento "${nombre}" porque esta en uso`);
+		return false;
+	}
+	if (!window.confirm(`Eliminar instrumento "${nombre}"?`)) {
+		return false;
+	}
+	delete musica.Instrumentos[nombre];
+	notify();
+	return true;
+}
+
+export function insertarNota(musicaNombre, canal, nota) {
+	const musica = state.proyecto.Musica[musicaNombre];
+	if (!musica) {
+		return -1;
+	}
+	if (!musica.Notas[canal]) {
+		musica.Notas[canal] = [];
+	}
+	musica.Notas[canal].push(nota);
+	notify();
+	return musica.Notas[canal].length - 1;
+}
+
+export function cambiarDuracionNota(musicaNombre, canal, indice, duracion) {
+	const nota = state.proyecto.Musica[musicaNombre]?.Notas?.[canal]?.[indice];
+	if (!nota) {
+		return;
+	}
+	nota.Duracion = duracion;
+	notify();
+}
+
+export function eliminarNota(musicaNombre, canal, indice) {
+	const lista = state.proyecto.Musica[musicaNombre]?.Notas?.[canal];
+	if (!lista || indice < 0 || indice >= lista.length) {
+		return false;
+	}
+	lista.splice(indice, 1);
+	notify();
+	return true;
+}
+
+const ORDEN_LISTAS = ["escena", "objeto", "sonido", "musica"];
+
 function siguienteSeleccion(tipo, nombre) {
 	const propio = Object.keys(mapaDe(tipo)).filter((n) => n !== nombre);
 	if (propio.length) {
 		return {tipo, nombre: propio[0]};
 	}
-	const otroTipo = tipo === "escena" ? "objeto" : "escena";
-	const otro = Object.keys(mapaDe(otroTipo));
-	if (otro.length) {
-		return {tipo: otroTipo, nombre: otro[0]};
+	for (const otroTipo of ORDEN_LISTAS) {
+		if (otroTipo === tipo) {
+			continue;
+		}
+		const otro = Object.keys(mapaDe(otroTipo));
+		if (otro.length) {
+			return {tipo: otroTipo, nombre: otro[0]};
+		}
 	}
 	return null;
 }
 
+const ETIQUETAS = {
+	escena: "escena",
+	objeto: "objeto",
+	sonido: "sonido",
+	musica: "musica",
+};
+
 export function eliminarEntidad(tipo, nombre) {
-	const etiqueta = tipo === "escena" ? "escena" : "objeto";
+	const etiqueta = ETIQUETAS[tipo] ?? tipo;
 	if (tipo === "escena" && escenaEnUso(nombre)) {
 		window.alert(`No se puede eliminar la escena "${nombre}" porque esta en uso`);
+		return false;
+	}
+	if (tipo === "sonido" && sonidoEnUso(nombre)) {
+		window.alert(`No se puede eliminar el sonido "${nombre}" porque esta en uso`);
 		return false;
 	}
 	if (!window.confirm(`Eliminar ${etiqueta} "${nombre}"?`)) {
@@ -265,7 +420,36 @@ export function escenaEnUso(nombre) {
 	return false;
 }
 
+export function sonidoEnUso(nombre) {
+	for (const musica of Object.values(state.proyecto.Musica)) {
+		for (const instrumento of Object.values(musica.Instrumentos || {})) {
+			if (instrumento.Sonido === nombre) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+export function instrumentoEnUso(musicaNombre, nombre) {
+	const musica = state.proyecto.Musica[musicaNombre];
+	if (!musica) {
+		return false;
+	}
+	for (const canal of Object.values(musica.Notas || {})) {
+		for (const nota of canal) {
+			if (nota.Instrumento === nombre) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 export function guardarBloquesActuales(bloques) {
+	if (!esEditorDeBloques(state.seleccion?.tipo)) {
+		return;
+	}
 	const entidad = entidadActual();
 	if (!entidad) {
 		return;
@@ -274,13 +458,17 @@ export function guardarBloquesActuales(bloques) {
 }
 
 function primeraSeleccion(proyecto) {
-	const escenas = Object.keys(proyecto.Escenas);
-	if (escenas.length) {
-		return {tipo: "escena", nombre: escenas[0]};
-	}
-	const objetos = Object.keys(proyecto.Objetos);
-	if (objetos.length) {
-		return {tipo: "objeto", nombre: objetos[0]};
+	const mapas = [
+		["escena", proyecto.Escenas],
+		["objeto", proyecto.Objetos],
+		["musica", proyecto.Musica],
+		["sonido", proyecto.Sonidos],
+	];
+	for (const [tipo, mapa] of mapas) {
+		const nombres = Object.keys(mapa || {});
+		if (nombres.length) {
+			return {tipo, nombre: nombres[0]};
+		}
 	}
 	return null;
 }

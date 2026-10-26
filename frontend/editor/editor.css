@@ -25,6 +25,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+[hidden] { display: none !important; }
+
 html, body {
 	height: 100%;
 	background: var(--bg);
@@ -322,6 +324,22 @@ body.col-resizing .injectionDiv {
 }
 
 .dot.scene { background: #59c059; }
+.dot.sound { background: #cf63cf; }
+.dot.music { background: #ffbf00; }
+
+.sound-menu {
+	position: fixed;
+	top: auto;
+	left: auto;
+	z-index: 50;
+}
+
+#sound-library {
+	display: flex;
+	flex-direction: column;
+	margin: 2px 0 2px 8px;
+	border-left: 1px solid var(--border);
+}
 
 /* categorias; el flyout de Blockly vive en el workspace */
 .blocks-panel {
@@ -614,4 +632,230 @@ body.col-resizing .injectionDiv {
 	border-color: var(--accent);
 	color: #0b0d12;
 	font-weight: 700;
+}
+
+.instruments-panel {
+	width: 280px;
+	flex-shrink: 0;
+	border-right: 1px solid var(--border);
+}
+
+.instruments-panel .panel-title {
+	justify-content: space-between;
+}
+
+.instrument-list {
+	overflow: auto;
+	max-height: 180px;
+	padding: 6px;
+}
+
+.instrument-empty {
+	color: var(--muted);
+	font-size: 12px;
+	padding: 8px;
+}
+
+.instrument-item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border: none;
+	background: transparent;
+	color: var(--text);
+	font: inherit;
+	text-align: left;
+	padding: 6px 8px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.instrument-item:hover { background: var(--hover); }
+.instrument-item.active { background: #243056; }
+
+.instrument-swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	flex-shrink: 0;
+}
+
+.instrument-form {
+	overflow: auto;
+	padding: 8px 10px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.instrument-form label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.instrument-form select,
+.instrument-form input[type="number"] {
+	background: var(--panel-2);
+	border: 1px solid var(--border);
+	color: var(--text);
+	font: inherit;
+	padding: 5px 6px;
+	border-radius: 4px;
+	width: 100%;
+}
+
+.instrument-check {
+	flex-direction: row !important;
+	align-items: center;
+	gap: 8px;
+	color: var(--text);
+}
+
+.instrument-check input { width: auto; }
+
+.instrument-adsr { display: flex; flex-direction: column; gap: 8px; }
+
+.instrument-remove {
+	border: 1px solid var(--border);
+	background: transparent;
+	color: var(--text);
+	font: inherit;
+	font-size: 12px;
+	padding: 6px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.workspace-body[data-modo="sonido"] #blocklyDiv,
+.workspace-body[data-modo="sonido"] .flyout-splitter,
+.workspace-body[data-modo="musica"] #blocklyDiv,
+.workspace-body[data-modo="musica"] .flyout-splitter {
+	display: none;
+}
+
+.sound-detail {
+	height: 100%;
+	padding: 16px 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	color: var(--text);
+}
+
+.sound-name {
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.piano {
+	height: 100%;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	user-select: none;
+}
+
+.piano-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	border-bottom: 1px solid var(--border);
+	flex-shrink: 0;
+}
+
+.piano-channels { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.piano-channel,
+#piano-delete {
+	border: 1px solid var(--border);
+	background: var(--panel-2);
+	color: var(--text);
+	font: inherit;
+	font-size: 12px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.piano-channel.active {
+	background: #243056;
+	border-color: var(--accent);
+}
+
+.piano-hint {
+	color: var(--muted);
+	font-size: 12px;
+}
+
+.piano-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	display: flex;
+	background: #10141c;
+}
+
+.piano-keys {
+	position: sticky;
+	left: 0;
+	z-index: 2;
+	width: 64px;
+	flex-shrink: 0;
+	background: #10141c;
+	border-right: 1px solid var(--border);
+}
+
+.piano-key,
+.piano-row {
+	height: 18px;
+	box-sizing: border-box;
+	border-bottom: 1px solid #1c2330;
+	font-size: 10px;
+	line-height: 18px;
+	padding: 0 6px;
+	color: var(--muted);
+}
+
+.piano-key.sharp,
+.piano-row.sharp { background: #181e2a; }
+
+.piano-grid {
+	position: relative;
+	flex: none;
+}
+
+.piano-row {
+	position: absolute;
+	left: 0;
+	right: 0;
+	padding: 0;
+}
+
+.piano-note {
+	position: absolute;
+	border-radius: 3px;
+	box-sizing: border-box;
+	border: 1px solid rgba(0, 0, 0, 0.35);
+	z-index: 1;
+	cursor: pointer;
+}
+
+.piano-note.selected {
+	outline: 2px solid #fff;
+	z-index: 2;
+}
+
+.piano-note-handle {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 8px;
+	height: 100%;
+	cursor: ew-resize;
+	background: rgba(255, 255, 255, 0.28);
 }

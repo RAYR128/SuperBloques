@@ -23,80 +23,90 @@ void RutinaInicializarAudioSPC700();
 
 // Comandos para SFX / Musica
 enum ComandosAudio : uint8_t {
-    SB_ACMD_FINAL_DE_CANAL = 0x00,
-    SB_ACMD_DURACION = 0x01, // 0x01-0x7F
-    SB_ACMD_NOTA = 0x80, // 0x80-0xEF, se le resta 0x80
-    
-    // Notas de percusion, es el equivalente de SB_ACMD_INSTRUMENTO - 0xF0 + C-4
-    SB_ACMD_PERC_1 = 0xF0,
-    SB_ACMD_PERC_2 = 0xF1,
-    SB_ACMD_PERC_3 = 0xF2,
-    SB_ACMD_PERC_4 = 0xF3,
-    SB_ACMD_PERC_5 = 0xF4,
-    SB_ACMD_PERC_6 = 0xF5,
-    SB_ACMD_PERC_7 = 0xF6,
-    SB_ACMD_PERC_8 = 0xF7,
-    SB_ACMD_PERC_9 = 0xF8,
-    SB_ACMD_PERC_10 = 0xF9,
-    SB_ACMD_PERC_11 = 0xFA,
-    SB_ACMD_PERC_12 = 0xFB,
+	SB_ACMD_FINAL_DE_CANAL = 0x00,
+	SB_ACMD_DURACION = 0x01, // 0x01-0x7F
+	SB_ACMD_NOTA = 0x80,	 // 0x80-0xEF, se le resta 0x80
 
-    // Comandos de control de audio
-    SB_ACMD_INSTRUMENTO = 0xFC, // 2 bytes, 0xFC + 0x00-0xFF = instrumento
-    SB_ACMD_CONTROL = 0xFD, // 2...+ bytes, 0xFD + 0x00-0xFF + ....
-    SB_ACMD_SILENCIO = 0xFE,
-    SB_ACMD_REST = 0xFF
+	// Notas de percusion, es el equivalente de SB_ACMD_INSTRUMENTO - 0xF0 + C-4
+	SB_ACMD_PERC_1 = 0xF0,
+	SB_ACMD_PERC_2 = 0xF1,
+	SB_ACMD_PERC_3 = 0xF2,
+	SB_ACMD_PERC_4 = 0xF3,
+	SB_ACMD_PERC_5 = 0xF4,
+	SB_ACMD_PERC_6 = 0xF5,
+	SB_ACMD_PERC_7 = 0xF6,
+	SB_ACMD_PERC_8 = 0xF7,
+	SB_ACMD_PERC_9 = 0xF8,
+	SB_ACMD_PERC_10 = 0xF9,
+	SB_ACMD_PERC_11 = 0xFA,
+	SB_ACMD_PERC_12 = 0xFB,
+
+	// Comandos de control de audio
+	SB_ACMD_INSTRUMENTO = 0xFC, // 2 bytes, 0xFC + 0x00-0xFF = instrumento
+	SB_ACMD_CONTROL = 0xFD,		// 2...+ bytes, 0xFD + 0x00-0xFF + ....
+	SB_ACMD_SILENCIO = 0xFE,
+	SB_ACMD_REST = 0xFF
 };
 
 enum ListaPointers : uint8_t {
-    SB_APTR_DRIVER_AUDIO = 0x00,
-    SB_APTR_DRIVER_SRCN = 0x01,
-    SB_APTR_DRIVER_SAMPLES = 0x02,
-    SB_APTR_DRIVER_MUSICA = 0x03
+	SB_APTR_DRIVER_AUDIO = 0x00,
+	SB_APTR_DRIVER_SRCN = 0x01,
+	SB_APTR_DRIVER_SAMPLES = 0x02,
+	SB_APTR_DRIVER_MUSICA = 0x03
 };
 
 // Clases para almacenar los datos de audio del proyecto
 class SonidoProyecto {
-public:
-    std::string Nombre;
+  public:
+	std::string Nombre;
 
-    // Exactamente 9 bytes por cada bloque BRR
-    // PuntoLoop es multiplo de 9
-    std::vector<uint8_t> Datos;
-    uint16_t PuntoLoop;
+	// Exactamente 9 bytes por cada bloque BRR
+	// PuntoLoop es multiplo de 9
+	std::vector<uint8_t> Datos;
+	uint16_t PuntoLoop;
 };
 
 class InstrumentoMusica {
-public:
-    std::string Nombre;
+  public:
+	std::string Nombre;
 
-    // Referencia a un sonido de la lista de sonidos del proyecto
-    int Sonido;
-    uint8_t ADSR[3];
-    uint16_t Frecuencia;
+	// Indice en SonidosProyecto. El JSON guarda el nombre.
+	int Sonido = -1;
+	bool EsGain = false;
+	uint8_t A = 0;
+	uint8_t D = 0;
+	uint8_t S = 0;
+	uint8_t R = 0;
+	uint8_t Gain = 127;
+	uint16_t Frecuencia = 0x0300;
+
+	// ADSR[0] = (EsGain ? 0x80 : 0x00) + D * 0x10 + A
+	// ADSR[1] = S * 0x20 + R
+	// ADSR[2] = EsGain ? Gain : 0x7F
+	void EmpaquetarADSR(uint8_t Salida[3]) const;
 };
 
 class NotaMusica {
-public:
-    // Referencia a un instrumento de la lista de instrumentos del proyecto
-    int Instrumento;
+  public:
+	// Referencia a un instrumento de la lista de instrumentos del proyecto
+	int Instrumento;
 
-    // 0x00-0x7F: Notas normales, 0x80-0xFF: Notas de percusion (solo 12)
-    uint8_t Nota;
-    int Posicion;
-    int Duracion;
+	// 0-111 en el proyecto. El driver acepta 0x00-0x7F como nota.
+	uint8_t Nota;
+	int Posicion;
+	int Duracion;
 };
 
 class MusicaProyecto {
-public:
-    std::string Nombre;
-    std::vector<uint8_t> DatosCanal[8];
-    std::vector<NotaMusica> NotasCanal[8];
-    std::vector<uint8_t> GeneracionFinal;
-    std::vector<InstrumentoMusica> Instrumentos;
+  public:
+	std::string Nombre;
+	std::vector<uint8_t> DatosCanal[8];
+	std::vector<NotaMusica> NotasCanal[8];
+	std::vector<uint8_t> GeneracionFinal;
+	std::vector<InstrumentoMusica> Instrumentos;
 
-    void Ensamblar();
-    int Generar(int InicioDatos);
+	void Ensamblar();
+	int Generar(int InicioDatos);
 };
 
 extern std::vector<SonidoProyecto> SonidosProyecto;
