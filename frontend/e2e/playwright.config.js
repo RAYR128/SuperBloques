@@ -14,7 +14,7 @@ export default defineConfig({
 		screenshot: "only-on-failure",
 	},
 	webServer: {
-		command: "bash ./servidor.sh",
+		command: "node ./servidor.js",
 		url: "http://127.0.0.1:8099/api/health",
 		timeout: 120_000,
 		reuseExistingServer: false,

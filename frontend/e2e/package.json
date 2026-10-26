@@ -4,12 +4,19 @@
 	"type": "module",
 	"packageManager": "pnpm@11.1.2",
 	"scripts": {
-		"pretest": "pnpm --dir ../editor build",
+		"build:editor": "pnpm --dir ../editor build",
+		"pretest": "pnpm run build:editor",
+		"pretest:headed": "pnpm run build:editor",
+		"pretest:ui": "pnpm run build:editor",
 		"test": "playwright test",
+		"test:headed": "playwright test --headed",
 		"test:ui": "playwright test --ui",
 		"browsers": "playwright install chromium"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.55.0"
+	},
+	"dependencies": {
+		"playwright": "^1.64.1"
 	}
 }
