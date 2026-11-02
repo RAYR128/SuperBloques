@@ -20,6 +20,7 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	// Rutina de subida de datos al SPC700
 	cc.Etiqueta("SUBIR_DATOS_SPC700");
 	cc.Empujar(REG_FLAGS);
+	cc.Etiqueta("SUBIR_DATOS_SPC700_COMIENZO");
 	cc.LimpiarFlags(FLAG_M_8BIT | FLAG_X_8BIT);
 	cc.CargarRegConst16(REG_Y, 0x0000);
 	cc.CargarRegConst16(REG_A, 0xBBAA);
@@ -102,6 +103,26 @@ void CrearCodigoDriverSPC700(std::vector<BloqueDato> &Datos) {
 	cc.Etiqueta("SUBIR_DATOS_SPC700_ESPERAR_SALTO");
 	cc.CompararAcumuladorMemoria(HW_APUIO0);
 	cc.Branch("SUBIR_DATOS_SPC700_ESPERAR_SALTO", BRANCH_ZERO_CLEAR);
+
+	// Aqui revisamos si hay que subir un siguiente bloque. Si el tamaño del bloque es 0, salimos de la rutina. Si no, subimos el siguiente bloque.
+	// Nota que por ahora para que esto funcione, es necesario que WRAM_SPC_ARAM_SALTO sea 0xFFC0 (ROM IPL), o si no no correra
+	// Incrementar pointer y repetir
+	cc.Etiqueta("SUBIR_DATOS_SPC700_REVISAR_SIGUIENTE_BLOQUE");
+	cc.LimpiarFlags(FLAG_M_8BIT);
+
+	// Incrementar puntero de bloque
+	cc.CargarRegEnMemoria(REG_A, WRAM_SPC_PTR_BLOQUE);
+	cc.LimpiarFlags(FLAG_CARRYF);
+	cc.SumaAcumuladorMemoria(WRAM_SPC_TAMANO);
+	cc.SumaAcumuladorConst16(4); // +4 para saltar al siguiente bloque (tamaño + direccion)
+	cc.AlmacenarRegEnMemoria(REG_A, WRAM_SPC_PTR_BLOQUE);
+
+	// Leer el tamaño del siguiente bloque. Si es 0, salir de la rutina.
+	cc.CargarAcumuladorIndirectoLargo(WRAM_SPC_PTR_BLOQUE);
+	cc.BranchLong("SUBIR_DATOS_SPC700_COMIENZO", BRANCH_ZERO_CLEAR);
+	cc.SetearFlags(FLAG_M_8BIT);
+
+	// Fin de la rutina de subida de datos al SPC700
 	cc.Sacar(REG_FLAGS);
 	cc.ReturnLong();
 

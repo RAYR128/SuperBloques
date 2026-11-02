@@ -358,6 +358,15 @@ void Emitidor65816::CargarRegEnMemoria_IndY(Registers reg, uint32_t addrHw) {
 	}
 }
 
+void Emitidor65816::CargarAcumuladorIndirectoLargo(uint32_t addrHw) {
+	uint32_t dp = addrHw - WRAM_DIRECTPAGE;
+	if(dp >= 0x100) {
+		throw std::runtime_error("CargarAcumuladorIndirectoLargo: direccion fuera de la pagina directa");
+	}
+	EmitirByte(OP_LDA_DPIL);
+	EmitirByte((uint8_t)dp);
+}
+
 void Emitidor65816::CargarAcumuladorIndirectoLargo_IndY(uint32_t addrHw) {
 	uint32_t dp = addrHw - WRAM_DIRECTPAGE;
 	if(dp >= 0x100) {
