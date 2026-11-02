@@ -11,7 +11,8 @@
 !EstadoEjecucion = $04
 !CanalEncenderLatch = $05
 
-!TablaInstrumento = $06
+;cuando la cancion se inicializa, esto contiene el pointer de los canales de la cancion, despues se le suma 16
+!TablaDatosMusica = $06
 
 !CanalActual = $08
 !CanalActualBflag = $09
@@ -27,31 +28,28 @@
 !ValorTemporalC = $0E
 !ValorTemporalD = $0F
 
-;usamos indices interleaved
-;existen 8 canales, usamos x * 2 para acceder a canales
-;por lo tanto $00-$0E es usado y $01-$0F respectivamente
-!VolumenCanalL = $10
-!VolumenCanalR = $11
-
 ;tics
-!TicCountActualCanal = $20
-!TicCountSiguienteCanal = $21
+!TicCountActualCanal = $10
+!TicCountSiguienteCanal = $11
 
 ;16-bit: puntero del canal actual.
-!PunteroDatosCanal1 = $30
-!PunteroDatosCanal2 = $31
+!PunteroDatosCanal1 = $20
+!PunteroDatosCanal2 = $21
 
 ;16-bit: puntero de inicio del canal.
-!PunteroComienzoCanal1 = $40
-!PunteroComienzoCanal2 = $41
+!PunteroComienzoCanal1 = $30
+!PunteroComienzoCanal2 = $31
 
 ;16-bit: frecuencia del instrumento actual.
-!FrecuenciaInstrumentoSub = $50
-!FrecuenciaInstrumentoHi = $51
+!FrecuenciaInstrumentoSub = $40
+!FrecuenciaInstrumentoHi = $41
 
 ;16-bit: Nota actual del canal.
-!SubNotaActualCanal = $60
-!NotaActualCanal = $61
+!SubNotaActualCanal = $50
+!NotaActualCanal = $51
+
+;puntero musica
+!PunteroMusica = $01FE
 
 ;el programa comienza en 0x0200
 ;vamos a utilizar 0x100-0x1FF para SRCN
@@ -75,26 +73,42 @@ InicializarDsp:
 	;resetear puertos input y correr timer 0, IPL visible
 	mov $f1, #$b1
 InicializarCancion:
-	;-------------------------------TO-DO: cuando se añada codigo para hacer uploads actual hay que reemplazar esto!!!------------------------------
-	mov !TablaInstrumento, #DatosInstrumento&$FF
-	mov !TablaInstrumento+1, #DatosInstrumento>>8
-
+	;to-do: convertir esto a una rutina dedicada
 	;datos de prueba
 	mov !TempoMusica, #$30
 
+	;leer puntero
+	mov a, !PunteroMusica
+	mov !TablaDatosMusica, a
+	mov a, !PunteroMusica+1
+	mov !TablaDatosMusica+1, a
+
 	;inicializar los 8 canales
-	mov x, #$0F
+	mov y, #$0F
 LoopInitCanal:
-	mov a, DatosMusica+x
-	mov !PunteroDatosCanal1+x, a
-	mov !PunteroComienzoCanal1+x, a
-	dec x : bpl LoopInitCanal
+	mov a, (!TablaDatosMusica)+y
+	mov !PunteroDatosCanal1+y, a
+	mov !PunteroComienzoCanal1+y, a
+	dec y : bpl LoopInitCanal
+
+	;ahora el puntero va a quedar apuntando en los datos de instrumento
+	mov a, !TablaDatosMusica : clrc : adc a, #$10 : mov !TablaDatosMusica, a
+	mov a, !TablaDatosMusica+1 : adc a, #$00 : mov !TablaDatosMusica+1, a
 
 	;dp
 	mov x, #$0E
 LoopInitParCanal:
-	mov a, #$00 : call CambiarInstrumentoCanal
-	mov a, #$40 : mov !VolumenCanalL+x, a : mov !VolumenCanalR+x, a
+	mov a, #$01 : mov !TicCountActualCanal+y, a : dec a : call CambiarInstrumentoCanal
+	
+	;volumen
+	mov a, x
+	xcn a
+	lsr a
+	mov $f2, a
+	mov $f3, #$40
+	inc $f2
+	mov $f3, #$40
+	;mov a, #$40 : mov !VolumenCanalL+x, a : mov !VolumenCanalR+x, a
 	dec x : dec x : bpl LoopInitParCanal
 
 	;------------------------------------------------------------------------------------------------------------------------------------------------
@@ -220,7 +234,7 @@ ret
 CambiarInstrumentoCanal:
 	mov y, #$06
 	mul ya
-	addw ya, !TablaInstrumento
+	addw ya, !TablaDatosMusica
 	movw !ValorTemporalA, ya
 
 	;deberiamos tener el registro DSP correcto para el instrumento actual.
@@ -340,33 +354,3 @@ Comando0VolumenCanal:
 	call LeerByteComandoCanal
 	mov $f2, a
 ret
-
-;datos musica
-;-------------------------------TO-DO: cuando se añada codigo para hacer uploads actual hay que reemplazar esto!!!------------------------------
-;estos son datos de ejemplo.
-;8 punteros (16-bit) para pointers para cada canal
-DatosMusica:
-	dw DatosTestCanal1
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-	dw DatosTestCanalVacio
-
-;formato
-;sample, adsr 1/2/3, frecuencia (LE)
-DatosInstrumento:
-	db $00,$8f,$e0,$7f : dw $0300
-
-DatosTestCanal1:
-	db $FD,$00,$20,$20
-	db $20,$94
-	db $20,$A4
-	db $20,$B4
-	db $00
-
-DatosTestCanalVacio:
-	db $60,$FF
-	db $00
