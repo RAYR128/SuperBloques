@@ -10,6 +10,8 @@
 std::vector<InstrumentoMusica> InstrumentosProyecto;
 std::vector<SonidoProyecto> SonidosProyecto;
 std::vector<MusicaProyecto> MusicasProyecto;
+std::vector<uint8_t> SRCN;
+std::vector<uint8_t> DatosSamples;
 
 void InstrumentoMusica::EmpaquetarADSR(uint8_t Salida[3]) const {
 	Salida[0] = (uint8_t)((EsGain ? 0x80 : 0x00) + (D * 0x10) + A);
@@ -315,10 +317,10 @@ void InstalarStubMusica() {
 	inst.Gain = 0x7F;
 	inst.Frecuencia = 0x0300;
 	m.Instrumentos.push_back(inst);
-	m.NotasCanal[0].push_back({0, 0x2C, 0, 32});
-	m.NotasCanal[0].push_back({0, 0x3C, 32, 32});
-	m.NotasCanal[0].push_back({0, 0x4C, 64, 32});
-	m.NotasCanal[0].push_back({0, 0x5C, 96, 32});
+	m.NotasCanal[0].push_back({0, 0x0C, 0, 32});
+	m.NotasCanal[0].push_back({0, 0x1C, 32, 32});
+	m.NotasCanal[0].push_back({0, 0x2C, 64, 32});
+	m.NotasCanal[0].push_back({0, 0x3C, 96, 32});
 	MusicasProyecto.push_back(m);
 }
 
@@ -331,8 +333,8 @@ void EnsamblarDatosMusicaSPC700(int Posicion, std::vector<BloqueDato> &Datos) {
 	int ptrMusica = Posicion;
 
 	// La tabla SRCN es una tabla conteniendo 2 pointers LE para cada sample
-	std::vector<uint8_t> SRCN;
-	std::vector<uint8_t> DatosSamples;
+	SRCN.clear();
+	DatosSamples.clear();
 	for(size_t sample = 0; sample < SonidosProyecto.size(); sample++) {
 		const SonidoProyecto &snd = SonidosProyecto[sample];
 		if(snd.Datos.size() % 9 != 0) {
