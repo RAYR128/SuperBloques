@@ -121,7 +121,7 @@ function refreshFlyout() {
 function selKey() {
 	const sel = state.seleccion;
 	const gen = state.generation ?? 0;
-	return sel ? `${gen}:${sel.tipo}:${sel.nombre}` : `${gen}:`;
+	return sel ? `${gen}:${sel.tipo}:${sel.nombre}:${sel.gfx ?? ""}` : `${gen}:`;
 }
 
 function refreshDropdownField(fieldName) {

@@ -520,7 +520,14 @@ export function parsearProyecto(texto) {
 
 	const sonidos = parsearSonidos(objetoOVacio(raiz, "Sonidos"));
 	const musica = parsearMusica(objetoOVacio(raiz, "Musica"), sonidos);
-	const proyecto = {Escenas: escenas, Objetos: objetos, Sonidos: sonidos, Musica: musica};
+	const proyecto = {
+		Escenas: escenas,
+		Objetos: objetos,
+		Sonidos: sonidos,
+		Musica: musica,
+		GraficosObjetos: parsearBlob(raiz, "GraficosObjetos", BLOB_SIZES.GraficosObjetos),
+		PaletaObjetos: parsearBlob(raiz, "PaletaObjetos", BLOB_SIZES.PaletaObjetos),
+	};
 	validarEscenasReferenciadas(proyecto);
 	return proyecto;
 }

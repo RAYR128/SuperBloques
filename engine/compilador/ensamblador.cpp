@@ -26,6 +26,22 @@ void ConRegALlamarJumpTable(std::string tabla) {
 	cc.LlamadaLong("CALL_DYNAMIC_POSITION");
 }
 
+// Setear HW_DMAADDR, tener A en 16-bit
+void RealizarDMA(uint16_t size, uint16_t comando = uint16_t((HW_VMDATA << 8) | HW_DMA_2Byte2Addr)) {
+	// Parametros de DMA
+	cc.CargarRegConst16(REG_A, comando);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAPARAM);
+
+	cc.CargarRegConst16(REG_A, size);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);
+
+	// Comenzar DMA
+	cc.SetearFlags(FLAG_M_8BIT);
+	cc.CargarRegConst8(REG_A, 1);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
+	cc.LimpiarFlags(FLAG_M_8BIT);
+}
+
 // VRAM
 void ConRegACrearDMAVramConTablaDinamica(std::string tabla, uint16_t size, uint16_t comando = uint16_t((HW_VMDATA << 8) | HW_DMA_2Byte2Addr)) {
 	// X = A * 3;
@@ -41,17 +57,7 @@ void ConRegACrearDMAVramConTablaDinamica(std::string tabla, uint16_t size, uint1
 	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 1);
 
 	// Parametros de DMA
-	cc.CargarRegConst16(REG_A, comando);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAPARAM);
-
-	cc.CargarRegConst16(REG_A, size);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_DMACNT);
-
-	// Comenzar DMA
-	cc.SetearFlags(FLAG_M_8BIT);
-	cc.CargarRegConst8(REG_A, 1);
-	cc.AlmacenarRegEnMemoria(REG_A, HW_MDMAEN);
-	cc.LimpiarFlags(FLAG_M_8BIT);
+	RealizarDMA(size, comando);
 }
 
 void SubirGraficosEscena(std::string tabla, uint16_t vram, uint16_t size) {
@@ -194,7 +200,19 @@ void RutinaControlEscena() {
 	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD + 1);
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
 	cc.ANDAcumuladorConst16(0x00FF);
-	ConRegACrearDMAVramConTablaDinamica("TABLA_DATOS_Paleta", 512, (HW_WMDATA << 8) | HW_DMA_1Byte1Addr);
+	ConRegACrearDMAVramConTablaDinamica("TABLA_DATOS_Paleta", 256, (HW_WMDATA << 8) | HW_DMA_1Byte1Addr);
+
+	// Subir paleta objetos
+	cc.Etiqueta("SUBIR_PALETA_OBJETOS");
+	cc.CargarRegConst16(REG_A, (WRAM_PALETA + 256));
+	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD);
+	cc.CargarRegConst16(REG_A, (WRAM_PALETA + 256) >> 8);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_WMADD + 1);
+	cc.CargarRegConst16Label(REG_A, "DATO_PaletaObjetos");
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR);
+	cc.CargarRegConst16Label(REG_A, "DATO_PaletaObjetos", 8);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 1);
+	RealizarDMA(256, (HW_WMDATA << 8) | HW_DMA_1Byte1Addr);
 
 	// Ahora llamamos a la rutina de init de la escena actual.
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
@@ -518,6 +536,8 @@ void EnsamblarROM() {
 	if(cc.ObtenerPC() >= ((uint32_t)BANCO_DATOS_PRIMERO << 15)) {
 		throw std::runtime_error("el codigo ocupa bancos de datos $10-$3F");
 	}
+	datos.push_back({"DATO_GraficosObjetos", GraficosObjetos, (uint32_t)sizeof(GraficosObjetos)});
+	datos.push_back({"DATO_PaletaObjetos", PaletaObjetos, (uint32_t)sizeof(PaletaObjetos)});
 	EmpaquetarDatosROM(std::move(datos));
 
 	// Finalizar ROM

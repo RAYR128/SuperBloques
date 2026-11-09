@@ -402,8 +402,15 @@ void CargarProyectoDesdeString(std::string JSONStr) {
 		NuevosObjetos.push_back(std::move(Actual));
 	}
 
+	uint8_t NuevosGraficos[sizeof(GraficosObjetos)];
+	uint8_t NuevaPaleta[sizeof(PaletaObjetos)];
+	CargarBlob(Raiz, "GraficosObjetos", NuevosGraficos, sizeof(NuevosGraficos));
+	CargarBlob(Raiz, "PaletaObjetos", NuevaPaleta, sizeof(NuevaPaleta));
+
 	EscenasProyecto = std::move(NuevasEscenas);
 	ObjetosProyecto = std::move(NuevosObjetos);
 	SonidosProyecto = std::move(NuevosSonidos);
 	MusicasProyecto = std::move(NuevasMusicas);
+	std::memcpy(GraficosObjetos, NuevosGraficos, sizeof(GraficosObjetos));
+	std::memcpy(PaletaObjetos, NuevaPaleta, sizeof(PaletaObjetos));
 }

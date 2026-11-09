@@ -4,6 +4,8 @@
 
 std::vector<Escena> EscenasProyecto;
 std::vector<ObjetoEscena> ObjetosProyecto;
+uint8_t GraficosObjetos[TILE_SIZE_4BPP * 0x200];
+uint8_t PaletaObjetos[256];
 
 void CompilarBloquesBhv(std::string init, std::string main, std::string identificador, std::vector<NodoBloque> &lista, ContextoCompilacion contexto) {
 	// Iniciar contexto

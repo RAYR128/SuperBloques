@@ -215,6 +215,54 @@ void Emitidor65816::CargarRegConst16(Registers reg, uint16_t valor) {
 	}
 }
 
+void Emitidor65816::CargarRegConst8Label(Registers reg, std::string label, uint8_t shift) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_IMMM);
+		break;
+	case REG_X:
+		EmitirByte(OP_LDX_IMMX);
+		break;
+	case REG_Y:
+		EmitirByte(OP_LDY_IMMX);
+		break;
+	default:
+		throw std::runtime_error("CargarRegConst8Label: Register invalido");
+		break;
+	}
+	ReferenciaCodigo ref;
+	ref.nombre = label;
+	ref.shift = shift;
+	ref.tipo = REF_SHORT;
+	ref.direccion = PC;
+	referencias.push_back(ref);
+	EmitirByte(0x00);
+}
+
+void Emitidor65816::CargarRegConst16Label(Registers reg, std::string label, uint8_t shift) {
+	switch(reg) {
+	case REG_A:
+		EmitirByte(OP_LDA_IMMM);
+		break;
+	case REG_X:
+		EmitirByte(OP_LDX_IMMX);
+		break;
+	case REG_Y:
+		EmitirByte(OP_LDY_IMMX);
+		break;
+	default:
+		throw std::runtime_error("CargarRegConst16Label: Register invalido");
+		break;
+	}
+	ReferenciaCodigo ref;
+	ref.nombre = label;
+	ref.shift = shift;
+	ref.tipo = REF_ABSOLUTE;
+	ref.direccion = PC;
+	referencias.push_back(ref);
+	EmitirPalabra(0x00);
+}
+
 void Emitidor65816::SumaAcumuladorConst8(uint8_t valor) {
 	EmitirByte(OP_ADC_IMMM);
 	EmitirByte(valor);
@@ -515,9 +563,10 @@ void Emitidor65816::Etiqueta(std::string nombre) {
 	etiquetas.push_back(l);
 }
 
-void Emitidor65816::CrearReferencia(std::string label, TipoReferencia tipo) {
+void Emitidor65816::CrearReferencia(std::string label, TipoReferencia tipo, uint8_t shift) {
 	ReferenciaCodigo ref;
 	ref.nombre = label;
+	ref.shift = shift;
 	ref.tipo = tipo;
 	ref.direccion = PC;
 	referencias.push_back(ref);
@@ -593,6 +642,7 @@ void Emitidor65816::Branch(std::string label, TipoBranch tipo) {
 	}
 	ReferenciaCodigo ref;
 	ref.nombre = label;
+	ref.shift = 0;
 	ref.tipo = REF_BRANCH;
 	ref.direccion = PC;
 	referencias.push_back(ref);
@@ -685,12 +735,19 @@ void Emitidor65816::ResolverReferencias() {
 				DROM[ref.direccion] = (uint8_t)offset;
 				break;
 			}
+			case REF_SHORT: {
+				direccion >>= ref.shift;
+				DROM[ref.direccion] = direccion & 0xFF;
+				break;
+			}
 			case REF_ABSOLUTE: {
+				direccion >>= ref.shift;
 				DROM[ref.direccion] = direccion & 0xFF;
 				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
 				break;
 			}
 			case REF_LONG: {
+				direccion >>= ref.shift;
 				DROM[ref.direccion] = direccion & 0xFF;
 				DROM[ref.direccion + 1] = (direccion >> 8) & 0xFF;
 				DROM[ref.direccion + 2] = (direccion >> 16) & 0xFF;

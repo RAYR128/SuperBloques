@@ -1,4 +1,5 @@
 import {initEmu} from "./emu.js";
+import {initGraficos} from "./graficos/editor.js";
 import {initMenu} from "./menu.js";
 import {initModo} from "./modo.js";
 import {initInstrumentos} from "./musica/instrumentos.js";
@@ -30,6 +31,7 @@ try {
 	initInstrumentos();
 	initPiano();
 	initModo();
+	initGraficos();
 	initMenu();
 	initEmu();
 	void pintarHeaderUser();

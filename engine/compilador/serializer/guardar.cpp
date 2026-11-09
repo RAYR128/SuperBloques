@@ -152,5 +152,7 @@ std::string ExportarProyectoAString() {
 	Raiz["Objetos"] = Objetos;
 	Raiz["Sonidos"] = Sonidos;
 	Raiz["Musica"] = Musica;
+	Raiz["GraficosObjetos"] = CodificarBase64(GraficosObjetos, sizeof(GraficosObjetos));
+	Raiz["PaletaObjetos"] = CodificarBase64(PaletaObjetos, sizeof(PaletaObjetos));
 	return Raiz.dump(1, '\t');
 }

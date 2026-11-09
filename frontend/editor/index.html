@@ -73,6 +73,20 @@
 			<button type="button" class="cat sensor" data-cat="sensor">Sensor</button>
 		</div>
 	</aside>
+	<aside class="panel palette-panel" id="palette-panel" hidden>
+		<div class="panel-title">Paleta</div>
+		<div class="palette-body">
+			<label>Paleta
+				<select id="gfx-paleta"></select>
+			</label>
+			<div id="gfx-colores" class="palette-colors"></div>
+			<div class="palette-rgb">
+				<label>R <input id="gfx-r" type="number" min="0" max="31" step="1" /></label>
+				<label>G <input id="gfx-g" type="number" min="0" max="31" step="1" /></label>
+				<label>B <input id="gfx-b" type="number" min="0" max="31" step="1" /></label>
+			</div>
+		</div>
+	</aside>
 	<aside class="panel instruments-panel" id="instruments-panel" hidden>
 		<div class="panel-title">
 			<span>Instrumentos</span>
@@ -109,6 +123,31 @@
 		<div class="workspace-body">
 			<div id="blocklyDiv"></div>
 			<div id="sound-detail" class="sound-detail" hidden></div>
+			<div id="gfx-editor" class="gfx-editor" hidden>
+				<div class="gfx-toolbar">
+					<label>Zoom
+						<select id="gfx-zoom">
+							<option value="1">1×</option>
+							<option value="2">2×</option>
+							<option value="4" selected>4×</option>
+							<option value="8">8×</option>
+						</select>
+					</label>
+					<label>Grilla
+						<select id="gfx-grilla">
+							<option value="8" selected>8×8</option>
+							<option value="16">16×16</option>
+							<option value="32">32×32</option>
+						</select>
+					</label>
+				</div>
+				<div id="gfx-scroll" class="gfx-scroll">
+					<div id="gfx-stage" class="gfx-stage">
+						<canvas id="gfx-canvas"></canvas>
+						<canvas id="gfx-grid" class="gfx-grid"></canvas>
+					</div>
+				</div>
+			</div>
 			<div id="piano-roll" class="piano" hidden>
 				<div class="piano-toolbar">
 					<div id="piano-channels" class="piano-channels"></div>

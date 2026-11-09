@@ -14,12 +14,14 @@ struct EtiquetaCodigo {
 // Es compilada en dos pasos: primero se crea la referencia, y luego se resuelve cuando se conoce la direccion del label o el valor literal.
 enum TipoReferencia {
 	REF_BRANCH,	  // Referencia a un label para un salto relativo (8 o 16 bits)
+	REF_SHORT,	  // Referencia a un label para una direccion corta (8 bits)
 	REF_ABSOLUTE, // Referencia a un label para una direccion absoluta (16 bits)
 	REF_LONG	  // Referencia a un label para una direccion larga (24 bits)
 };
 
 struct ReferenciaCodigo {
 	std::string nombre;
+	uint8_t shift; // 0-15
 	uint32_t direccion;
 	TipoReferencia tipo;
 };
@@ -351,7 +353,7 @@ class Emitidor65816 {
 
 	// Crear etiquetas y referencias a labels, direcciones o valores literales. Se debe llamar antes de emitir la instruccion que requiere la referencia.
 	void Etiqueta(std::string nombre);
-	void CrearReferencia(std::string label, TipoReferencia tipo);
+	void CrearReferencia(std::string label, TipoReferencia tipo, uint8_t shift = 0);
 
 	// Setear y obtener el contador de programa (PC)
 	void SetearPC(uint32_t direccion);
@@ -371,6 +373,10 @@ class Emitidor65816 {
 	// Cargar valor directo/constante a un register
 	void CargarRegConst8(Registers reg, uint8_t valor);
 	void CargarRegConst16(Registers reg, uint16_t valor);
+	
+	// Cargar referencia de label a un register
+	void CargarRegConst8Label(Registers reg, std::string label, uint8_t shift = 0);
+	void CargarRegConst16Label(Registers reg, std::string label, uint8_t shift = 0);
 
 	// Sumar a acumulador (REG_A) El caller debe hacer CLC (LimpiarFlags(FLAG_CARRYF)) antes.
 	void SumaAcumuladorConst8(uint8_t valor);

@@ -9,7 +9,9 @@ export const BLOB_SIZES = {
 	Tilemap1: 8192,
 	Tilemap2: 2048,
 	Tilemap3: 2048,
-	Paleta: 512,
+	Paleta: 256,
+	GraficosObjetos: 16384,
+	PaletaObjetos: 256,
 };
 
 function base64DeDataUrl(dataUrl) {
@@ -18,7 +20,28 @@ function base64DeDataUrl(dataUrl) {
 }
 
 const GRAFICOS_HUD_DEFECTO = base64DeDataUrl(graficosHudDefectoUrl);
-const PALETA_DEFECTO = base64DeDataUrl(paletaDefectoUrl);
+
+function bytesDeBase64(b64) {
+	const bin = atob(b64);
+	const out = new Uint8Array(bin.length);
+	for (let i = 0; i < bin.length; i++) {
+		out[i] = bin.charCodeAt(i);
+	}
+	return out;
+}
+
+function bytesABase64(bytes) {
+	const chunk = 0x8000;
+	let binary = "";
+	for (let i = 0; i < bytes.length; i += chunk) {
+		binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+	}
+	return btoa(binary);
+}
+
+const PALETA_COMPLETA = bytesDeBase64(base64DeDataUrl(paletaDefectoUrl));
+const PALETA_DEFECTO = bytesABase64(PALETA_COMPLETA.subarray(0, BLOB_SIZES.Paleta));
+const PALETA_OBJETOS_DEFECTO = bytesABase64(PALETA_COMPLETA.subarray(BLOB_SIZES.Paleta, BLOB_SIZES.Paleta + BLOB_SIZES.PaletaObjetos));
 
 export const ESCENA_VARIABLES_MAX = 128;
 export const OBJETO_VARIABLES_MAX = 43;
@@ -102,6 +125,8 @@ export function proyectoPorDefecto() {
 		Objetos: {},
 		Sonidos: {},
 		Musica: {},
+		GraficosObjetos: zerosBase64(BLOB_SIZES.GraficosObjetos),
+		PaletaObjetos: PALETA_OBJETOS_DEFECTO,
 	};
 }
 
@@ -320,18 +345,22 @@ export function eliminarEntidad(tipo, nombre) {
 		return false;
 	}
 	delete mapaDe(tipo)[nombre];
-	if (state.seleccion && state.seleccion.tipo === tipo && state.seleccion.nombre === nombre) {
+	const sel = state.seleccion;
+	const gfxDeEscena = tipo === "escena" && sel && sel.tipo === "gfx" && sel.gfx !== "objetos" && sel.nombre === nombre;
+	if (sel && ((sel.tipo === tipo && sel.nombre === nombre) || gfxDeEscena)) {
 		state.seleccion = siguienteSeleccion(tipo, nombre);
 	}
 	notify();
 	return true;
 }
 
-export function seleccionar(tipo, nombre) {
-	if (state.seleccion && state.seleccion.tipo === tipo && state.seleccion.nombre === nombre) {
+export function seleccionar(tipo, nombre, gfx) {
+	const sel = state.seleccion;
+	const gfxNuevo = gfx || "";
+	if (sel && sel.tipo === tipo && sel.nombre === nombre && (sel.gfx || "") === gfxNuevo) {
 		return;
 	}
-	state.seleccion = {tipo, nombre};
+	state.seleccion = gfxNuevo ? {tipo, nombre, gfx: gfxNuevo} : {tipo, nombre};
 	notify();
 }
 

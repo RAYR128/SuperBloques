@@ -48,10 +48,61 @@ function itemEl(tipo, nombre) {
 	return row;
 }
 
+function gfxActivo(gfx, nombre) {
+	const sel = state.seleccion;
+	return !!(sel && sel.tipo === "gfx" && sel.gfx === gfx && sel.nombre === nombre);
+}
+
+function filaGfx(etiqueta, gfx, nombre) {
+	const row = document.createElement("button");
+	row.type = "button";
+	row.className = "tree-gfx" + (gfxActivo(gfx, nombre) ? " active" : "");
+	row.dataset.tipo = "gfx";
+	row.dataset.gfx = gfx;
+	row.textContent = etiqueta;
+	row.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (gfxActivo(gfx, nombre)) {
+			return;
+		}
+		flushWorkspace();
+		seleccionar("gfx", nombre, gfx);
+	});
+	return row;
+}
+
+function escenaAbierta(nombre) {
+	const sel = state.seleccion;
+	if (!sel) {
+		return false;
+	}
+	if (sel.tipo === "escena" && sel.nombre === nombre) {
+		return true;
+	}
+	return sel.tipo === "gfx" && sel.gfx !== "objetos" && sel.nombre === nombre;
+}
+
+function escenaEl(nombre) {
+	const wrap = document.createElement("div");
+	wrap.className = "tree-scene";
+	wrap.append(itemEl("escena", nombre));
+	if (!escenaAbierta(nombre)) {
+		return wrap;
+	}
+	const sub = document.createElement("div");
+	sub.className = "tree-sub";
+	sub.append(filaGfx("GFX Principal", "principal", nombre), filaGfx("GFX Hud", "hud", nombre));
+	wrap.append(sub);
+	return wrap;
+}
+
 function renderLista(el, tipo, mapa) {
 	el.replaceChildren();
+	if (tipo === "objeto") {
+		el.append(filaGfx("GFX Objetos", "objetos", ""));
+	}
 	for (const nombre of Object.keys(mapa)) {
-		el.append(itemEl(tipo, nombre));
+		el.append(tipo === "escena" ? escenaEl(nombre) : itemEl(tipo, nombre));
 	}
 }
 

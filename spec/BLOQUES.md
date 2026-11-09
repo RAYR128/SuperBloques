@@ -4,7 +4,7 @@ Especificacion en progreso
 
 ## Formato
 
-Un proyecto es un objeto JSON con cuatro mapas: `Escenas`, `Objetos`, `Sonidos` y `Musica`. Las keys son los nombres. Los blobs binarios van como strings base64 RFC 4648 (alfabeto `A-Za-z0-9+/`, padding `=`).
+Un proyecto es un objeto JSON con cuatro mapas: `Escenas`, `Objetos`, `Sonidos` y `Musica`, mas dos blobs de raiz: `GraficosObjetos` y `PaletaObjetos`. Las keys de los mapas son los nombres. Los blobs binarios van como strings base64 RFC 4648 (alfabeto `A-Za-z0-9+/`, padding `=`).
 
 ```json
 {
@@ -59,7 +59,9 @@ Un proyecto es un objeto JSON con cuatro mapas: `Escenas`, `Objetos`, `Sonidos` 
 				}
 			}
 		}
-	}
+	},
+	"GraficosObjetos": "<base64>",
+	"PaletaObjetos": "<base64>"
 }
 ```
 
@@ -164,4 +166,15 @@ Los buffers de cada escena se almacenan como blobs base64 de tamaño fijo. Un de
 | `Tilemap1` | `64 * 64 * 2` = 8192 |
 | `Tilemap2` | `32 * 32 * 2` = 2048 |
 | `Tilemap3` | `32 * 32 * 2` = 2048 |
-| `Paleta` | `256 * 2` = 512 |
+| `Paleta` | 256 |
+
+`Paleta` es la mitad de CGRAM que usan los fondos: 128 colores, 8 paletas de 16. Cada color ocupa 2 bytes little-endian, `0BBBBBGGGGGRRRRR`. Los graficos 2BPP del HUD usan 8 paletas de 4 colores (8 bytes cada una) tomadas de los primeros 64 bytes de esa paleta.
+
+`GraficosObjetos` y `PaletaObjetos` no pertenecen a un objeto. Si se omiten, se cargan como ceros. Un tamaño distinto se rechaza.
+
+| Campo | Bytes |
+|---|---|
+| `GraficosObjetos` | `TILE_SIZE_4BPP * 0x200` = 16384 |
+| `PaletaObjetos` | 256 |
+
+`PaletaObjetos` tiene el mismo empaque que `Paleta`: 8 paletas de 16 colores.

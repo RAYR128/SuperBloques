@@ -152,6 +152,9 @@ test("exportar descarga el JSON del proyecto", async ({page}) => {
 	expect(json.Objetos).toEqual({});
 	expect(json.Sonidos).toEqual({});
 	expect(json.Musica).toEqual({});
+	expect(Buffer.from(json.Escenas.Escena1.Paleta, "base64")).toHaveLength(256);
+	expect(Buffer.from(json.GraficosObjetos, "base64")).toHaveLength(16384);
+	expect(Buffer.from(json.PaletaObjetos, "base64")).toHaveLength(256);
 });
 
 test("importar restaura el proyecto exportado", async ({page}) => {
@@ -392,4 +395,66 @@ test("el piano roll reemplaza los bloques", async ({page}) => {
 	await expect(page.locator("#piano-roll")).toBeHidden();
 	await expect(page.locator("#blocklyDiv .blocklySvg")).toBeVisible();
 	await expect(page.locator("#workspace-title")).toHaveText("Bloques");
+});
+
+test("el editor de graficos pinta tiles y edita la paleta", async ({page}) => {
+	await abrirEditor(page);
+	await expect(page.locator('[data-gfx="principal"]')).toBeVisible();
+	await expect(page.locator('[data-gfx="hud"]')).toBeVisible();
+	await expect(page.locator('[data-gfx="objetos"]')).toHaveText("GFX Objetos");
+
+	await page.locator('[data-gfx="principal"]').click();
+	await expect(page.locator("#workspace-title")).toHaveText("GFX Principal — Escena1");
+	await expect(page.locator("#palette-panel")).toBeVisible();
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("width", "128");
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("height", "512");
+	await expect(page.locator("#gfx-paleta option")).toHaveCount(8);
+	await expect(page.locator("#gfx-colores .palette-color")).toHaveCount(16);
+	await expect(page.locator("#gfx-colores .palette-color").first()).toContainText("transparente");
+	await expect(page.locator("#blocklyDiv")).toBeHidden();
+
+	await page.locator("#gfx-colores .palette-color").nth(1).click();
+	await page.locator("#gfx-canvas").click({position: {x: 2, y: 2}});
+	const alpha = await page.locator("#gfx-canvas").evaluate((canvas) => {
+		const ctx = canvas.getContext("2d");
+		return ctx.getImageData(0, 0, 1, 1).data[3];
+	});
+	expect(alpha).toBe(255);
+
+	const antes = await page.locator("#gfx-r").inputValue();
+	const rojo = antes === "7" ? "8" : "7";
+	await page.locator("#gfx-r").fill(rojo);
+
+	await page.locator('[data-gfx="hud"]').click();
+	await expect(page.locator("#workspace-title")).toHaveText("GFX Hud — Escena1");
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("width", "128");
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("height", "128");
+	await expect(page.locator("#gfx-colores .palette-color")).toHaveCount(4);
+	await expect(page.locator("#gfx-paleta option")).toHaveCount(8);
+
+	await page.locator('[data-gfx="objetos"]').click();
+	await expect(page.locator("#workspace-title")).toHaveText("GFX Objetos");
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("width", "128");
+	await expect(page.locator("#gfx-canvas")).toHaveAttribute("height", "256");
+	await expect(page.locator("#gfx-colores .palette-color")).toHaveCount(16);
+
+	await page.locator('[data-tipo="escena"][data-nombre="Escena1"]').click();
+	await expect(page.locator("#gfx-editor")).toBeHidden();
+	await expect(page.locator("#blocklyDiv .blocklySvg")).toBeVisible();
+
+	await abrirMenu(page);
+	const descargaLista = page.waitForEvent("download");
+	await page.locator("#menu-export").click();
+	const descarga = await descargaLista;
+	const archivo = path.join(os.tmpdir(), `sb-gfx-${Date.now()}.json`);
+	await descarga.saveAs(archivo);
+	const json = JSON.parse(await fs.readFile(archivo, "utf8"));
+	const gfx = Buffer.from(json.Escenas.Escena1.GraficosPrincipales, "base64");
+	expect(gfx[0] & 0x80).toBe(0x80);
+	expect(gfx[1] & 0x80).toBe(0);
+	expect(gfx[16] & 0x80).toBe(0);
+	expect(gfx[17] & 0x80).toBe(0);
+	const paleta = Buffer.from(json.Escenas.Escena1.Paleta, "base64");
+	expect(paleta).toHaveLength(256);
+	expect(paleta[2] & 31).toBe(Number(rojo));
 });
