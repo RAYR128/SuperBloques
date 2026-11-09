@@ -214,6 +214,16 @@ void RutinaControlEscena() {
 	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 1);
 	RealizarDMA(256, (HW_WMDATA << 8) | HW_DMA_1Byte1Addr);
 
+	// Subir graficos objetos
+	cc.Etiqueta("SUBIR_GRAFICOS_OBJETOS");
+	cc.CargarRegConst16(REG_A, ADD_VRAM_GRAFICOS_SPRITES);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_VMADD);
+	cc.CargarRegConst16Label(REG_A, "DATO_GraficosObjetos");
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR);
+	cc.CargarRegConst16Label(REG_A, "DATO_GraficosObjetos", 8);
+	cc.AlmacenarRegEnMemoria(REG_A, HW_DMAADDR + 1);
+	RealizarDMA(16384);
+
 	// Ahora llamamos a la rutina de init de la escena actual.
 	cc.CargarRegEnMemoria(REG_A, WRAM_ESCENA_ACTUAL);
 	cc.ANDAcumuladorConst16(0x00FF);
