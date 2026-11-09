@@ -104,6 +104,13 @@ Variables de entorno:
 
 El primer usuario que se registra es administrador si no hubo bootstrap por env.
 
+## Docker
+`docker compose up --build` compila el compilador y el emulador a WebAssembly, arma el dist del editor y levanta el backend en el puerto 80.
+
+La base bbolt queda en el volumen `superbloques-data` y se conserva entre `up` y `down`. `docker compose down -v` la borra.
+
+Para crear la cuenta admin al arrancar, agrega al servicio `backend` las variables `SUPERBLOQUES_ADMIN_USER` y `SUPERBLOQUES_ADMIN_PASSWORD`. Tienen que ir las dos. Detras de un proxy TLS, se tiene que agregar `TRUST_HTTPS=1`.
+
 # Estado actual
 ## Compilador
 El compilador produce una ROM ejecutable en emuladores. Los objetos no tienen sistema de renderizacion aun. Se puede compilar a WebAssembly y utilizar en el editor.

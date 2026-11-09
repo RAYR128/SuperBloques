@@ -1,0 +1,17 @@
+.git
+.github
+build
+build-*
+**/node_modules
+frontend/editor/dist
+frontend/editor/public/compilador
+frontend/editor/public/emu
+frontend/e2e
+data
+**/*.db
+**/*.sfc
+**/*.o
+**/*.exe
+**/*.sym
+**/*.log
+superbloques_cli

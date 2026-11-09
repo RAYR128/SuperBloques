@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      ADDR: ":80"
+      DB_PATH: /data/superbloques.db
+      EDITOR_DIR: /app/editor
+      SITIO_DIR: /app/sitio
+    volumes:
+      - superbloques-data:/data
+    restart: unless-stopped
+
+volumes:
+  superbloques-data:
