@@ -851,15 +851,47 @@ body.col-resizing .injectionDiv {
 	min-height: 0;
 	display: flex;
 	flex-direction: column;
+	user-select: none;
 }
 
 .gfx-toolbar {
 	display: flex;
 	align-items: flex-end;
+	flex-wrap: wrap;
 	gap: 12px;
 	padding: 6px 8px;
 	border-bottom: 1px solid var(--border);
 	flex-shrink: 0;
+}
+
+.gfx-tools {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.gfx-tool,
+#gfx-undo,
+#gfx-redo {
+	border: 1px solid var(--border);
+	background: var(--panel-2);
+	color: var(--text);
+	font: inherit;
+	font-size: 12px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.gfx-tool.active {
+	background: #243056;
+	border-color: var(--accent);
+}
+
+#gfx-undo:disabled,
+#gfx-redo:disabled {
+	opacity: 0.45;
+	cursor: default;
 }
 
 .gfx-scroll {
@@ -885,6 +917,7 @@ body.col-resizing .injectionDiv {
 	display: block;
 	image-rendering: pixelated;
 	touch-action: none;
+	cursor: crosshair;
 }
 
 .gfx-grid {
@@ -892,6 +925,26 @@ body.col-resizing .injectionDiv {
 	inset: 0;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
+}
+
+#gfx-preview {
+	position: absolute;
+	left: 0;
+	top: 0;
+	pointer-events: none;
+	image-rendering: pixelated;
+	z-index: 1;
+}
+
+#gfx-cursor {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 2;
+	box-sizing: border-box;
+	border: 1px solid rgba(255, 255, 255, 0.95);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85);
 	pointer-events: none;
 }
 

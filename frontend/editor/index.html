@@ -125,12 +125,24 @@
 			<div id="sound-detail" class="sound-detail" hidden></div>
 			<div id="gfx-editor" class="gfx-editor" hidden>
 				<div class="gfx-toolbar">
+					<div id="gfx-tools" class="gfx-tools">
+						<button type="button" class="gfx-tool active" data-herramienta="lapiz">Lapiz</button>
+						<button type="button" class="gfx-tool" data-herramienta="linea">Linea</button>
+						<button type="button" class="gfx-tool" data-herramienta="rect">Rectangulo</button>
+						<button type="button" class="gfx-tool" data-herramienta="rect-lleno">Rectangulo relleno</button>
+						<button type="button" class="gfx-tool" data-herramienta="circulo">Circulo</button>
+						<button type="button" class="gfx-tool" data-herramienta="circulo-lleno">Circulo relleno</button>
+						<button type="button" class="gfx-tool" data-herramienta="tomar">Tomar color</button>
+					</div>
+					<button type="button" id="gfx-undo" title="Ctrl+Z" disabled>Deshacer</button>
+					<button type="button" id="gfx-redo" title="Ctrl+Y" disabled>Rehacer</button>
 					<label>Zoom
 						<select id="gfx-zoom">
 							<option value="1">1×</option>
 							<option value="2">2×</option>
 							<option value="4" selected>4×</option>
 							<option value="8">8×</option>
+							<option value="16">16×</option>
 						</select>
 					</label>
 					<label>Grilla
@@ -145,6 +157,8 @@
 					<div id="gfx-stage" class="gfx-stage">
 						<canvas id="gfx-canvas"></canvas>
 						<canvas id="gfx-grid" class="gfx-grid"></canvas>
+						<canvas id="gfx-preview"></canvas>
+						<div id="gfx-cursor" hidden></div>
 					</div>
 				</div>
 			</div>

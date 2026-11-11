@@ -458,3 +458,143 @@ test("el editor de graficos pinta tiles y edita la paleta", async ({page}) => {
 	expect(paleta).toHaveLength(256);
 	expect(paleta[2] & 31).toBe(Number(rojo));
 });
+
+function cssDePixel(px, py, zoom = 4) {
+	const medio = Math.floor(zoom / 2);
+	return {x: px * zoom + medio, y: py * zoom + medio};
+}
+
+async function pixelCanvas(page, x, y) {
+	return page.locator("#gfx-canvas").evaluate((canvas, pos) => {
+		const data = canvas.getContext("2d").getImageData(pos.x, pos.y, 1, 1).data;
+		return [data[0], data[1], data[2], data[3]];
+	}, {x, y});
+}
+
+async function pulsarPixel(page, x, y) {
+	const pos = cssDePixel(x, y);
+	await page.locator("#gfx-canvas").click({position: pos});
+}
+
+async function arrastrarPixel(page, x0, y0, x1, y1) {
+	const canvas = page.locator("#gfx-canvas");
+	const caja = await canvas.boundingBox();
+	const a = cssDePixel(x0, y0);
+	const b = cssDePixel(x1, y1);
+	await page.mouse.move(caja.x + a.x, caja.y + a.y);
+	await page.mouse.down();
+	await page.mouse.move(caja.x + b.x, caja.y + b.y);
+	await page.mouse.up();
+}
+
+test("el editor de graficos deshace, traza formas y marca el pixel", async ({page}) => {
+	await abrirEditor(page);
+	await page.locator('[data-gfx="principal"]').click();
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+	await expect(page.locator("#gfx-redo")).toBeDisabled();
+	await expect(page.locator('#gfx-tools [data-herramienta="lapiz"]')).toHaveClass(/active/);
+
+	await page.locator("#gfx-colores .palette-color").nth(1).click();
+	await pulsarPixel(page, 0, 0);
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(255);
+	await expect(page.locator("#gfx-undo")).toBeEnabled();
+
+	await page.locator("#gfx-undo").click();
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(0);
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+	await expect(page.locator("#gfx-redo")).toBeEnabled();
+
+	await page.locator("#gfx-redo").click();
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(255);
+
+	await page.keyboard.press("Control+Z");
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(0);
+	await page.keyboard.press("Control+Y");
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(255);
+
+	await page.locator('[data-gfx="hud"]').click();
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+	await expect(page.locator("#gfx-redo")).toBeDisabled();
+	await page.locator('[data-gfx="principal"]').click();
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(255);
+
+	await page.locator("#gfx-colores .palette-color").nth(2).click();
+	await pulsarPixel(page, 1, 0);
+	const color1 = await pixelCanvas(page, 0, 0);
+	const color2 = await pixelCanvas(page, 1, 0);
+	expect(color2[3]).toBe(255);
+	expect(color2.slice(0, 3).join()).not.toBe(color1.slice(0, 3).join());
+	await page.locator("#gfx-undo").click();
+	expect((await pixelCanvas(page, 1, 0))[3]).toBe(0);
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+
+	await page.locator('[data-herramienta="tomar"]').click();
+	await pulsarPixel(page, 0, 0);
+	await expect(page.locator("#gfx-undo")).toBeDisabled();
+	await expect(page.locator("#gfx-colores .palette-color.active")).toContainText("Color 1");
+	await page.locator('[data-herramienta="lapiz"]').click();
+	await pulsarPixel(page, 2, 0);
+	expect(await pixelCanvas(page, 2, 0)).toEqual(color1);
+
+	await page.locator('[data-herramienta="rect"]').click();
+	await arrastrarPixel(page, 6, 2, 8, 4);
+	for (const [x, y] of [[6, 2], [8, 2], [6, 4], [8, 4], [7, 2], [6, 3]]) {
+		expect((await pixelCanvas(page, x, y))[3], `borde ${x},${y}`).toBe(255);
+	}
+	expect((await pixelCanvas(page, 7, 3))[3]).toBe(0);
+
+	await page.locator('[data-herramienta="rect-lleno"]').click();
+	await arrastrarPixel(page, 0, 2, 2, 3);
+	for (let y = 2; y <= 3; y++) {
+		for (let x = 0; x <= 2; x++) {
+			expect((await pixelCanvas(page, x, y))[3], `relleno ${x},${y}`).toBe(255);
+		}
+	}
+	expect((await pixelCanvas(page, 3, 2))[3]).toBe(0);
+	await page.locator("#gfx-undo").click();
+	expect((await pixelCanvas(page, 0, 2))[3]).toBe(0);
+	expect((await pixelCanvas(page, 2, 3))[3]).toBe(0);
+	expect((await pixelCanvas(page, 7, 2))[3]).toBe(255);
+	expect((await pixelCanvas(page, 0, 0))[3]).toBe(255);
+
+	await page.locator('[data-herramienta="linea"]').click();
+	await arrastrarPixel(page, 0, 6, 4, 6);
+	for (let x = 0; x <= 4; x++) {
+		expect((await pixelCanvas(page, x, 6))[3], `linea ${x}`).toBe(255);
+	}
+	expect((await pixelCanvas(page, 5, 6))[3]).toBe(0);
+
+	await page.locator('[data-herramienta="circulo"]').click();
+	await arrastrarPixel(page, 10, 10, 12, 10);
+	for (const [x, y] of [[12, 10], [8, 10], [10, 12], [10, 8]]) {
+		expect((await pixelCanvas(page, x, y))[3], `circulo ${x},${y}`).toBe(255);
+	}
+	expect((await pixelCanvas(page, 10, 10))[3]).toBe(0);
+
+	await page.locator('[data-herramienta="circulo-lleno"]').click();
+	await arrastrarPixel(page, 18, 10, 20, 10);
+	for (const [x, y] of [[20, 10], [16, 10], [18, 12], [18, 8], [18, 10]]) {
+		expect((await pixelCanvas(page, x, y))[3], `disco ${x},${y}`).toBe(255);
+	}
+
+	await expect(page.locator('#gfx-zoom option[value="16"]')).toHaveText("16×");
+	await page.locator("#gfx-zoom").selectOption("8");
+	let caja = await page.locator("#gfx-canvas").boundingBox();
+	await page.mouse.move(caja.x + 4, caja.y + 4);
+	const cursor = page.locator("#gfx-cursor");
+	await expect(cursor).toBeVisible();
+	await expect(cursor).toHaveCSS("width", "8px");
+	await page.mouse.move(caja.x + 9, caja.y + 17);
+	const transform = await cursor.evaluate((el) => el.style.transform);
+	expect(transform).toBe("translate(8px, 16px)");
+
+	await page.locator("#gfx-zoom").selectOption("4");
+	await expect(cursor).toBeHidden();
+
+	await page.locator("#gfx-zoom").selectOption("16");
+	caja = await page.locator("#gfx-canvas").boundingBox();
+	await page.mouse.move(caja.x + 2, caja.y + 2);
+	await expect(cursor).toBeVisible();
+	await expect(cursor).toHaveCSS("width", "16px");
+});
